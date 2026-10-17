@@ -1,0 +1,27 @@
+{
+  "name": "unmissable",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Last night's NBA games, ranked without spoilers.",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "fetch": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts",
+    "fetch:fixture": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts --fixture"
+  },
+  "dependencies": {
+    "@fontsource/barlow-condensed": "^5.2.0",
+    "@fontsource/big-shoulders-display": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.0"
+  }
+}

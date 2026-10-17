@@ -1,0 +1,233 @@
+/* Self-hosted fonts (the site makes no request to Google Fonts) */
+@import "@fontsource/big-shoulders-display/700";
+@import "@fontsource/big-shoulders-display/900";
+@import "@fontsource/barlow-condensed/500";
+@import "@fontsource/barlow-condensed/600";
+
+:root {
+  --bg: #f3f1ec;
+  --ink: #141414;
+  --muted: #5c5a55;
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-text: "Barlow Condensed", "Arial Narrow", sans-serif;
+
+  --gap: 12px;
+  --radius: 6px;
+  --stripe: 7px;   /* secondary color stripe */
+  --diag: 28px;    /* horizontal offset of the diagonal cut */
+
+  /* Standard card */
+  --card-h: 104px;
+  --note-w: 72px;
+  --note-h: 78px;
+  --note-size: 40px;
+  --name-size: 22cqi;
+  --name-max: 30px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Page ---------- */
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 16px 40px;
+}
+
+.page__header {
+  padding: 0 4px 16px;
+}
+
+.page__brand {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page__night {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.page__title {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 10vw, 56px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.page__status {
+  margin: 0 4px 16px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.page__status[hidden] {
+  display: none;
+}
+
+.page__footer {
+  margin: 24px 4px 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* ---------- List ---------- */
+
+.games {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* ---------- Card ---------- */
+
+.card {
+  position: relative;
+  display: flex;
+  height: var(--card-h);
+}
+
+/* Best game of the night: featured, taller card */
+.card--featured {
+  --card-h: 150px;
+  --note-w: 96px;
+  --note-h: 108px;
+  --note-size: 56px;
+  --name-size: 26cqi;
+  --name-max: 38px;
+}
+
+.card__side {
+  /* The two halves overlap by --diag to form the diagonal */
+  flex: 1 1 50%;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--primary);
+  /* White text everywhere: all 30 primary colors pass contrast for the team names */
+  color: #fff;
+}
+
+.card__side--away {
+  align-items: flex-start;
+  border-radius: var(--radius) 0 0 var(--radius);
+  box-shadow: inset var(--stripe) 0 0 var(--secondary);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--diag)) 100%, 0 100%);
+  padding-inline: calc(var(--stripe) + 12px) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
+}
+
+.card__side--home {
+  margin-left: calc(-1 * var(--diag));
+  align-items: flex-end;
+  text-align: right;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  box-shadow: inset calc(-1 * var(--stripe)) 0 0 var(--secondary);
+  clip-path: polygon(var(--diag) 0, 100% 0, 100% 100%, 0 100%);
+  padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc(var(--stripe) + 12px);
+}
+
+/* Watermark abbreviation on the inner side (stands in for a logo) */
+.card__abbr {
+  position: absolute;
+  bottom: -0.24em;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: calc(var(--card-h) * 0.95);
+  line-height: 1;
+  opacity: 0.12;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card__side--away .card__abbr {
+  right: calc(var(--diag) / 2 + 4px);
+}
+
+.card__side--home .card__abbr {
+  left: calc(var(--diag) / 2 + 4px);
+}
+
+.card__location {
+  position: relative;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.card__name {
+  position: relative;
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: min(var(--name-max), var(--name-size));
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-wrap: balance;
+  hyphens: manual; /* only breaks at soft hyphens (Timber-wolves) */
+}
+
+/* The rating: an upright, vertical block in the middle of the card */
+.card__note {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--note-w);
+  height: var(--note-h);
+  translate: -50% -50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  border: 3px solid var(--bg);
+  border-radius: 4px;
+}
+
+.card__note-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--note-size);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--bg);
+}
+
+@media (min-width: 560px) {
+  :root {
+    --gap: 14px;
+    --card-h: 112px;
+  }
+}
