@@ -1,21 +1,5 @@
 {
   "version": 1,
-  "date": "2026-04-04",
-  "games": [
-    {
-      "away": "SAS",
-      "home": "DEN",
-      "note": 100
-    },
-    {
-      "away": "WAS",
-      "home": "MIA",
-      "note": 24
-    },
-    {
-      "away": "DET",
-      "home": "PHI",
-      "note": 4
-    }
-  ]
+  "date": "2026-10-16",
+  "games": []
 }
