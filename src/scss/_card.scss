@@ -16,6 +16,7 @@
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
+  --stripe: #{$stripe}; // secondary color stripe on the card edges
   --location-size: 19px;
   --name-font: 56px;
 
@@ -44,6 +45,7 @@
   @media (max-width: $breakpoint-tablet) {
     --card-h: 140px;
     --side-padding: 32px;
+    --stripe: #{$stripe-tablet};
     --location-size: 13px;
     --name-font: 35px;
     --note-w: 80px;
@@ -82,10 +84,10 @@
 
   .card__side--away {
     align-items: flex-start;
-    box-shadow: inset $stripe 0 0 var(--secondary);
+    box-shadow: inset var(--stripe) 0 0 var(--secondary);
     // No clip-path here: the home half covers it. Two cuts meeting on the same line leave a
     // hairline gap (anti-aliasing), more visible on tall cards.
-    padding-inline: calc($stripe + var(--side-padding)) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
+    padding-inline: calc(var(--stripe) + var(--side-padding)) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
 
     .card__abbr {
       right: calc(var(--diag) / 2 + 4px);
@@ -96,9 +98,9 @@
     margin-left: calc(-1 * var(--diag));
     align-items: flex-end;
     text-align: right;
-    box-shadow: inset (-$stripe) 0 0 var(--secondary);
+    box-shadow: inset calc(-1 * var(--stripe)) 0 0 var(--secondary);
     clip-path: polygon(var(--diag) 0, 100% 0, 100% 100%, 0 100%);
-    padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc($stripe + var(--side-padding));
+    padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc(var(--stripe) + var(--side-padding));
 
     .card__abbr {
       left: calc(var(--diag) / 2 + 4px);
