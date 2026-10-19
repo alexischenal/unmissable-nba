@@ -1,25 +1,27 @@
 // scripts/fetch-night.ts
-// The server script, to run every morning (around 8 a.m. Paris time):
-//   1. fetches last night's games from nba.com;
-//   2. computes the ratings;
+// The server script, run every 15 minutes by GitHub Actions:
+//   1. decides whether there is a night to publish (scripts/nba/plan.ts) — most runs stop here;
+//   2. fetches the night's games from nba.com and computes the ratings;
 //   3. writes public/data/YYYY-MM-DD.json and public/data/latest.json, WITHOUT any score.
 //
 // Usage:
-//   npm run fetch                      → last night (US date)
+//   npm run fetch                      → whatever the current time calls for
 //   npm run fetch -- --date=2026-10-20 → a specific date
 //   npm run fetch:fixture              → the real games of April 4, 2026, no network
 
 import { existsSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
+import { planRun } from './nba/plan.ts';
 import {
   competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
+import type { RawSchedule } from './nba/types.ts';
 import type { NightJson } from '../src/types/public.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,19 +29,8 @@ const OUT_DIR = path.join(ROOT, 'public', 'data');
 
 class NotFinishedError extends Error {}
 
-// The day before, in New York time: at 8 a.m. in Paris, it's 2 a.m. on the East Coast.
-function lastNightInNewYork(): string {
-  const todayNY = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit',
-  }).format(new Date());
-  const d = new Date(`${todayNY}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().slice(0, 10);
-}
-
-async function gamesFromNba(date: string): Promise<Game[]> {
-  console.log('NBA schedule…');
-  const scheduled = gamesOnDate(await fetchSchedule(), date);
+async function gamesFromNba(schedule: RawSchedule, date: string): Promise<Game[]> {
+  const scheduled = gamesOnDate(schedule, date);
   console.log(`${scheduled.length} game(s) on ${date}`);
 
   // A game that hasn't started is only treated as postponed once the night is surely over
@@ -117,24 +108,50 @@ async function main(): Promise<void> {
   const dateArg = args.find((a) => a.startsWith('--date='))?.slice('--date='.length);
   if (dateArg && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) throw new Error(`Invalid date: ${dateArg}`);
 
-  const date = useFixture ? '2026-04-04' : (dateArg ?? lastNightInNewYork());
+  const published = (date: string) => existsSync(path.join(OUT_DIR, `${date}.json`));
 
-  // Scheduled runs: if last night is already published, there's nothing to do.
-  // (A night is only ever written once all its games are over.) An explicit --date always runs.
-  if (!useFixture && !dateArg && existsSync(path.join(OUT_DIR, `${date}.json`))) {
-    console.log(`Night of ${date} already published, nothing to do.`);
-    return;
+  let date: string;
+  let games: Game[];
+  if (useFixture) {
+    date = '2026-04-04';
+    games = await gamesFromFixtures();
+  } else {
+    console.log('NBA schedule…');
+    const schedule = await fetchSchedule();
+    if (dateArg) {
+      date = dateArg; // an explicit date always runs
+    } else {
+      const plan = planRun(
+        new Date(),
+        (d) => gamesOnDate(schedule, d).map((g) => ({ tipOff: g.gameDateTimeUTC })),
+        published,
+      );
+      if (plan.action !== 'process') {
+        console.log(`Nothing to do: ${plan.reason}.`);
+        return;
+      }
+      date = plan.date;
+    }
+    games = await gamesFromNba(schedule, date);
   }
-
-  const games = useFixture ? await gamesFromFixtures() : await gamesFromNba(date);
 
   logDetails(games);
 
   const json = JSON.stringify(buildPublicJson(date, games), null, 2) + '\n';
   await mkdir(OUT_DIR, { recursive: true });
   await writeFile(path.join(OUT_DIR, `${date}.json`), json);
-  await writeFile(path.join(OUT_DIR, 'latest.json'), json);
-  console.log(`\nWritten: public/data/${date}.json and public/data/latest.json`);
+  console.log(`\nWritten: public/data/${date}.json`);
+
+  // latest.json only ever moves forward: catching up on an older night (or a manual --date)
+  // must not replace a more recent one.
+  const latestPath = path.join(OUT_DIR, 'latest.json');
+  const latestDate = existsSync(latestPath)
+    ? ((JSON.parse(await readFile(latestPath, 'utf8')) as Partial<NightJson>).date ?? '')
+    : '';
+  if (useFixture || date >= latestDate) {
+    await writeFile(latestPath, json);
+    console.log('Written: public/data/latest.json');
+  }
 }
 
 main().catch((error: unknown) => {

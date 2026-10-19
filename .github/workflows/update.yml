@@ -1,0 +1,114 @@
+# Wakes up every 15 minutes: publishes a night as soon as its last game is over,
+# then rebuilds and redeploys the site. Also redeploys on every push to main.
+#
+# Most runs have nothing to do (no game under way, night already published): the script
+# says so in a few seconds and nothing is built or deployed. See scripts/nba/plan.ts.
+
+name: Update and deploy
+
+on:
+  schedule:
+    # Cron times are UTC. GitHub may start scheduled runs a few minutes late.
+    - cron: "*/15 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "US date to fetch (YYYY-MM-DD). Empty = whatever the current time calls for."
+        required: false
+
+permissions:
+  contents: write # commit the new JSON
+  pages: write    # deploy to GitHub Pages
+  id-token: write # required by deploy-pages
+
+jobs:
+  update:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    # One data run at a time, so two runs never publish the same night.
+    concurrency:
+      group: data
+      cancel-in-progress: false
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The script only uses Node's built-ins: no npm install needed, so idle runs stay short.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch the night's games
+        env:
+          DATE: ${{ github.event.inputs.date }}
+        run: |
+          set +e
+          if [ -n "$DATE" ]; then ARGS="--date=$DATE"; else ARGS=""; fi
+          node --experimental-strip-types --no-warnings scripts/fetch-night.ts $ARGS
+          code=$?
+          if [ $code -eq 2 ]; then
+            echo "::notice::Some games aren't over yet. Keeping the previous data; the next run will retry."
+            exit 0
+          fi
+          exit $code
+
+      - name: Commit new data
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          if git diff --cached --quiet; then
+            echo "No new data."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "data: night of $(jq -r .date public/data/latest.json)"
+            # Someone may have pushed to main during the run: replay our commit on top of it.
+            git pull --rebase
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: update
+    # On a push, "update" is skipped: deploy anyway. Manual runs always deploy.
+    # Scheduled runs only deploy when there is new data.
+    if: >-
+      always() && (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.update.outputs.changed == 'true'
+      ) && needs.update.result != 'failure'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # The branch tip, so the data just committed by "update" is included.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
