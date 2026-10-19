@@ -5,10 +5,11 @@ name: Daily update and deploy
 
 on:
   schedule:
-    # Cron times are UTC. 06:15 UTC = 07:15 in Paris in winter (08:15 in summer).
-    - cron: "15 6 * * *"
-    # Second run, in case a late game (West Coast, overtime) wasn't over at the first one.
-    - cron: "15 9 * * *"
+    # Cron times are UTC. Every 30 minutes from 05:00 to 09:30 UTC
+    # = 06:00 to 10:30 in Paris in winter (07:00 to 11:30 in summer).
+    # The night is published by the first run after its last game ends;
+    # later runs see it's already there and stop right away.
+    - cron: "*/30 5-9 * * *"
   push:
     branches: [main]
   workflow_dispatch:
@@ -68,6 +69,8 @@ jobs:
             echo "No new data."
           else
             git commit -m "data: night of $(jq -r .date public/data/latest.json)"
+            # Someone may have pushed to main during the run: replay our commit on top of it.
+            git pull --rebase
             git push
           fi
 

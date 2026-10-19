@@ -9,6 +9,7 @@
 //   npm run fetch -- --date=2026-10-20 → a specific date
 //   npm run fetch:fixture              → the real games of April 4, 2026, no network
 
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,25 +42,29 @@ async function gamesFromNba(date: string): Promise<Game[]> {
   const scheduled = gamesOnDate(await fetchSchedule(), date);
   console.log(`${scheduled.length} game(s) on ${date}`);
 
+  // A game that hasn't started is only treated as postponed once the night is surely over
+  // (from 06:00 UTC the next day). Before that, it simply hasn't been played yet.
+  const nightIsOver = Date.now() > Date.parse(`${date}T00:00:00Z`) + 30 * 60 * 60 * 1000;
+
   const games: Game[] = [];
   for (const entry of scheduled) {
     const label = `${entry.awayTeam.teamTricode}@${entry.homeTeam.teamTricode}`;
     console.log(`Box score ${label} (${entry.gameId})…`);
 
-    // A game that never started (postponed) must not block the whole night.
-    // If it is only late, the next scheduled run will pick it up.
     let box;
     try {
       box = await fetchBoxscore(entry.gameId);
     } catch (error) {
       if (entry.gameStatus === 1) {
-        console.warn(`${label}: no box score and not started (postponed?), skipped.`);
+        if (!nightIsOver) throw new NotFinishedError(`${label} hasn't started yet: nothing published.`);
+        console.warn(`${label}: no box score and never started (postponed?), skipped.`);
         continue;
       }
       throw error;
     }
     if (box.game.gameStatus === 1 && entry.gameStatus === 1) {
-      console.warn(`${label}: not started (postponed?), skipped.`);
+      if (!nightIsOver) throw new NotFinishedError(`${label} hasn't started yet: nothing published.`);
+      console.warn(`${label}: never started (postponed?), skipped.`);
       continue;
     }
 
@@ -113,6 +118,14 @@ async function main(): Promise<void> {
   if (dateArg && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) throw new Error(`Invalid date: ${dateArg}`);
 
   const date = useFixture ? '2026-04-04' : (dateArg ?? lastNightInNewYork());
+
+  // Scheduled runs: if last night is already published, there's nothing to do.
+  // (A night is only ever written once all its games are over.) An explicit --date always runs.
+  if (!useFixture && !dateArg && existsSync(path.join(OUT_DIR, `${date}.json`))) {
+    console.log(`Night of ${date} already published, nothing to do.`);
+    return;
+  }
+
   const games = useFixture ? await gamesFromFixtures() : await gamesFromNba(date);
 
   logDetails(games);
