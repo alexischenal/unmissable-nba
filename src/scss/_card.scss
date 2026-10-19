@@ -16,7 +16,6 @@
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
-  --stripe: #{$stripe}; // secondary color stripe on the card edges
   --location-size: 19px;
   --name-font: 56px;
 
@@ -45,7 +44,6 @@
   @media (max-width: $breakpoint-tablet) {
     --card-h: 140px;
     --side-padding: 32px;
-    --stripe: #{$stripe-tablet};
     --location-size: 13px;
     --name-font: 35px;
     --note-w: 80px;
