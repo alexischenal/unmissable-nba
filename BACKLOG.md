@@ -32,8 +32,9 @@
    screen, plus a peek at the next one. Two pages, never more.
    - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
    - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain.
-     The label is always the home page night, so the link says where it leads. The site name also leads home,
-     and the burger menu has the link too.
+     The label is always the home page night, so the link says where it leads.
+   - **The logo (`UNMISSABLE` in the header) links to the home page**, on the Next page and everywhere else.
+     The burger menu has the link too.
    - **"Next" = the next calendar night, only if it has games.** No games tomorrow: no "Next" button. No skipping
      ahead, so "Next" always means tomorrow night and needs no date.
    - **The home page night expires after 24 hours.** It stays on screen until the next night's first tip-off,
