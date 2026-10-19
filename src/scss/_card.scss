@@ -16,10 +16,43 @@
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
+  --location-size: 24px;
+  --name-font: 70px;
 
   position: relative;
   display: flex;
   height: var(--card-h);
+
+  // Desktop first: each breakpoint adjusts the sizes at that width and below (largest to smallest)
+  @media (max-width: $breakpoint-laptop) {
+    --card-h: 180px;
+    --side-padding: 72px;
+    --location-size: 20px;
+    --name-font: 60px;
+  }
+
+  @media (max-width: $breakpoint-small-laptop) {
+    --card-h: 160px;
+    --side-padding: 56px;
+    --location-size: 18px;
+    --name-font: 52px;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    --card-h: 140px;
+    --side-padding: 32px;
+    --location-size: 16px;
+    --name-font: 44px;
+  }
+
+  // Phones: half a card is ~190px wide, so the name size follows the width of its half
+  // (22cqi = 22% of the half), capped by --name-max
+  @media (max-width: $breakpoint-mobile) {
+    --card-h: 104px;
+    --side-padding: 12px;
+    --location-size: 12px;
+    --name-font: min(var(--name-max), var(--name-size));
+  }
 
   // The two halves overlap by --diag: the home half, cut on the diagonal, sits on top of the away half
   .card__side {
@@ -76,7 +109,7 @@
 
   .card__location {
     position: relative;
-    font-size: 24px;
+    font-size: var(--location-size);
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -88,7 +121,7 @@
     max-width: 100%;
     font-family: $font-display;
     font-weight: 900;
-    font-size: 70px;
+    font-size: var(--name-font);
     line-height: 0.95;
     text-transform: uppercase;
     text-wrap: balance;
@@ -133,7 +166,7 @@
 }
 
 // Best game of the night: featured, taller card.
-// Must stay after .card (and its media query), so it wins on wide screens too.
+// Must stay after .card, so it wins over .card's sizes at every width.
 .card--featured {
   --card-h: 350px;
   --note-w: 96px;
@@ -141,6 +174,23 @@
   --note-size: 56px;
   --name-size: 26cqi;
   --name-max: 38px;
+
+  // Its own breakpoints: written after .card's, they win on the featured card
+  @media (max-width: $breakpoint-laptop) {
+    --card-h: 300px;
+  }
+
+  @media (max-width: $breakpoint-small-laptop) {
+    --card-h: 260px;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    --card-h: 220px;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    --card-h: 150px;
+  }
 }
 
 // In progress: greyed out, nothing in the middle, no animation (a teaser, never a spoiler)
