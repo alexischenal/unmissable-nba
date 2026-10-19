@@ -50,7 +50,17 @@ export function App() {
         if (games.length === 0) return null;
         return (
           <section className="games" key={groupState}>
-            {heading && <h2 className="games__heading">{heading}</h2>}
+            {heading && (
+              <h2 className="games__heading">
+                {heading}
+                {/* Three dots appearing one after the other: games still going */}
+                {groupState === 'live' && (
+                  <span className="games__dots" aria-hidden="true">
+                    <span>.</span><span>.</span><span>.</span>
+                  </span>
+                )}
+              </h2>
+            )}
             <ol className="games__list" aria-label={label}>
               {games.map(({ game, index }) => (
                 <li className="games__item" key={`${game.away}@${game.home}`}>

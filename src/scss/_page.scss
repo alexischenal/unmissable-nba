@@ -57,11 +57,49 @@ body {
     }
   }
 
+  // "In progress..." — the dots appear one after the other, then start again
+  .games__dots span {
+    animation: games-dot 1.5s infinite;
+    opacity: 0;
+  }
+
+  .games__dots span:nth-child(2) {
+    animation-delay: 0.25s;
+  }
+
+  .games__dots span:nth-child(3) {
+    animation-delay: 0.5s;
+  }
+
+  // No animation for visitors who turned motion off: the three dots just stay
+  @media (prefers-reduced-motion: reduce) {
+    .games__dots span {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
   .games__list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+  }
+}
+
+@keyframes games-dot {
+  0%,
+  15% {
+    opacity: 0;
+  }
+
+  30%,
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
   }
 }
