@@ -56,9 +56,8 @@ Rules for every GIF: official GIPHY embed (no self-hosted copy), the light video
 (MP4/WebM) rather than the .gif, alt text, and a still image under `prefers-reduced-motion`.
 Pick one at random among several so returning visitors don't always see the same one.
 
-- **No games** — same treatment for **yesterday and tomorrow**: the arrow towards an empty night is disabled,
-  and anyone reaching that night anyway sees the no-games screen, with a copy adapted to the direction
-  ("No games last night." / "No games tomorrow.") and the same GIF rotation.
+- **No games** — with "Next" skipping to the next night with games, the no-games screen only shows when there's
+  no next night at all (All-Star break, off-season), or for an old link to an empty night. Same GIF rotation.
 - **No games last night** (All-Star break, off days)
   - **Nick Young celebrating a three that misses.** The user opened the site sure there'd be a game… and there isn't.
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
