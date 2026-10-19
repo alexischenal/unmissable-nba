@@ -1,0 +1,6 @@
+// Entry point of the styles, imported by src/main.tsx. Vite compiles it: nothing to run.
+// Partials start with "_" and are loaded with @use (never @import, deprecated in Sass).
+
+@use "page";
+@use "header";
+@use "card";
