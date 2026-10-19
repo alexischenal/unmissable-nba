@@ -5,11 +5,15 @@
 .header {
   padding: 0 4px 16px;
   background-color: $black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
   .header__brand {
-    margin: 0 0 10px;
     font-family: var(--font-display);
+    color: $white;
     font-weight: 900;
-    font-size: 18px;
+    font-size: 40px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
