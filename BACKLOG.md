@@ -77,7 +77,7 @@ Pick one at random among several so returning visitors don't always see the same
   - **"Oh, the vast emptiness" (*Futurama*).** The user's pick for the moments with nothing to show. A character
     watches the universe literally come to an end, says *"Oh, the vast emptiness"* and shakes his empty beer can;
     another one answers *"I can take a hint"* and hands him a full one. Perfect for "no games": nothing left to
-    watch… so grab a drink. Probably *The Late Philip J. Fry* (the end-of-the-universe episode), to confirm.
+    watch… so grab a drink. From *The Late Philip J. Fry* (the end-of-the-universe episode).
     Use the official GIPHY version of the scene.
   - Other options: Michael Scott "No, God! No, God, please, no!" (*The Office*), "This is fine" dog,
     Squidward at his window (*SpongeBob*).
