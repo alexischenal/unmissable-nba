@@ -12,6 +12,9 @@
   margin-bottom: 10px;
 
   .header__brand {
+    // It's an <h1> now: the browser gives h1s a default margin (0.67em above and below)
+    margin: 0;
+    line-height: 1;
     font-family: $font-display;
     color: $white;
     font-weight: 900;

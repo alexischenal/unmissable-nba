@@ -21,7 +21,7 @@ $gap: 0;
 $gap-tablet: 14px;
 $radius: 6px;
 $stripe: 10px; // secondary color stripe on the card edges
-$diag: 28px;  // horizontal offset of the diagonal cut
+$diag-ratio: 0.27; // diagonal cut: horizontal offset = card height × this ratio (same angle at every height)
 
 // Breakpoints
 $breakpoint-tablet: 560px;

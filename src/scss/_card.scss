@@ -11,12 +11,15 @@
   --note-size: 40px;
   --name-size: 22cqi;
   --name-max: 30px;
+  // Horizontal offset of the diagonal, proportional to the height: the angle stays the same
+  // on every card, whatever its height (featured, wide screens).
+  --diag: calc(var(--card-h) * #{$diag-ratio});
 
   position: relative;
   display: flex;
   height: var(--card-h);
 
-  // The two halves overlap by $diag to form the diagonal
+  // The two halves overlap by --diag: the home half, cut on the diagonal, sits on top of the away half
   .card__side {
     flex: 1 1 50%;
     min-width: 0;
@@ -34,24 +37,25 @@
   .card__side--away {
     align-items: flex-start;
     box-shadow: inset $stripe 0 0 var(--secondary);
-    clip-path: polygon(0 0, 100% 0, calc(100% - $diag) 100%, 0 100%);
-    padding-inline: calc($stripe + 12px) calc($diag / 2 + var(--note-w) / 2 + 6px);
+    // No clip-path here: the home half covers it. Two cuts meeting on the same line leave a
+    // hairline gap (anti-aliasing), more visible on tall cards.
+    padding-inline: calc($stripe + 12px) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
 
     .card__abbr {
-      right: calc($diag / 2 + 4px);
+      right: calc(var(--diag) / 2 + 4px);
     }
   }
 
   .card__side--home {
-    margin-left: -$diag;
+    margin-left: calc(-1 * var(--diag));
     align-items: flex-end;
     text-align: right;
     box-shadow: inset (-$stripe) 0 0 var(--secondary);
-    clip-path: polygon($diag 0, 100% 0, 100% 100%, 0 100%);
-    padding-inline: calc($diag / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
+    clip-path: polygon(var(--diag) 0, 100% 0, 100% 100%, 0 100%);
+    padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
 
     .card__abbr {
-      left: calc($diag / 2 + 4px);
+      left: calc(var(--diag) / 2 + 4px);
     }
   }
 
