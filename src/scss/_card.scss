@@ -6,7 +6,7 @@
   // Card sizes: custom properties (not Sass variables), because the featured card and wider
   // screens override them, and every element of the card reads them.
   --card-h: 200px;
-  --note-w: 72px;
+  --note-w: 80px;
   --note-h: 78px;
   --note-size: 40px;
   --name-size: 22cqi;
@@ -178,7 +178,7 @@
 // Must stay after .card, so it wins over .card's sizes at every width.
 .card--featured {
   --card-h: 350px;
-  --note-w: 96px;
+  --note-w: 112px;
   --note-h: 108px;
   --note-size: 56px;
   --name-size: 26cqi;
