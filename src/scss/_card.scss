@@ -15,6 +15,8 @@
   // on every card, whatever its height (featured, wide screens).
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
+  --side-padding: 100px;
+
   position: relative;
   display: flex;
   height: var(--card-h);
@@ -39,7 +41,7 @@
     box-shadow: inset $stripe 0 0 var(--secondary);
     // No clip-path here: the home half covers it. Two cuts meeting on the same line leave a
     // hairline gap (anti-aliasing), more visible on tall cards.
-    padding-inline: calc($stripe + 12px) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
+    padding-inline: calc($stripe + var(--side-padding)) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
 
     .card__abbr {
       right: calc(var(--diag) / 2 + 4px);
@@ -52,7 +54,7 @@
     text-align: right;
     box-shadow: inset (-$stripe) 0 0 var(--secondary);
     clip-path: polygon(var(--diag) 0, 100% 0, 100% 100%, 0 100%);
-    padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
+    padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc($stripe + var(--side-padding));
 
     .card__abbr {
       left: calc(var(--diag) / 2 + 4px);

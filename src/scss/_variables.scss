@@ -24,4 +24,11 @@ $stripe: 10px; // secondary color stripe on the card edges
 $diag-ratio: 0.27; // diagonal cut: horizontal offset = card height × this ratio (same angle at every height)
 
 // Breakpoints
-$breakpoint-tablet: 560px;
+$breakpoint-laptop: 1440px;       // laptops
+$breakpoint-small-laptop: 1280px; // petits laptops (13")
+$breakpoint-tablet: 1024px;       // tablettes
+$breakpoint-mobile: 768px;        // téléphones
+
+//@media (max-width: $breakpoint-laptop) {
+//  --side-padding: 40px;
+//}
