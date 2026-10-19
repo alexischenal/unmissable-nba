@@ -2,18 +2,10 @@
 
 ## Next up — Monday
 
-1. **Merge the `monday-prep` branch** (the October 17 files: workflow every 30 min from 05:00 UTC, early exit,
-   safer postponed-game check, README, `algorithm.txt`, this backlog, plus the `git pull --rebase` fix).
-   Done before Wednesday's first real test.
-2. **Top priority: move the front end to React** (Vite + React + TypeScript).
-   - Why: the planned features (three sections, live updates, cards changing state, menu, "Next night" page)
-     add a lot of state to manage — a framework's job. And React is what front-end job offers ask for.
-   - What changes: only `index.html` and `src/main.ts`, which become components (`<MatchCard>`, `<GameList>`…).
-   - What doesn't: the algorithm, the NBA adapter, the types, the script, the workflow, the JSON format.
-     So Wednesday's test isn't at risk.
-   - Do it on a separate branch, merge once it renders the April 4 night exactly like today
-     (`?date=2026-04-04`).
-   - Good moment for the HTML/CSS redesign too (grid, card heights in `svh` with `clamp()`).
+1. **React migration — done on the `react` branch.** Vite + React 19 + TypeScript; renders the exact same
+   pixels as before (checked on April 4, an empty night and the error state, mobile and desktop). Merge it.
+2. **Good moment for the HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the
+   markup lives in components.
 3. **Switch the main domain to `unmissable.watch`** ("an unmissable watch": a real English phrase, universal,
    any time of day). The site isn't launched yet: cheapest moment to change.
    - Redo for `.watch` what was done for `.am`: TXT verification (GitHub account → Pages), A + AAAA records

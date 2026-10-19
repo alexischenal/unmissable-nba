@@ -9,46 +9,9 @@
   <title>Unmissable — What to watch this morning</title>
   <meta name="description" content="Last night's NBA games, ranked without spoilers." />
   <meta name="theme-color" content="#F3F1EC" />
-  <link rel="stylesheet" href="/src/styles.css" />
 </head>
 <body>
-  <main class="page">
-    <header class="page__header">
-      <p class="page__brand">Unmissable</p>
-      <p class="page__night" id="night-label">&nbsp;</p>
-      <h1 class="page__title">What to watch this morning</h1>
-    </header>
-
-    <p class="page__status" id="status" role="status">Loading games…</p>
-
-    <ol class="games" id="games" aria-label="Last night's games, most recommended first"></ol>
-
-    <footer class="page__footer">
-      Not affiliated with the NBA. Ratings only measure what happened on the court.
-    </footer>
-  </main>
-
-  <!-- One game card, cloned by src/main.ts for each game -->
-  <template id="card-template">
-    <li class="games__item">
-      <article class="card">
-        <div class="card__side card__side--away">
-          <span class="card__abbr" aria-hidden="true"></span>
-          <span class="card__location"></span>
-          <span class="card__name"></span>
-        </div>
-        <div class="card__side card__side--home">
-          <span class="card__abbr" aria-hidden="true"></span>
-          <span class="card__location"></span>
-          <span class="card__name"></span>
-        </div>
-        <div class="card__note" aria-hidden="true">
-          <span class="card__note-value"></span>
-        </div>
-      </article>
-    </li>
-  </template>
-
-  <script type="module" src="/src/main.ts"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

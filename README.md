@@ -36,16 +36,20 @@ NBA API (cdn.nba.com)  ←  scripts/fetch-night.ts   (server side, once a day ar
                                  ↓  computes the ratings
                          public/data/YYYY-MM-DD.json   (teams + rating, NO score)
                                  ↓
-                         index.html + src/main.ts   (reads the JSON, renders the cards)
+                         React app (src/)   (reads the JSON, renders the cards)
 ```
 
 Zero spoilers is guaranteed by the architecture: the score is never published, not even in the JSON.
 If one of last night's games isn't over, the script publishes nothing (exit code 2).
 
 ```
-index.html               page + card template (<template>)
+index.html               page shell (React mounts in #root)
+src/main.tsx             entry point
+src/App.tsx              the page: header, list of games, footer
+src/components/          MatchCard (one game)
+src/hooks/useNight.ts    loads the night: loading / ready / error
+src/lib/night.ts         fetching the JSON, "Night of…" label (no React)
 src/styles.css           all the styles
-src/main.ts              loads the JSON and renders the cards
 src/config/teams.ts      the 30 teams: location, name, colors
 src/config/scoring.ts    EVERY setting of the algorithm
 src/lib/scoring.ts       the algorithm (pure functions)
