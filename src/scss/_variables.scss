@@ -23,5 +23,10 @@ $radius: 6px;
 $stripe: 10px; // secondary color stripe on the card edges
 $diag-ratio: 0.27; // diagonal cut: horizontal offset = card height × this ratio (same angle at every height)
 
-// Breakpoints
-$breakpoint-tablet: 560px;
+// Breakpoints — mobile first: the styles without a media query are the mobile ones,
+// then each breakpoint adds what changes from that width up:
+//   @media (min-width: $breakpoint-tablet) { … }
+$breakpoint-mobile: 480px;        // large phones
+$breakpoint-tablet: 768px;        // tablets, phones in landscape
+$breakpoint-small-laptop: 1024px; // small laptops, tablets in landscape
+$breakpoint-laptop: 1440px;       // laptops and desktop screens
