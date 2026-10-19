@@ -124,8 +124,16 @@ Pick one at random among several so returning visitors don't always see the same
     Say "check", not "update": a check only updates the site if a game has finished since the last one.
     The schedule then lives in three places (front, workflow, cron-job.org): keep the front's copy in one
     shared constant, and update all three together.
-  - **How the rating works** (the text in `how-it-works.txt`).
-  - **About**: not affiliated with the NBA, no cookies, link to the GitHub repo.
+  - **How the rating works** — a page of its own, from `how-it-works.txt`. Its name, to pick among:
+    **The Playbook** (working title: a team's book of plays, "how we play"), **Chalk Talk** (the coach at the
+    whiteboard), **Film Room** (where players rewatch games), **Why 100?**.
+  - **Next night** (link to `/next`; on the Next page, the link back to the home page instead).
+  - **Legal notice** (mandatory in France, even for a personal site): publisher (name, or a contact with the
+    details left with the host), host (GitHub, with its address), no cookies, visit counter without personal
+    data, not affiliated with the NBA, a line on team names and the data used. To check with the official
+    wording before launch.
+- **Small footer with the same links** (rating page, Next night, Legal notice), plus the "Not affiliated with
+  the NBA" line already there. On desktop, where the burger isn't needed, it's the main way to reach them.
 
 - **Tags per game** (tap a card to reveal them). Only on-court facts, never prestige ("top clash", rivalry…).
   Rate each tag's spoiler risk; a spoiler tag needs an explicit second action.
