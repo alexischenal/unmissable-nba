@@ -54,6 +54,9 @@
     --name-size: 18cqi;
     --name-max: 24px;
     --name-font: min(var(--name-max), var(--name-size));
+    --note-w: 60px;
+    --note-h: 58px;
+    --note-size: 28px;
   }
 
   // The two halves overlap by --diag: the home half, cut on the diagonal, sits on top of the away half
@@ -201,5 +204,8 @@
     --card-h: 150px;
     --name-size: 22cqi;
     --name-max: 30px;
+    --note-w: 84px;
+    --note-h: 80px;
+    --note-size: 40px;
   }
 }
