@@ -220,6 +220,23 @@ body {
   color: var(--bg);
 }
 
+/* Not started yet: the tip-off time, local to the visitor, instead of the rating */
+.card__note-value--time {
+  font-size: calc(var(--note-size) * 0.5);
+  text-align: center;
+}
+
+.card__note-period {
+  display: block;
+  font-size: 0.6em;
+}
+
+/* In progress: greyed out, nothing in the middle, no animation (a teaser, never a spoiler) */
+.card--live {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
 @media (min-width: 560px) {
   :root {
     --gap: 14px;

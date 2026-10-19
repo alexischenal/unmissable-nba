@@ -41,7 +41,7 @@ NBA API (cdn.nba.com)  ←  scripts/fetch-night.ts   (server side, every 15 minu
 ```
 
 Zero spoilers is guaranteed by the architecture: the score is never published, not even in the JSON.
-If one of last night's games isn't over, the script publishes nothing (exit code 2).
+The JSON only holds the teams, the tip-off time and, once a game is over, its rating.
 
 ```
 index.html               page shell (React mounts in #root)
@@ -58,6 +58,7 @@ src/types/game.ts        the in-house Game type, independent of any API
 src/types/public.ts      the public JSON format
 scripts/fetch-night.ts   the server script
 scripts/nba/plan.ts      what a run should do (pure function, tested in plan.test.ts)
+scripts/nba/order.ts     the order of the games in the JSON (tested in order.test.ts)
 scripts/nba/client.ts    HTTP calls to nba.com
 scripts/nba/adapter.ts   NBA format → Game type (the only file to fix if the NBA changes its format)
 scripts/nba/types.ts     shape of the NBA responses
@@ -80,16 +81,19 @@ Full formulas and worked examples on real games: [`algorithm.txt`](algorithm.txt
 
 `.github/workflows/update.yml` runs on GitHub Actions:
 
-- **every 15 minutes**: `scripts/nba/plan.ts` decides whether there's anything to do. Before the last tip-off of a
-  night, nothing (the run stops in seconds, nothing is deployed). After it, the box scores are checked; as soon as
-  every game is over, the night is published: `public/data/*.json` committed, site rebuilt and deployed.
-  A night that's still unpublished the next day gets caught up. A day without games publishes nothing: the site
-  keeps showing the last night;
+- **every 15 minutes**: `scripts/nba/plan.ts` decides whether there's anything to do. Until a night's first
+  tip-off, the site keeps showing the previous night. At the first tip-off, the night appears with every game
+  unrated; then each game gets its rating as soon as it's over. A run only commits and redeploys when something
+  changed. A night still incomplete the next day gets caught up. A day without games publishes nothing;
 - **on every push to `main`**: rebuilds and deploys (no fetch);
 - **manually** (*Actions → Update and deploy → Run workflow*), with an optional date.
 
-If a game isn't over, nothing is published and the next run retries. A postponed game is skipped once the night is
-surely over. `npm test` checks these rules on opening night's real tip-off times.
+A game is never rated before it's over (no partial rating). A postponed game is skipped once the night is surely
+over. `npm test` checks these rules on opening night's real tip-off times.
+
+On the site, a card has three states, computed at page load: **upcoming** (the tip-off time, in the visitor's own
+time zone and format), **live** (greyed out, nothing in the middle), **rated**. Rated games come first, best first.
+A 100 is featured right away; otherwise the best game is featured once the whole night is rated.
 
 **Pre-launch:** the site carries a `noindex` meta tag and a blocking `robots.txt`. At launch, remove the meta tag in `index.html` and allow crawling in `public/robots.txt`.
 

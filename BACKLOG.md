@@ -99,13 +99,10 @@ Goal: games that end in the European evening (US weekend afternoons, Christmas D
 games played in Europe…) should be rated right away, not the next morning.
 "As soon as it ends, you know whether it's worth watching."
 
-- **Run often — done (October 19).** The workflow wakes up every 15 minutes, all day; `scripts/nba/plan.ts`
-  decides: before the last tip-off of a night it stops in seconds, after it the box scores are checked until the
-  night is over, then it's published. Still all-or-nothing per night: the next step is publishing game by game.
+- **Run often, rate game by game — done (October 19).** The workflow wakes up every 15 minutes; the night appears
+  at its first tip-off, each game is rated as soon as it's over (three card states: upcoming / live / rated).
   - Check statuses with the light scoreboard file
     (`https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json`) rather than the full schedule.
-  - Only fetch the box score of games that became final since the last run.
-  - Only change `updatedAt` / commit when a game was added or changed.
   - GitHub scheduled runs can start a few minutes late: "as soon as it ends" means within ~15–30 min.
 - **Precise timing with cron-job.org in front of GitHub.** GitHub scheduled runs can start several
   minutes late. A free external cron service (cron-job.org) can call the GitHub API on the minute to start

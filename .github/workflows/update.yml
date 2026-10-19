@@ -1,7 +1,7 @@
-# Wakes up every 15 minutes: publishes a night as soon as its last game is over,
-# then rebuilds and redeploys the site. Also redeploys on every push to main.
+# Wakes up every 15 minutes: puts a night on the site at its first tip-off, rates each game
+# as soon as it's over, then rebuilds and redeploys the site. Also redeploys on every push to main.
 #
-# Most runs have nothing to do (no game under way, night already published): the script
+# Most runs have nothing to do (no game under way, night already fully rated): the script
 # says so in a few seconds and nothing is built or deployed. See scripts/nba/plan.ts.
 
 name: Update and deploy
@@ -45,15 +45,8 @@ jobs:
         env:
           DATE: ${{ github.event.inputs.date }}
         run: |
-          set +e
           if [ -n "$DATE" ]; then ARGS="--date=$DATE"; else ARGS=""; fi
           node --experimental-strip-types --no-warnings scripts/fetch-night.ts $ARGS
-          code=$?
-          if [ $code -eq 2 ]; then
-            echo "::notice::Some games aren't over yet. Keeping the previous data; the next run will retry."
-            exit 0
-          fi
-          exit $code
 
       - name: Commit new data
         id: commit

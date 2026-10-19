@@ -4,10 +4,15 @@
 import { MatchCard } from './components/MatchCard.tsx';
 import { useNight } from './hooks/useNight.ts';
 import { nightLabel } from './lib/night.ts';
+import { gameState, nightIsComplete } from './types/public.ts';
+
+// Card states are computed once, at page load: no card changes under the visitor's eyes.
+const LOADED_AT = Date.now();
 
 export function App() {
   const state = useNight();
   const night = state.status === 'ready' ? state.night : null;
+  const complete = night !== null && nightIsComplete(night);
 
   let status: string | null = null;
   if (state.status === 'loading') status = 'Loading games…';
@@ -28,7 +33,13 @@ export function App() {
       <ol className="games" aria-label="Last night's games, most recommended first">
         {night?.games.map((game, i) => (
           <li className="games__item" key={`${game.away}@${game.home}`}>
-            <MatchCard game={game} rank={i + 1} featured={i === 0} />
+            <MatchCard
+              game={game}
+              state={gameState(game, LOADED_AT)}
+              rank={i + 1}
+              // A 100 is featured right away; otherwise the best game, once the whole night is rated.
+              featured={game.note === 100 || (complete && i === 0)}
+            />
           </li>
         ))}
       </ol>
