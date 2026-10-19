@@ -2,8 +2,21 @@
 
 ## Next up — Monday
 
-1. **HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the markup lives in components.
-2. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
+   runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
+   GitHub API. GitHub's schedule stays as a fallback.
+   - [ ] Merge PR #22 first (dispatched runs only redeploy when there's new data).
+   - [ ] GitHub token: *Settings → Developer settings → Personal access tokens → Fine-grained*, repository
+     `unmissable-nba` only, permission *Actions: Read and write* only, expiration 1 year (date in the calendar).
+     Never paste it anywhere else than cron-job.org.
+   - [ ] cron-job.org job, every 5 minutes: `POST https://api.github.com/repos/alexischenal/unmissable-nba/actions/workflows/update.yml/dispatches`,
+     headers `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`, `Content-Type: application/json`,
+     body `{"ref":"main"}`. Turn on failure e-mails: an expired token fails silently otherwise.
+   - [ ] Check: *Actions* shows `workflow_dispatch` runs every 5 minutes (~20 s when idle), cron-job.org gets a 204.
+   - Duplicates with GitHub's schedule are harmless: the `data` and `pages` concurrency groups never run twice
+     at once, and the script does nothing when the night is up to date.
+2. **HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the markup lives in components.
+3. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
@@ -101,20 +114,6 @@ games played in Europe…) should be rated right away, not the next morning.
   - Check statuses with the light scoreboard file
     (`https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json`) rather than the full schedule.
   - GitHub scheduled runs can start a few minutes late: "as soon as it ends" means within ~15–30 min.
-- **Precise timing with cron-job.org in front of GitHub.** GitHub scheduled runs can start several
-  minutes late. A free external cron service (cron-job.org) can call the GitHub API on the minute to start
-  the workflow (`workflow_dispatch`, same as the *Run workflow* button):
-  `POST https://api.github.com/repos/alexischenal/unmissable-nba/actions/workflows/update.yml/dispatches`
-  with body `{"ref":"main"}` and headers `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`.
-  - **Keep the GitHub schedule as a fallback** — it's exactly today's setup. When cron-job.org works, the
-    following scheduled runs stop right away (nothing new); if it fails, GitHub takes over, just less punctually.
-    Duplicates are harmless: the `data` and `pages` concurrency groups never run twice at once, and the script
-    exits early when the night is already up to date.
-  - **Token**: a fine-grained personal access token limited to this one repository, with only
-    "Actions: read and write". Worst case if stolen: someone can trigger the workflow, nothing more.
-  - **Expiration**: set one (e.g. 1 year), write the date in a calendar, and turn on cron-job.org's
-    failure e-mails — an expired token fails silently otherwise.
-  - Precision gained: the run starts on time; running + deploying still takes 1–2 minutes.
 - **Publish progressively**: rate finished games as they end; the night's ranking fills in over time.
   This replaces today's rule ("a complete night or nothing"). The JSON per US date keeps growing until
   every game is final.
