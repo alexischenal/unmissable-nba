@@ -16,8 +16,8 @@
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
-  --location-size: 24px;
-  --name-font: 70px;
+  --location-size: 20px;
+  --name-font: 58px;
 
   position: relative;
   display: flex;
@@ -27,15 +27,15 @@
   @media (max-width: $breakpoint-laptop) {
     --card-h: 180px;
     --side-padding: 72px;
-    --location-size: 20px;
-    --name-font: 60px;
+    --location-size: 17px;
+    --name-font: 50px;
   }
 
   @media (max-width: $breakpoint-small-laptop) {
     --card-h: 160px;
     --side-padding: 56px;
-    --location-size: 18px;
-    --name-font: 52px;
+    --location-size: 15px;
+    --name-font: 44px;
     --note-w: 92px;
     --note-h: 88px;
     --note-size: 46px;
@@ -44,8 +44,8 @@
   @media (max-width: $breakpoint-tablet) {
     --card-h: 140px;
     --side-padding: 32px;
-    --location-size: 16px;
-    --name-font: 44px;
+    --location-size: 14px;
+    --name-font: 36px;
     --note-w: 80px;
     --note-h: 78px;
     --note-size: 40px;
@@ -56,9 +56,9 @@
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
-    --location-size: 10px;
-    --name-size: 18cqi;
-    --name-max: 24px;
+    --location-size: 9px;
+    --name-size: 16cqi;
+    --name-max: 21px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 60px;
     --note-h: 58px;
@@ -192,14 +192,21 @@
   --note-size: 72px;
   --name-size: 26cqi;
   --name-max: 38px;
+  // Bigger names than the other cards
+  --location-size: 24px;
+  --name-font: 70px;
 
   // Its own breakpoints: written after .card's, they win on the featured card
   @media (max-width: $breakpoint-laptop) {
     --card-h: 300px;
+    --location-size: 20px;
+    --name-font: 60px;
   }
 
   @media (max-width: $breakpoint-small-laptop) {
     --card-h: 260px;
+    --location-size: 18px;
+    --name-font: 52px;
     --note-w: 128px;
     --note-h: 120px;
     --note-size: 64px;
@@ -207,6 +214,8 @@
 
   @media (max-width: $breakpoint-tablet) {
     --card-h: 220px;
+    --location-size: 16px;
+    --name-font: 44px;
     --note-w: 112px;
     --note-h: 108px;
     --note-size: 56px;
@@ -214,8 +223,10 @@
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
+    --location-size: 10px;
     --name-size: 22cqi;
     --name-max: 30px;
+    --name-font: min(var(--name-max), var(--name-size));
     --note-w: 84px;
     --note-h: 80px;
     --note-size: 40px;
