@@ -99,11 +99,9 @@ Goal: games that end in the European evening (US weekend afternoons, Christmas D
 games played in Europe…) should be rated right away, not the next morning.
 "As soon as it ends, you know whether it's worth watching."
 
-- **Run often, from 9 p.m. Paris time to the next morning.** v1: every 30 minutes from 05:00 to 09:30 UTC.
-  Move to every 15 minutes, from the evening until late morning, with a cheap early exit when there's nothing new.
-  GitHub cron is UTC only, so to cover 9 p.m. Paris all season (UTC+1 in winter, UTC+2 in spring/fall):
-  `*/15 19-23,0-9 * * *` → from 19:00 UTC (8 p.m. Paris in winter, 9 p.m. in summer) to 09:45 UTC.
-  The first evening games (a 7 p.m. Paris tip-off) end around 9:15 p.m.
+- **Run often — done (October 19).** The workflow wakes up every 15 minutes, all day; `scripts/nba/plan.ts`
+  decides: before the last tip-off of a night it stops in seconds, after it the box scores are checked until the
+  night is over, then it's published. Still all-or-nothing per night: the next step is publishing game by game.
   - Check statuses with the light scoreboard file
     (`https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json`) rather than the full schedule.
   - Only fetch the box score of games that became final since the last run.
@@ -112,11 +110,11 @@ games played in Europe…) should be rated right away, not the next morning.
 - **Precise timing with cron-job.org in front of GitHub.** GitHub scheduled runs can start several
   minutes late. A free external cron service (cron-job.org) can call the GitHub API on the minute to start
   the workflow (`workflow_dispatch`, same as the *Run workflow* button):
-  `POST https://api.github.com/repos/alexischenal/unmissable-nba/actions/workflows/daily.yml/dispatches`
+  `POST https://api.github.com/repos/alexischenal/unmissable-nba/actions/workflows/update.yml/dispatches`
   with body `{"ref":"main"}` and headers `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`.
   - **Keep the GitHub schedule as a fallback** — it's exactly today's setup. When cron-job.org works, the
     following scheduled runs stop right away (nothing new); if it fails, GitHub takes over, just less punctually.
-    Duplicates are harmless: the `pages` concurrency group never deploys twice at once, and the script
+    Duplicates are harmless: the `data` and `pages` concurrency groups never run twice at once, and the script
     exits early when the night is already up to date.
   - **Token**: a fine-grained personal access token limited to this one repository, with only
     "Actions: read and write". Worst case if stolen: someone can trigger the workflow, nothing more.
@@ -202,7 +200,7 @@ Things that need a human, to check every summer before the new season:
   the joke is worth keeping.
 - **Scheduled workflow**: on a public repo, GitHub disables scheduled workflows after 60 days without
   activity. No games all summer = no commits = the cron gets switched off. Before the season starts:
-  *Actions → Daily update and deploy → Enable workflow* if GitHub disabled it.
+  *Actions → Update and deploy → Enable workflow* if GitHub disabled it.
 - **NBA data**: quick test run at the start of the season — the schedule file switches to the new season.
 
 ## Algorithm v2 — play-by-play data

@@ -6,6 +6,7 @@ export type RawScheduleGame = {
   gameId: string; // e.g. '0022600001' — '002' = regular season
   gameStatus: number; // 1 = scheduled, 2 = live, 3 = final
   gameDateEst?: string; // e.g. '2026-10-20T00:00:00Z'
+  gameDateTimeUTC?: string; // tip-off, e.g. '2026-10-20T19:00:00Z'
   homeTeam: { teamTricode: string };
   awayTeam: { teamTricode: string };
 };
