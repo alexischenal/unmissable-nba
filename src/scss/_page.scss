@@ -2,6 +2,16 @@
 
 @use "variables" as *;
 
+:root {
+  // Width of the secondary color stripe on the card edges. On :root, not on .card: the header and
+  // the section headings align on it too (left edge of UNMISSABLE / IN PROGRESS, right edge of NIGHT OF).
+  --stripe: #{$stripe};
+
+  @media (max-width: $breakpoint-tablet) {
+    --stripe: #{$stripe-tablet};
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -42,7 +52,7 @@ body {
 
   .games__heading {
     margin: 0;
-    padding: 28px 20px 12px;
+    padding: 28px var(--stripe) 12px;
     font-family: $font-display;
     font-weight: 900;
     font-size: 28px;
@@ -52,7 +62,7 @@ body {
     color: $ink;
 
     @media (max-width: $breakpoint-mobile) {
-      padding: 36px 12px 16px;
+      padding: 36px var(--stripe) 16px;
       font-size: 28px;
     }
   }
