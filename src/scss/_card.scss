@@ -149,9 +149,3 @@
   --name-size: 26cqi;
   --name-max: 38px;
 }
-
-// In progress: greyed out, nothing in the middle, no animation (a teaser, never a spoiler)
-.card--live {
-  filter: grayscale(1);
-  opacity: 0.55;
-}
