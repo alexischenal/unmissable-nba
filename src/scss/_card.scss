@@ -54,13 +54,13 @@
   }
 
   // Phones: half a card is ~190px wide, so the name size follows the width of its half
-  // (22cqi = 22% of the half), capped by --name-max
+  // (23cqi = 23% of the half), capped by --name-max
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
-    --location-size: 10px;
-    --name-size: 18cqi;
-    --name-max: 24px;
+    --location-size: 12px;
+    --name-size: 23cqi;
+    --name-max: 32px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 60px;
     --note-h: 58px;
@@ -138,7 +138,7 @@
     line-height: 0.95;
     text-transform: uppercase;
     text-wrap: balance;
-    hyphens: manual; // only breaks at soft hyphens (Timber-wolves)
+    hyphens: manual; // never adds hyphens on its own
   }
 
   // The rating: an upright, vertical block in the middle of the card
@@ -226,9 +226,9 @@
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
     // Same names as the other cards on phones: no room for bigger ones
-    --location-size: 10px;
-    --name-size: 18cqi;
-    --name-max: 24px;
+    --location-size: 12px;
+    --name-size: 23cqi;
+    --name-max: 32px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 72px;
     --note-h: 68px;
