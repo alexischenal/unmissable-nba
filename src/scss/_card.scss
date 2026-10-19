@@ -130,6 +130,13 @@
     display: block;
     font-size: 0.6em;
   }
+
+  // Small "%" after the rating, sitting on the baseline (bottom of the digits)
+  .card__note-unit {
+    margin-left: 0.04em;
+    font-size: 0.35em;
+    vertical-align: baseline;
+  }
 }
 
 // Best game of the night: featured, taller card.

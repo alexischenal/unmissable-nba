@@ -69,7 +69,12 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
       <TeamSide side="away" abbr={game.away} team={away} />
       <TeamSide side="home" abbr={game.home} team={home} />
       <div className="card__note" aria-hidden="true">
-        {state === 'rated' && <span className="card__note-value">{game.note}</span>}
+        {state === 'rated' && (
+          <span className="card__note-value">
+            {game.note}
+            <span className="card__note-unit">%</span>
+          </span>
+        )}
         {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
       </div>
     </article>
