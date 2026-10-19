@@ -2,3 +2,4 @@ node_modules
 dist
 .idea/workspace.xml
 .DS_Store
+.idea/compiler.xml
