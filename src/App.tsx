@@ -21,13 +21,12 @@ export function App() {
 
   return (
     <main className="page">
-      <header className="page__header">
-          <span class="header__title">
-              <p className="page__brand">Unmissable</p>
-              <h1 className="page__title">What to watch this morning</h1>
-          </span>
-        <p className="page__night">{night ? nightLabel(night.date) : ' '}</p>
-
+      <header className="header">
+        <div className="header__title">
+          <p className="header__brand">Unmissable</p>
+          <h1 className="header__heading">What to watch this morning</h1>
+        </div>
+        <p className="header__night">{night ? nightLabel(night.date) : '\u00A0'}</p>
       </header>
 
       <p className="page__status" role="status" hidden={status === null}>{status}</p>
