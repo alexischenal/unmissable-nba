@@ -2,137 +2,149 @@
 
 @use "variables" as *;
 
-/* ---------- Card ---------- */
-
 .card {
+  // Card sizes: custom properties (not Sass variables), because the featured card and wider
+  // screens override them, and every element of the card reads them.
+  --card-h: 104px;
+  --note-w: 72px;
+  --note-h: 78px;
+  --note-size: 40px;
+  --name-size: 22cqi;
+  --name-max: 30px;
+
   position: relative;
   display: flex;
   height: var(--card-h);
-}
 
-/* Best game of the night: featured, taller card */
-.card--featured {
-  --card-h: 260px;
-  --note-w: 96px;
-  --note-h: 108px;
-  --note-size: 56px;
-  --name-size: 26cqi;
-  --name-max: 38px;
-}
+  @media (min-width: $breakpoint-tablet) {
+    --card-h: 112px;
+  }
 
-.card__side {
-  /* The two halves overlap by $diag to form the diagonal */
-  flex: 1 1 50%;
-  min-width: 0;
-  position: relative;
-  overflow: hidden;
-  container-type: inline-size;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: var(--primary);
-  /* White text everywhere: all 30 primary colors pass contrast for the team names */
-  color: #fff;
-}
+  // Best game of the night: featured, taller card.
+  // Must stay after the media query above, so it wins on wide screens too.
+  &--featured {
+    --card-h: 260px;
+    --note-w: 96px;
+    --note-h: 108px;
+    --note-size: 56px;
+    --name-size: 26cqi;
+    --name-max: 38px;
+  }
 
-.card__side--away {
-  align-items: flex-start;
-  border-radius: $radius 0 0 $radius;
-  box-shadow: inset $stripe 0 0 var(--secondary);
-  clip-path: polygon(0 0, 100% 0, calc(100% - $diag) 100%, 0 100%);
-  padding-inline: calc($stripe + 12px) calc($diag / 2 + var(--note-w) / 2 + 6px);
-}
+  // In progress: greyed out, nothing in the middle, no animation (a teaser, never a spoiler)
+  &--live {
+    filter: grayscale(1);
+    opacity: 0.55;
+  }
 
-.card__side--home {
-  margin-left: -$diag;
-  align-items: flex-end;
-  text-align: right;
-  border-radius: 0 $radius $radius 0;
-  box-shadow: inset (-$stripe) 0 0 var(--secondary);
-  clip-path: polygon($diag 0, 100% 0, 100% 100%, 0 100%);
-  padding-inline: calc($diag / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
-}
+  // The two halves overlap by $diag to form the diagonal
+  &__side {
+    flex: 1 1 50%;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--primary);
+    // White text everywhere: all 30 primary colors pass contrast for the team names
+    color: $white;
 
-/* Watermark abbreviation on the inner side (stands in for a logo) */
-.card__abbr {
-  position: absolute;
-  bottom: -0.24em;
-  font-family: $font-display;
-  font-weight: 900;
-  font-size: calc(var(--card-h) * 0.95);
-  line-height: 1;
-  opacity: 0.12;
-  pointer-events: none;
-  user-select: none;
-}
+    &--away {
+      align-items: flex-start;
+      border-radius: $radius 0 0 $radius;
+      box-shadow: inset $stripe 0 0 var(--secondary);
+      clip-path: polygon(0 0, 100% 0, calc(100% - $diag) 100%, 0 100%);
+      padding-inline: calc($stripe + 12px) calc($diag / 2 + var(--note-w) / 2 + 6px);
 
-.card__side--away .card__abbr {
-  right: calc($diag / 2 + 4px);
-}
+      .card__abbr {
+        right: calc($diag / 2 + 4px);
+      }
+    }
 
-.card__side--home .card__abbr {
-  left: calc($diag / 2 + 4px);
-}
+    &--home {
+      margin-left: -$diag;
+      align-items: flex-end;
+      text-align: right;
+      border-radius: 0 $radius $radius 0;
+      box-shadow: inset (-$stripe) 0 0 var(--secondary);
+      clip-path: polygon($diag 0, 100% 0, 100% 100%, 0 100%);
+      padding-inline: calc($diag / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
 
-.card__location {
-  position: relative;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+      .card__abbr {
+        left: calc($diag / 2 + 4px);
+      }
+    }
+  }
 
-.card__name {
-  position: relative;
-  max-width: 100%;
-  font-family: $font-display;
-  font-weight: 900;
-  font-size: min(var(--name-max), var(--name-size));
-  line-height: 0.95;
-  text-transform: uppercase;
-  text-wrap: balance;
-  hyphens: manual; /* only breaks at soft hyphens (Timber-wolves) */
-}
+  // Watermark abbreviation on the inner side (stands in for a logo)
+  &__abbr {
+    position: absolute;
+    bottom: -0.24em;
+    font-family: $font-display;
+    font-weight: 900;
+    font-size: calc(var(--card-h) * 0.95);
+    line-height: 1;
+    opacity: 0.12;
+    pointer-events: none;
+    user-select: none;
+  }
 
-/* The rating: an upright, vertical block in the middle of the card */
-.card__note {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--note-w);
-  height: var(--note-h);
-  translate: -50% -50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $ink;
-  border: 3px solid $bg;
-  border-radius: 4px;
-}
+  &__location {
+    position: relative;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
-.card__note-value {
-  font-family: $font-display;
-  font-weight: 900;
-  font-size: var(--note-size);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: $bg;
-}
+  &__name {
+    position: relative;
+    max-width: 100%;
+    font-family: $font-display;
+    font-weight: 900;
+    font-size: min(var(--name-max), var(--name-size));
+    line-height: 0.95;
+    text-transform: uppercase;
+    text-wrap: balance;
+    hyphens: manual; // only breaks at soft hyphens (Timber-wolves)
+  }
 
-/* Not started yet: the tip-off time, local to the visitor, instead of the rating */
-.card__note-value--time {
-  font-size: calc(var(--note-size) * 0.5);
-  text-align: center;
-}
+  // The rating: an upright, vertical block in the middle of the card
+  &__note {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--note-w);
+    height: var(--note-h);
+    translate: -50% -50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $ink;
+    border: 3px solid $bg;
+    border-radius: 4px;
+  }
 
-.card__note-period {
-  display: block;
-  font-size: 0.6em;
-}
+  &__note-value {
+    font-family: $font-display;
+    font-weight: 900;
+    font-size: var(--note-size);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: $bg;
 
-/* In progress: greyed out, nothing in the middle, no animation (a teaser, never a spoiler) */
-.card--live {
-  filter: grayscale(1);
-  opacity: 0.55;
+    // Not started yet: the tip-off time, local to the visitor, instead of the rating
+    &--time {
+      font-size: calc(var(--note-size) * 0.5);
+      text-align: center;
+    }
+  }
+
+  &__note-period {
+    display: block;
+    font-size: 0.6em;
+  }
 }

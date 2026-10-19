@@ -3,7 +3,7 @@
 //
 // What stays a CSS custom property (var(--…)) instead, because it changes while the page runs:
 //   --primary, --secondary   team colors, set per card by the React code
-//   --card-h, --note-*, --name-*   card sizes: different on the featured card and on wider screens
+//   --card-h, --note-*, --name-*   card sizes (in _card.scss): different on the featured card and on wider screens
 
 // Colors
 $black: #000;
