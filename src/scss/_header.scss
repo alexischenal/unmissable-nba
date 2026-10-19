@@ -11,7 +11,7 @@
   padding: 20px;
   margin-bottom: 10px;
 
-  &__brand {
+  .header__brand {
     font-family: $font-display;
     color: $white;
     font-weight: 900;
@@ -20,7 +20,7 @@
     text-transform: uppercase;
   }
 
-  &__night {
+  .header__night {
     margin: 0;
     font-size: 13px;
     font-weight: 600;
@@ -29,7 +29,7 @@
     color: $muted;
   }
 
-  &__heading {
+  .header__heading {
     margin: 2px 0 0;
     font-family: $font-display;
     font-weight: 900;

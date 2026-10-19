@@ -19,17 +19,17 @@ body {
 .page {
   margin: 0 auto;
 
-  &__status {
+  .page__status {
     margin: 0 4px 16px;
     font-size: 18px;
     color: $muted;
-
-    &[hidden] {
-      display: none;
-    }
   }
 
-  &__footer {
+  .page__status[hidden] {
+    display: none;
+  }
+
+  .page__footer {
     margin: 24px 4px 0;
     font-size: 13px;
     letter-spacing: 0.04em;
