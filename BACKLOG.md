@@ -15,8 +15,7 @@
    - [ ] Check: *Actions* shows `workflow_dispatch` runs every 5 minutes (~20 s when idle), cron-job.org gets a 204.
    - Duplicates with GitHub's schedule are harmless: the `data` and `pages` concurrency groups never run twice
      at once, and the script does nothing when the night is up to date.
-2. **HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the markup lives in components.
-3. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+2. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
