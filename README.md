@@ -92,7 +92,7 @@ A game is never rated before it's over (no partial rating). A postponed game is 
 over. `npm test` checks these rules on opening night's real tip-off times.
 
 On the site, a card has three states, computed at page load: **upcoming** (the tip-off time, in the visitor's own
-time zone and format), **live** (greyed out, nothing in the middle), **rated**. Rated games come first, best first.
+time zone and format), **live** (no block in the middle, under an "In progress" heading), **rated**. Rated games come first, best first.
 A 100 is featured right away; otherwise the best game is featured once the whole night is rated.
 
 **Pre-launch:** the site carries a `noindex` meta tag and a blocking `robots.txt`. At launch, remove the meta tag in `index.html` and allow crawling in `public/robots.txt`.

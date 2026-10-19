@@ -1,7 +1,7 @@
 // src/components/MatchCard.tsx
 // One game: away team on the left, home team on the right, and in the middle:
 //   - upcoming → the tip-off time, in the visitor's own time zone and format;
-//   - live     → nothing (the card is greyed out);
+//   - live     → nothing in the middle;
 //   - rated    → the rating.
 
 import type { CSSProperties } from 'react';
@@ -68,10 +68,18 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
     <article className={classes.filter(Boolean).join(' ')} aria-label={label}>
       <TeamSide side="away" abbr={game.away} team={away} />
       <TeamSide side="home" abbr={game.home} team={home} />
-      <div className="card__note" aria-hidden="true">
-        {state === 'rated' && <span className="card__note-value">{game.note}</span>}
-        {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
-      </div>
+      {/* In progress: no block in the middle at all */}
+      {state !== 'live' && (
+        <div className="card__note" aria-hidden="true">
+          {state === 'rated' && (
+            <span className="card__note-value">
+              {game.note}
+              <span className="card__note-unit">%</span>
+            </span>
+          )}
+          {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
+        </div>
+      )}
     </article>
   );
 }
