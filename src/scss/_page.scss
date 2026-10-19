@@ -1,0 +1,80 @@
+// Page: design tokens, base styles, page layout, list of games
+
+:root {
+  --bg: #f3f1ec;
+  --ink: #141414;
+  --muted: #5c5a55;
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-text: "Barlow Condensed", "Arial Narrow", sans-serif;
+
+  --gap: 12px;
+  --radius: 6px;
+  --stripe: 7px;   /* secondary color stripe */
+  --diag: 28px;    /* horizontal offset of the diagonal cut */
+
+  /* Standard card */
+  --card-h: 104px;
+  --note-w: 72px;
+  --note-h: 78px;
+  --note-size: 40px;
+  --name-size: 22cqi;
+  --name-max: 30px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Page ---------- */
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 16px 40px;
+}
+
+.page__status {
+  margin: 0 4px 16px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.page__status[hidden] {
+  display: none;
+}
+
+.page__footer {
+  margin: 24px 4px 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* ---------- List ---------- */
+
+.games {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+@media (min-width: 560px) {
+  :root {
+    --gap: 14px;
+    --card-h: 112px;
+  }
+}
