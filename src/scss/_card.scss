@@ -5,7 +5,7 @@
 .card {
   // Card sizes: custom properties (not Sass variables), because the featured card and wider
   // screens override them, and every element of the card reads them.
-  --card-h: 104px;
+  --card-h: 200px;
   --note-w: 72px;
   --note-h: 78px;
   --note-size: 40px;
@@ -15,10 +15,6 @@
   position: relative;
   display: flex;
   height: var(--card-h);
-
-  @media (min-width: $breakpoint-tablet) {
-    --card-h: 112px;
-  }
 
   // The two halves overlap by $diag to form the diagonal
   .card__side {
@@ -37,7 +33,6 @@
 
   .card__side--away {
     align-items: flex-start;
-    border-radius: $radius 0 0 $radius;
     box-shadow: inset $stripe 0 0 var(--secondary);
     clip-path: polygon(0 0, 100% 0, calc(100% - $diag) 100%, 0 100%);
     padding-inline: calc($stripe + 12px) calc($diag / 2 + var(--note-w) / 2 + 6px);
@@ -51,7 +46,6 @@
     margin-left: -$diag;
     align-items: flex-end;
     text-align: right;
-    border-radius: 0 $radius $radius 0;
     box-shadow: inset (-$stripe) 0 0 var(--secondary);
     clip-path: polygon($diag 0, 100% 0, 100% 100%, 0 100%);
     padding-inline: calc($diag / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
@@ -76,7 +70,7 @@
 
   .card__location {
     position: relative;
-    font-size: 12px;
+    font-size: 24px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -88,7 +82,7 @@
     max-width: 100%;
     font-family: $font-display;
     font-weight: 900;
-    font-size: min(var(--name-max), var(--name-size));
+    font-size: 70px;
     line-height: 0.95;
     text-transform: uppercase;
     text-wrap: balance;
@@ -135,7 +129,7 @@
 // Best game of the night: featured, taller card.
 // Must stay after .card (and its media query), so it wins on wide screens too.
 .card--featured {
-  --card-h: 260px;
+  --card-h: 350px;
   --note-w: 96px;
   --note-h: 108px;
   --note-size: 56px;
