@@ -74,6 +74,8 @@ Pick one at random among several so returning visitors don't always see the same
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
   - **John Travolta looking around an empty room** (*Pulp Fiction*). Literally the emptiness.
   - **Crying Jordan.** The sports despair classic (a bit overused).
+  - **"The vast emptiness" (*Futurama*).** The user's pick for the moments with nothing to show. Find the official
+    GIPHY version of the scene (check the exact quote and episode before using it).
   - Other options: Michael Scott "No, God! No, God, please, no!" (*The Office*), "This is fine" dog,
     Squidward at his window (*SpongeBob*).
 - **Error state** (data couldn't be loaded)
