@@ -12,6 +12,8 @@ on:
     - cron: "*/15 * * * *"
   push:
     branches: [main]
+  # Also started every 5 minutes by cron-job.org through the GitHub API (more punctual than
+  # GitHub's own schedule, which stays as a fallback). See BACKLOG.md.
   workflow_dispatch:
     inputs:
       date:
@@ -67,12 +69,12 @@ jobs:
 
   deploy:
     needs: update
-    # On a push, "update" is skipped: deploy anyway. Manual runs always deploy.
-    # Scheduled runs only deploy when there is new data.
+    # On a push, "update" is skipped: deploy anyway. Otherwise (schedule, cron-job.org, the
+    # Run workflow button), only deploy when there is new data — cron-job.org starts a run
+    # every 5 minutes, it must not redeploy the site each time.
     if: >-
       always() && (
         github.event_name == 'push' ||
-        github.event_name == 'workflow_dispatch' ||
         needs.update.outputs.changed == 'true'
       ) && needs.update.result != 'failure'
     runs-on: ubuntu-latest

@@ -86,7 +86,11 @@ Full formulas and worked examples on real games: [`algorithm.txt`](algorithm.txt
   unrated; then each game gets its rating as soon as it's over. A run only commits and redeploys when something
   changed. A night still incomplete the next day gets caught up. A day without games publishes nothing;
 - **on every push to `main`**: rebuilds and deploys (no fetch);
+- **every 5 minutes from cron-job.org**, which starts the same workflow through the GitHub API (GitHub's own
+  schedule can start runs several minutes late; it stays as a fallback);
 - **manually** (*Actions → Update and deploy → Run workflow*), with an optional date.
+
+Only a push, or a run that found new data, rebuilds and redeploys the site.
 
 A game is never rated before it's over (no partial rating). A postponed game is skipped once the night is surely
 over. `npm test` checks these rules on opening night's real tip-off times.
