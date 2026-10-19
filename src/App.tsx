@@ -23,8 +23,7 @@ export function App() {
     <main className="page">
       <header className="header">
         <div className="header__title">
-          <p className="header__brand">Unmissable</p>
-          <h1 className="header__heading">What to watch this morning</h1>
+          <h1 className="header__brand">Unmissable</h1>
         </div>
         <p className="header__night">{night ? nightLabel(night.date) : '\u00A0'}</p>
       </header>
