@@ -6,9 +6,9 @@
   // Card sizes: custom properties (not Sass variables), because the featured card and wider
   // screens override them, and every element of the card reads them.
   --card-h: 200px;
-  --note-w: 80px;
-  --note-h: 78px;
-  --note-size: 40px;
+  --note-w: 104px;
+  --note-h: 100px;
+  --note-size: 52px;
   --name-size: 22cqi;
   --name-max: 30px;
   // Horizontal offset of the diagonal, proportional to the height: the angle stays the same
@@ -36,6 +36,9 @@
     --side-padding: 56px;
     --location-size: 18px;
     --name-font: 52px;
+    --note-w: 92px;
+    --note-h: 88px;
+    --note-size: 46px;
   }
 
   @media (max-width: $breakpoint-tablet) {
@@ -43,6 +46,9 @@
     --side-padding: 32px;
     --location-size: 16px;
     --name-font: 44px;
+    --note-w: 80px;
+    --note-h: 78px;
+    --note-size: 40px;
   }
 
   // Phones: half a card is ~190px wide, so the name size follows the width of its half
@@ -54,6 +60,9 @@
     --name-size: 18cqi;
     --name-max: 24px;
     --name-font: min(var(--name-max), var(--name-size));
+    --note-w: 60px;
+    --note-h: 58px;
+    --note-size: 28px;
   }
 
   // The two halves overlap by --diag: the home half, cut on the diagonal, sits on top of the away half
@@ -157,7 +166,7 @@
 
   // Not started yet: the tip-off time, local to the visitor, instead of the rating
   .card__note-value--time {
-    font-size: calc(var(--note-size) * 0.5);
+    font-size: calc(var(--note-size) * 0.55);
     text-align: center;
   }
 
@@ -178,9 +187,9 @@
 // Must stay after .card, so it wins over .card's sizes at every width.
 .card--featured {
   --card-h: 350px;
-  --note-w: 112px;
-  --note-h: 108px;
-  --note-size: 56px;
+  --note-w: 144px;
+  --note-h: 136px;
+  --note-size: 72px;
   --name-size: 26cqi;
   --name-max: 38px;
 
@@ -191,15 +200,24 @@
 
   @media (max-width: $breakpoint-small-laptop) {
     --card-h: 260px;
+    --note-w: 128px;
+    --note-h: 120px;
+    --note-size: 64px;
   }
 
   @media (max-width: $breakpoint-tablet) {
     --card-h: 220px;
+    --note-w: 112px;
+    --note-h: 108px;
+    --note-size: 56px;
   }
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
     --name-size: 22cqi;
     --name-max: 30px;
+    --note-w: 84px;
+    --note-h: 80px;
+    --note-size: 40px;
   }
 }
