@@ -16,8 +16,8 @@
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
-  --location-size: 20px;
-  --name-font: 58px;
+  --location-size: 19px;
+  --name-font: 56px;
 
   position: relative;
   display: flex;
@@ -27,15 +27,15 @@
   @media (max-width: $breakpoint-laptop) {
     --card-h: 180px;
     --side-padding: 72px;
-    --location-size: 17px;
-    --name-font: 50px;
+    --location-size: 16px;
+    --name-font: 48px;
   }
 
   @media (max-width: $breakpoint-small-laptop) {
     --card-h: 160px;
     --side-padding: 56px;
-    --location-size: 15px;
-    --name-font: 44px;
+    --location-size: 14px;
+    --name-font: 42px;
     --note-w: 92px;
     --note-h: 88px;
     --note-size: 46px;
@@ -44,8 +44,8 @@
   @media (max-width: $breakpoint-tablet) {
     --card-h: 140px;
     --side-padding: 32px;
-    --location-size: 14px;
-    --name-font: 36px;
+    --location-size: 13px;
+    --name-font: 35px;
     --note-w: 80px;
     --note-h: 78px;
     --note-size: 40px;
@@ -56,9 +56,9 @@
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
-    --location-size: 9px;
-    --name-size: 16cqi;
-    --name-max: 21px;
+    --location-size: 10px;
+    --name-size: 18cqi;
+    --name-max: 24px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 60px;
     --note-h: 58px;
@@ -192,7 +192,7 @@
   --note-size: 72px;
   --name-size: 26cqi;
   --name-max: 38px;
-  // Bigger names than the other cards
+  // Names 25% bigger than on the other cards (they are 20% smaller), except on phones
   --location-size: 24px;
   --name-font: 70px;
 
@@ -223,12 +223,13 @@
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
+    // Same names as the other cards on phones: no room for bigger ones
     --location-size: 10px;
-    --name-size: 22cqi;
-    --name-max: 30px;
+    --name-size: 18cqi;
+    --name-max: 24px;
     --name-font: min(var(--name-max), var(--name-size));
-    --note-w: 84px;
-    --note-h: 80px;
-    --note-size: 40px;
+    --note-w: 72px;
+    --note-h: 68px;
+    --note-size: 34px;
   }
 }
