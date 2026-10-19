@@ -33,6 +33,10 @@
    - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
    - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain.
      The label is always the home page night, so the link says where it leads.
+   - **URL: `unmissable.watch/next`.** GitHub Pages only serves files that exist, so the build copies
+     `dist/index.html` to `dist/next/index.html` (one line after `vite build`); the app reads
+     `location.pathname` to know which page it's on. No router library needed for two pages.
+   - **If "Next" isn't obvious enough as a link**: underlined and in white. Decide at design time.
    - **The logo (`UNMISSABLE` in the header) links to the home page**, on the Next page and everywhere else.
      The burger menu has the link too.
    - **"Next" = the next calendar night, only if it has games.** No games tomorrow: no "Next" button. No skipping
