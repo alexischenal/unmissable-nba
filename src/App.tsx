@@ -22,10 +22,12 @@ export function App() {
   return (
     <main className="page">
       <header className="page__header">
-        <p className="page__brand">Unmissable</p>
-        {/* Non-breaking space while loading, so the header doesn't jump */}
+          <span class="header__title">
+              <p className="page__brand">Unmissable</p>
+              <h1 className="page__title">What to watch this morning</h1>
+          </span>
         <p className="page__night">{night ? nightLabel(night.date) : ' '}</p>
-        <h1 className="page__title">What to watch this morning</h1>
+
       </header>
 
       <p className="page__status" role="status" hidden={status === null}>{status}</p>
