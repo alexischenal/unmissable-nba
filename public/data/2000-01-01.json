@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "date": "2000-01-01",
+  "games": [
+    { "away": "SAS", "home": "DEN", "tipOff": "2000-01-02T01:00:00Z", "note": 100 },
+    { "away": "MIN", "home": "POR", "tipOff": "2000-01-02T03:00:00Z", "note": 74 },
+    { "away": "PHI", "home": "NYK", "tipOff": "2000-01-02T00:00:00Z", "note": 52 },
+    { "away": "WAS", "home": "MIA", "tipOff": "2000-01-02T00:30:00Z", "note": 24 },
+    { "away": "LAL", "home": "GSW", "tipOff": "2000-01-02T03:30:00Z" },
+    { "away": "BKN", "home": "SAS", "tipOff": "2000-01-02T01:30:00Z" },
+    { "away": "OKC", "home": "SAS", "tipOff": "2099-01-02T01:30:00Z" },
+    { "away": "BOS", "home": "DET", "tipOff": "2099-01-02T03:00:00Z" }
+  ]
+}
