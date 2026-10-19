@@ -23,6 +23,7 @@ import { planRun, type Published } from './nba/plan.ts';
 import {
   competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
+import { useScoring } from '../src/config/scoring.ts';
 import type { Game } from '../src/types/game.ts';
 import type { RawSchedule } from './nba/types.ts';
 import { nightIsComplete, type NightJson } from '../src/types/public.ts';
@@ -158,9 +159,32 @@ async function save(night: NightJson, { forceLatest = false } = {}): Promise<voi
   }
 }
 
+// The real settings of the algorithm are not in the repo (see src/config/scoring.ts):
+// the SCORING_CONFIG secret on GitHub Actions, or scoring.secret.json locally.
+function loadScoring(): void {
+  const fromEnv = process.env.SCORING_CONFIG;
+  if (fromEnv) {
+    useScoring(JSON.parse(fromEnv), 'SCORING_CONFIG secret');
+    console.log('Scoring: real settings (SCORING_CONFIG).');
+    return;
+  }
+  const localFile = path.join(ROOT, 'scoring.secret.json');
+  if (existsSync(localFile)) {
+    useScoring(JSON.parse(readFileSync(localFile, 'utf8')), 'scoring.secret.json');
+    console.log('Scoring: real settings (scoring.secret.json).');
+    return;
+  }
+  // On GitHub, never publish ratings computed with the example values
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    throw new Error('The SCORING_CONFIG secret is missing: nothing published.');
+  }
+  console.warn('Scoring: EXAMPLE settings (no SCORING_CONFIG, no scoring.secret.json). Ratings are not the real ones.');
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const useFixture = args.includes('--fixture');
+  loadScoring();
   const dateArg = args.find((a) => a.startsWith('--date='))?.slice('--date='.length);
   if (dateArg && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) throw new Error(`Invalid date: ${dateArg}`);
 

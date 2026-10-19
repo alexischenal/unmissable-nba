@@ -52,7 +52,7 @@ src/hooks/useNight.ts    loads the night: loading / ready / error
 src/lib/night.ts         fetching the JSON, "Night of…" label (no React)
 src/scss/main.scss       styles entry point: @use the partials (_page, _header, _card), compiled by Vite
 src/config/teams.ts      the 30 teams: location, name, colors
-src/config/scoring.ts    EVERY setting of the algorithm
+src/config/scoring.ts    the settings of the algorithm (example values; real ones are a secret)
 src/lib/scoring.ts       the algorithm (pure functions)
 src/types/game.ts        the in-house Game type, independent of any API
 src/types/public.ts      the public JSON format
@@ -69,13 +69,19 @@ fixtures/                real games of April 4, 2026, to develop without network
 
 The rating only measures what happened on the court, never who was playing.
 
-1. **Competitive or blowout?** Competitive if the margin is ≤ 10 at the end of regulation, or ≤ 5 at the end of the 3rd quarter, or if the losing team led by 12 or more.
-2. **Competitive**: 50 points, plus up to 30 points of competitiveness and entertainment (suspense, scenario, comeback, points scored per 48 min), plus performances: every player above 30 efficiency adds `(eff − 30)² / 20`, uncapped.
-3. **Blowout**: same calculation, capped at 49. A blowout stays a blowout.
+1. **Competitive or blowout?** A game is competitive if it was close at the end of regulation, if the fourth
+   quarter was still up for grabs, or if a team came back from a big deficit. Competitive games are rated from 50 up;
+   blowouts never go above 49. A blowout stays a blowout, even with a monster stat line.
+2. **How good was it?** Suspense, twists (lead changes, ties), comebacks, offense, and big individual performances
+   (the bigger, the more it counts).
 
-Games are ranked on the raw rating (which can exceed 100); the display is capped at 100. The raw rating is in the public JSON (`raw`), never shown on the site: it says nothing about the winner, and whoever digs into the JSON is welcome to it.
+Games are ranked on the raw rating (which can exceed 100); the display is capped at 100. The raw rating is in the
+public JSON (`raw`), never shown on the site: it says nothing about the winner.
 
-Full formulas and worked examples on real games: [`algorithm.txt`](algorithm.txt).
+**The code is open, the settings are not.** `src/lib/scoring.ts` is the whole algorithm, but the values in
+`src/config/scoring.ts` are examples. The real ones live in the `SCORING_CONFIG` secret on GitHub Actions
+(*Settings → Secrets and variables → Actions*), or in a local `scoring.secret.json` (ignored by Git) to test with
+them. Without either, the script runs with the examples and says so; on GitHub, it refuses to publish.
 
 ## Deployment
 
