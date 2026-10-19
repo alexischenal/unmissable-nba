@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Unmissable's icons. Use one in a component with:
+      <svg className="…" aria-hidden="true"><use href="/sprite.svg#dots" /></svg>
+    Each icon takes the color of its text (currentColor). Its size comes from the CSS of the outer <svg>.
+  -->
+  <style>
+    /* "In progress..." — the dots appear one after the other, then start again */
+    .dot { opacity: 0; animation: dot 1.5s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.25s; }
+    .dot:nth-child(3) { animation-delay: 0.5s; }
+    /* Visitors who turned motion off: the three dots just stay */
+    @media (prefers-reduced-motion: reduce) {
+      .dot { opacity: 1; animation: none; }
+    }
+    @keyframes dot {
+      0%, 15% { opacity: 0; }
+      30%, 80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+
+  <!-- Three dots, animated: after "In progress" -->
+  <symbol id="dots" viewBox="0 0 30 6" fill="currentColor">
+    <circle class="dot" cx="3" cy="3" r="3" />
+    <circle class="dot" cx="15" cy="3" r="3" />
+    <circle class="dot" cx="27" cy="3" r="3" />
+  </symbol>
+</svg>

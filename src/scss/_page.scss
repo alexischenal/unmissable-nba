@@ -57,6 +57,16 @@ body {
     }
   }
 
+  // "In progress..." — the dots come from public/sprite.svg (#dots), which also holds their animation.
+  // Sized in em, so they follow the heading's font size; they take its color (currentColor).
+  .games__dots {
+    width: 0.8em;
+    height: 0.16em;
+    margin-left: 0.14em;
+    vertical-align: baseline;
+    overflow: visible;
+  }
+
   .games__list {
     list-style: none;
     margin: 0;
