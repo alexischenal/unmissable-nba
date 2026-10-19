@@ -4,13 +4,12 @@
 //   1. rated games, best first;
 //   2. then the others, by tip-off time.
 //
-// The raw rating (which can exceed 100) is only known for games rated during this run:
-// it breaks ties between them. Between a game rated earlier and one rated now, the earlier
-// one keeps its place.
+// Ties on the displayed rating (two 100s) are broken by the raw rating, kept in the JSON.
+// Files written before the raw rating existed don't have it: the earlier game keeps its place.
 
 import type { PublicGame } from '../../src/types/public.ts';
 
-export type Entry = PublicGame & { raw?: number };
+export type Entry = PublicGame;
 
 export function orderGames(previous: PublicGame[], entries: Entry[]): PublicGame[] {
   const key = (g: PublicGame) => `${g.away}@${g.home}`;
@@ -29,5 +28,5 @@ export function orderGames(previous: PublicGame[], entries: Entry[]): PublicGame
     .filter((g) => g.note === undefined)
     .sort((a, b) => tip(a) - tip(b) || key(a).localeCompare(key(b)));
 
-  return [...rated, ...unrated].map(({ raw: _raw, ...game }) => game);
+  return [...rated, ...unrated];
 }

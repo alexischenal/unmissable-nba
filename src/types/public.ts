@@ -1,12 +1,15 @@
 // src/types/public.ts
 // The public JSON read by the site. Zero spoilers, guaranteed by the architecture:
-// it ONLY contains the teams, the tip-off time and the displayed rating, never the score.
+// it ONLY contains the teams, the tip-off time and the ratings, never the score.
 
 export type PublicGame = {
   away: string; // abbreviation, e.g. 'SAS'
   home: string; // e.g. 'DEN'
   tipOff?: string; // ISO time in UTC (version 2). Missing in version 1 files.
   note?: number; // displayed rating, 0 to 100 — only once the game is over
+  // Raw rating, can exceed 100 (one decimal). Not shown on the site: it ranks games with the
+  // same displayed rating (two 100s) from one run to the next. Says nothing about the winner.
+  raw?: number;
 };
 
 export type NightJson = {

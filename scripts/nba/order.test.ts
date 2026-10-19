@@ -23,7 +23,16 @@ test('two 100s rated in the same run: the raw rating decides', () => {
   assert.deepEqual(names(games), ['C', 'A']);
 });
 
-test('a 100 rated earlier keeps its place over a new 100', () => {
+test('two 100s rated at different runs: the raw rating kept in the JSON still decides', () => {
+  const previous = [{ away: 'A', home: 'B', note: 100, raw: 104 }];
+  const games = orderGames(previous, [
+    { away: 'C', home: 'D', note: 100, raw: 150 },
+    { away: 'A', home: 'B', note: 100, raw: 104 },
+  ]);
+  assert.deepEqual(names(games), ['C', 'A']);
+});
+
+test('an older file without raw ratings: the 100 rated earlier keeps its place', () => {
   const previous = [{ away: 'A', home: 'B', note: 100 }];
   const games = orderGames(previous, [
     { away: 'C', home: 'D', note: 100, raw: 150 },
@@ -32,7 +41,7 @@ test('a 100 rated earlier keeps its place over a new 100', () => {
   assert.deepEqual(names(games), ['A', 'C']);
 });
 
-test('the raw rating is never published', () => {
-  const [game] = orderGames([], [{ away: 'A', home: 'B', note: 100, raw: 123 }]);
-  assert.deepEqual(Object.keys(game!), ['away', 'home', 'note']);
+test('the raw rating is kept in the JSON', () => {
+  const [game] = orderGames([], [{ away: 'A', home: 'B', note: 100, raw: 123.1 }]);
+  assert.equal(game!.raw, 123.1);
 });

@@ -73,7 +73,7 @@ The rating only measures what happened on the court, never who was playing.
 2. **Competitive**: 50 points, plus up to 30 points of competitiveness and entertainment (suspense, scenario, comeback, points scored per 48 min), plus performances: every player above 30 efficiency adds `(eff − 30)² / 20`, uncapped.
 3. **Blowout**: same calculation, capped at 49. A blowout stays a blowout.
 
-Games are ranked on the raw rating (which can exceed 100); the display is capped at 100.
+Games are ranked on the raw rating (which can exceed 100); the display is capped at 100. The raw rating is in the public JSON (`raw`), never shown on the site: it says nothing about the winner, and whoever digs into the JSON is welcome to it.
 
 Full formulas and worked examples on real games: [`algorithm.txt`](algorithm.txt).
 
