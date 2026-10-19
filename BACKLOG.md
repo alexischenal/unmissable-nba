@@ -28,7 +28,19 @@
      About 30% fewer runs. To check against the season's real schedule before switching it on.
    - [ ] **GitHub's own schedule down to once an hour** once cron-job.org has proved reliable: it's only the fallback.
    - With all three: under ~20 kWh a year.
-3. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+3. **High priority — "Night of X" and "Next", no "Previous".** Unmissable isn't an archive: one night on
+   screen, plus a peek at the next one. Two pages, never more.
+   - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
+   - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain, with
+     that night's date somewhere visible (e.g. `Next · October 21–22`). The site name also leads home.
+   - **"Next" = the next night with games**, not the next calendar day: during a day off it skips ahead, and the
+     date says which night it is. No next night with games (All-Star break, off-season): no "Next" at all.
+   - **Next page content**: the "Coming up" cards only (tip-off times in the visitor's time zone), neutral,
+     no rating. Details in the "Next night" page section below.
+   - **Data**: the script publishes `public/data/next.json` (teams + tip-off times, nothing else), from the
+     schedule read once a day (see item 2). When the next night's first game tips off, it becomes the home page.
+   - Replaces the old three-night idea (Yesterday / Tonight / Tomorrow with two arrows).
+4. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
@@ -77,15 +89,11 @@ Pick one at random among several so returning visitors don't always see the same
   - **Far left**: the burger menu, before the name (on desktop too).
   - **Left**: "unmissable.watch", link to the home page (= the current night).
   - **Centre**: "Last update X min ago", with the night label ("Night of October 20–21") just under it.
-  - **Right**: the two navigation arrows (back / forward one night).
+  - **Right**: the night switch, "Night of X" and "Next" side by side (see "Next up").
   - **As the screen narrows, items move into the burger** (the "priority+" pattern): on mobile, none of it fits.
-    On mobile, keep only **the burger, the name and the two navigation arrows**; "Last update" and the
-    night label go into the burger.
+    On mobile, keep only **the burger, the name and the night switch**; "Last update" goes into the burger.
   - **Navigating from night to night updates the header**: the night label and "Last update" always describe
     the night on screen (each night's JSON carries its own date and `updatedAt`).
-    On mobile, keep a **short label always visible, right under the two arrows** ("Yesterday" / "Tonight" /
-    "Tomorrow"): it sits next to the control that changes it, so tapping an arrow and seeing the label
-    change go together. With the full night label in the burger, nothing else would say which night you're on.
   - Implementation: simplest and most robust is to have each item in both places (header and menu) and
     show one or the other with media queries (or container queries on the header). No JavaScript moving
     elements around. Hidden copies use `display: none`, so screen readers don't read them twice.
@@ -257,9 +265,9 @@ To do after the box score is validated (October 21) and the current algorithm is
   - Even lighter option: GoatCounter can count with a tiny image instead of JavaScript.
   - Alternatives considered: Cloudflare Web Analytics (needs a Cloudflare account), Umami (more to set up).
 
-## Much later — "Next night" page
+## "Next night" page — details
 
-Not before the progressive updates are in place. The site could also become the place to check
+Now high priority (see "Next up"). The site could also become the place to check
 what's on tonight, in your own time. Partly covered by the main page from the first tip-off ("Coming up"
 cards); this separate page is for checking tonight's slate earlier in the day, before any game has started.
 Same card design as the "Coming up" state.
@@ -290,22 +298,7 @@ because of their Paris tip-off times. Same night, two days. Unmissable groups by
   shows the local tip-off time ("01:30") instead of a rating, with "Paris time · in 6 h 30 min" as a small line.
   Do both, so a time is never read as a rating: an outlined box instead of a filled one, and a clear page
   title ("Tonight" vs "Last night").
-- **Navigation: three nights, no more — a back arrow and a forward arrow side by side in the header.**
-  Unmissable is not an archive site: you can go one night back and one night forward, that's it.
-  - Strictly the **calendar nights next to the one on screen**: the arrows only ever move one night back or
-    one night forward. Both targets update at the first tip-off, together with the main page.
-  - **If the adjacent night has no games, its arrow is disabled** (greyed, not clickable), in both directions.
-    E.g. during the All-Star break, no forward arrow at all — we don't jump to the next night with games.
-    Someone reaching an empty night anyway (old link, typed URL) gets the no-games screen.
-  - Labels (relative to now, everyday words): **"Yesterday" / "Tonight" / "Tomorrow"** — symmetric, and a
-    little wink to an audience that watches games at 3 a.m. and for whom time stopped meaning much anyway.
-    Since the arrows never skip a night, "Yesterday" and "Tomorrow" are always true.
-  - On the "Last night" page, the back button is disabled (no further back); on the "Next night" page, the
-    forward button is disabled. Each page has a way back to the main page.
-  - Technically easy: every night is already saved as its own JSON (`public/data/YYYY-MM-DD.json`, empty
-    nights included) and the page already reads `?date=YYYY-MM-DD`. "Last night" = the calendar night
-    before; the page reads its JSON and disables the button if `games` is empty.
-  - A toggle between "current" and "next" was considered and dropped: harder to fit in the header.
+- **Navigation: see "Next up" — "Night of X" and "Next", no "Previous".**
 
 ## Launch
 
