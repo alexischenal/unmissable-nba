@@ -27,6 +27,6 @@ export async function loadNight(signal?: AbortSignal): Promise<NightJson> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/${file}`, { cache: 'no-cache', signal });
   if (!res.ok) throw new Error(`Could not load ${file} (${res.status})`);
   const json = (await res.json()) as NightJson;
-  if (json.version !== 1 || !Array.isArray(json.games)) throw new Error('Unknown data format');
+  if ((json.version !== 1 && json.version !== 2) || !Array.isArray(json.games)) throw new Error('Unknown data format');
   return json;
 }
