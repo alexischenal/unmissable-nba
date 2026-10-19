@@ -9,7 +9,7 @@ import '@fontsource/big-shoulders-display/700';
 import '@fontsource/big-shoulders-display/900';
 import '@fontsource/barlow-condensed/500';
 import '@fontsource/barlow-condensed/600';
-import './styles.scss';
+import './scss/main.scss';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

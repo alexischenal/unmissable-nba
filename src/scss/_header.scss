@@ -1,0 +1,32 @@
+// Header: brand, night label, title
+
+.page__header {
+  padding: 0 4px 16px;
+}
+
+.page__brand {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page__night {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.page__title {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 10vw, 56px);
+  line-height: 1;
+  text-transform: uppercase;
+}

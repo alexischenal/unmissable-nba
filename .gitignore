@@ -2,3 +2,5 @@ node_modules
 dist
 .idea/workspace.xml
 .DS_Store
+# Local demo nights (see README)
+public/data/2099-*.json

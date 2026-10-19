@@ -50,7 +50,7 @@ src/App.tsx              the page: header, list of games, footer
 src/components/          MatchCard (one game)
 src/hooks/useNight.ts    loads the night: loading / ready / error
 src/lib/night.ts         fetching the JSON, "Night of…" label (no React)
-src/styles.scss          all the styles (Sass, compiled by Vite)
+src/scss/main.scss       styles entry point: @use the partials (_page, _header, _card), compiled by Vite
 src/config/teams.ts      the 30 teams: location, name, colors
 src/config/scoring.ts    EVERY setting of the algorithm
 src/lib/scoring.ts       the algorithm (pure functions)

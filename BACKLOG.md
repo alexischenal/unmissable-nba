@@ -8,10 +8,6 @@
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
    record in the meantime: it stops anyone else from claiming the domain on GitHub Pages.
-3. **Split the SCSS into partials** (`_tokens.scss`, `_card.scss`, `_page.scss`…). Setup done: `sass-embedded`
-   is installed, Vite compiles `src/styles.scss` on its own. Use `@use` / `@forward`, not `@import`. Keep CSS
-   custom properties for runtime values (`--primary`, `--secondary`, `--card-h`).
-
 ---
 
 Ideas parked for later. Nothing below is needed for v1.
