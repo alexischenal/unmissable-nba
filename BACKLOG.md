@@ -50,7 +50,16 @@
    - **Data**: the script publishes `public/data/next.json` (teams + tip-off times, nothing else), from the
      schedule read once a day (see item 2). When the next night's first game tips off, it becomes the home page.
    - Replaces the old three-night idea (Yesterday / Tonight / Tomorrow with two arrows).
-4. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+4. **High priority — learn container queries (`cqi` and friends).** Pure CSS, no JavaScript, no cost at load
+   time: `1cqi` = 1% of the width of the nearest container (`container-type: inline-size`). Already used on the
+   site: `.card__side` is a container, and the team names on phones are `20cqi`. Also: `cqw`, `cqh`, `cqmin`,
+   and `@container` rules (styles that depend on a component's own width, not the screen's).
+   Reading: MDN, "CSS container queries" (https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries),
+   section "Container query length units".
+   - [ ] First use case: on the featured card, on phones, size the watermark abbreviation (`.card__abbr`) in `cqi`
+     instead of `card height × 0.95`, so the three letters always fill their half (today it's a happy accident at
+     ~396px wide). Abbreviations differ in width (OKC vs LAL): close, not pixel-perfect.
+5. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
