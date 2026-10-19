@@ -87,8 +87,9 @@ STEP 3 — RANKING AND DISPLAY
   - Games are ranked on the RAW rating, which can exceed 100
     (two games both shown at "100" keep their order).
   - The displayed rating is min(100, round(raw)).
-  - The public JSON only contains the teams and the displayed rating,
-    already sorted. Never the score.
+  - The public JSON only contains the teams, the tip-off time, the displayed
+    rating and the raw rating (one decimal, not shown on the site), already
+    sorted. Never the score.
 
 
 WORKED EXAMPLES — NIGHT OF APRIL 4, 2026

@@ -29,6 +29,7 @@ import { nightIsComplete, type NightJson } from '../src/types/public.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(ROOT, 'public', 'data');
+const round1 = (x: number) => Math.round(x * 10) / 10;
 const fileFor = (date: string) => path.join(OUT_DIR, `${date}.json`);
 
 async function readNight(file: string): Promise<NightJson | null> {
@@ -60,7 +61,7 @@ function logRated(game: Game): void {
 async function updateNight(schedule: RawSchedule, date: string, now: number): Promise<NightJson> {
   const previous = (await readNight(fileFor(date)))?.games ?? [];
   const alreadyRated = new Map(
-    previous.filter((g) => g.note !== undefined).map((g) => [`${g.away}@${g.home}`, g.note]),
+    previous.filter((g) => g.note !== undefined).map((g) => [`${g.away}@${g.home}`, g]),
   );
 
   // A game that hasn't started is only treated as postponed once the night is surely over
@@ -77,9 +78,9 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     const label = `${away}@${home}`;
     const base = { away, home, ...(g.gameDateTimeUTC ? { tipOff: g.gameDateTimeUTC } : {}) };
 
-    const note = alreadyRated.get(label);
-    if (note !== undefined) {
-      entries.push({ ...base, note });
+    const rated = alreadyRated.get(label);
+    if (rated) {
+      entries.push({ ...base, note: rated.note, ...(rated.raw !== undefined ? { raw: rated.raw } : {}) });
       continue;
     }
     if (base.tipOff && Date.parse(base.tipOff) > now) {
@@ -114,7 +115,7 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     }
     const game = toGame(box!);
     logRated(game);
-    entries.push({ ...base, note: displayScore(game), raw: rawScore(game) });
+    entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)) });
   }
 
   return { version: 2, date, games: orderGames(previous, entries) };
@@ -128,7 +129,7 @@ async function fixtureNight(): Promise<NightJson> {
   ]);
   const games = [sasAtDen, wasAtMia, detAtPhi];
   games.forEach(logRated);
-  const entries = games.map((g) => ({ away: g.away, home: g.home, note: displayScore(g), raw: rawScore(g) }));
+  const entries = games.map((g) => ({ away: g.away, home: g.home, note: displayScore(g), raw: round1(rawScore(g)) }));
   return { version: 2, date: '2026-04-04', games: orderGames([], entries) };
 }
 
