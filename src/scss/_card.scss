@@ -50,7 +50,9 @@
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
-    --location-size: 12px;
+    --location-size: 10px;
+    --name-size: 18cqi;
+    --name-max: 24px;
     --name-font: min(var(--name-max), var(--name-size));
   }
 
@@ -190,6 +192,8 @@
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
+    --name-size: 22cqi;
+    --name-max: 30px;
   }
 }
 
