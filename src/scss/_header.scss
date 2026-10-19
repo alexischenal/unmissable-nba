@@ -1,5 +1,7 @@
 // Header: brand, night label, title
 
+@use "variables" as *;
+
 .header {
   padding: 0 4px 16px;
   background-color: $black;
