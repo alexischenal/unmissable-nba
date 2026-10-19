@@ -2,7 +2,7 @@
 
 **What to watch this morning.** Last night's NBA games, ranked **without a single spoiler**: you see which game is worth your time, never who won.
 
-Live at [unmissable.am](https://unmissable.am) — *a.m.*, because it's made for the morning after.
+Live at [unmissable.watch](https://unmissable.watch).
 
 > Not affiliated with the NBA. No official logos or typefaces: team colors and abbreviations only.
 
@@ -49,7 +49,7 @@ src/App.tsx              the page: header, list of games, footer
 src/components/          MatchCard (one game)
 src/hooks/useNight.ts    loads the night: loading / ready / error
 src/lib/night.ts         fetching the JSON, "Night of…" label (no React)
-src/styles.css           all the styles
+src/styles.scss          all the styles (Sass, compiled by Vite)
 src/config/teams.ts      the 30 teams: location, name, colors
 src/config/scoring.ts    EVERY setting of the algorithm
 src/lib/scoring.ts       the algorithm (pure functions)
