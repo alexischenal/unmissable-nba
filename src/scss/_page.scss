@@ -38,10 +38,30 @@ body {
 }
 
 .games {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
+  // One group of games: rated, in progress, coming up
 
+  .games__heading {
+    margin: 0;
+    padding: 28px 20px 12px;
+    font-family: $font-display;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $ink;
+
+    @media (max-width: $breakpoint-mobile) {
+      padding: 20px 12px 8px;
+      font-size: 20px;
+    }
+  }
+
+  .games__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
 }

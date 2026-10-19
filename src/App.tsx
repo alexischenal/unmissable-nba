@@ -4,15 +4,30 @@
 import { MatchCard } from './components/MatchCard.tsx';
 import { useNight } from './hooks/useNight.ts';
 import { nightLabel } from './lib/night.ts';
-import { gameState, nightIsComplete } from './types/public.ts';
+import { gameState, nightIsComplete, type GameState, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
 const LOADED_AT = Date.now();
+
+// The three groups, in display order. Rated games come first, without a heading;
+// the next groups get an <h2> to separate them.
+const GROUPS: { state: GameState; heading: string | null; label: string }[] = [
+  { state: 'rated', heading: null, label: 'Finished games, most recommended first' },
+  { state: 'live', heading: 'In progress', label: 'Games in progress' },
+  { state: 'upcoming', heading: 'Coming up', label: 'Games not started yet' },
+];
 
 export function App() {
   const state = useNight();
   const night = state.status === 'ready' ? state.night : null;
   const complete = night !== null && nightIsComplete(night);
+
+  // The games split by state, keeping the JSON's order (rated: best first; others: by tip-off)
+  const byState = new Map<GameState, { game: PublicGame; index: number }[]>();
+  night?.games.forEach((game, index) => {
+    const s = gameState(game, LOADED_AT);
+    byState.set(s, [...(byState.get(s) ?? []), { game, index }]);
+  });
 
   let status: string | null = null;
   if (state.status === 'loading') status = 'Loading games…';
@@ -30,19 +45,28 @@ export function App() {
 
       <p className="page__status" role="status" hidden={status === null}>{status}</p>
 
-      <ol className="games" aria-label="Last night's games, most recommended first">
-        {night?.games.map((game, i) => (
-          <li className="games__item" key={`${game.away}@${game.home}`}>
-            <MatchCard
-              game={game}
-              state={gameState(game, LOADED_AT)}
-              rank={i + 1}
-              // A 100 is featured right away; otherwise the best game, once the whole night is rated.
-              featured={game.note === 100 || (complete && i === 0)}
-            />
-          </li>
-        ))}
-      </ol>
+      {GROUPS.map(({ state: groupState, heading, label }) => {
+        const games = byState.get(groupState) ?? [];
+        if (games.length === 0) return null;
+        return (
+          <section className="games" key={groupState}>
+            {heading && <h2 className="games__heading">{heading}</h2>}
+            <ol className="games__list" aria-label={label}>
+              {games.map(({ game, index }) => (
+                <li className="games__item" key={`${game.away}@${game.home}`}>
+                  <MatchCard
+                    game={game}
+                    state={groupState}
+                    rank={index + 1}
+                    // A 100 is featured right away; otherwise the best game, once the whole night is rated.
+                    featured={game.note === 100 || (complete && index === 0)}
+                  />
+                </li>
+              ))}
+            </ol>
+          </section>
+        );
+      })}
 
       <footer className="page__footer">
         Not affiliated with the NBA. Ratings only measure what happened on the court.
