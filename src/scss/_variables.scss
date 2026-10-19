@@ -20,7 +20,8 @@ $font-text: "Barlow Condensed", "Arial Narrow", sans-serif;
 $gap: 0;
 $gap-tablet: 14px;
 $radius: 6px;
-$stripe: 10px; // secondary color stripe on the card edges
+$stripe: 20px;        // secondary color stripe on the card edges (desktop and laptops)
+$stripe-tablet: 10px; // the same stripe on tablets and phones
 $diag-ratio: 0.27; // diagonal cut: horizontal offset = card height × this ratio (same angle at every height)
 
 // Breakpoints
