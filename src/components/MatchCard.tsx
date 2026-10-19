@@ -11,10 +11,10 @@ import type { GameState, PublicGame } from '../types/public.ts';
 
 const FALLBACK_TEAM: Team = { location: '', name: '?', primary: '#5C5A55', secondary: '#141414' };
 
-// Break point (soft hyphen) for a single-word name that is too long:
-// "TIMBER- / WOLVES" on two lines, at the same size as the other names.
+// Break point for a single-word name that is too long: "TIMBER / WOLVES" on two lines (no hyphen),
+// at the same size as the other names. A zero-width space: invisible, and only breaks if needed.
 const SOFT_BREAKS: Record<string, string> = {
-  Timberwolves: 'Timber­wolves',
+  Timberwolves: 'Timber\u200Bwolves',
 };
 
 // The browser's locale and time zone: "21:00" in Paris, "3:00 PM" in New York.
