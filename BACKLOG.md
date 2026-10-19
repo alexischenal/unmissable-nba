@@ -5,7 +5,7 @@
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
    GitHub API. GitHub's schedule stays as a fallback.
-   - [ ] Merge PR #22 first (dispatched runs only redeploy when there's new data).
+   - [x] Merge PR #22 first (dispatched runs only redeploy when there's new data).
    - [ ] GitHub token: *Settings → Developer settings → Personal access tokens → Fine-grained*, repository
      `unmissable-nba` only, permission *Actions: Read and write* only, expiration 1 year (date in the calendar).
      Never paste it anywhere else than cron-job.org.
@@ -15,7 +15,42 @@
    - [ ] Check: *Actions* shows `workflow_dispatch` runs every 5 minutes (~20 s when idle), cron-job.org gets a 204.
    - Duplicates with GitHub's schedule are harmless: the `data` and `pages` concurrency groups never run twice
      at once, and the script does nothing when the night is up to date.
-2. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+2. **High priority — fewer, lighter runs (ecological footprint).** ~400 runs a day (cron-job.org every 5 min +
+   GitHub every 15 min), ~40–60 kWh a year (rough estimate). Most of it is wasted:
+   - [ ] **Read the full-season schedule once a day, not on every run.** `scheduleLeagueV2.json` weighs several MB
+     and is downloaded ~400 times a day to read three lines. Cache it between runs (e.g. a daily copy of the
+     current night's games), or use the small daily file `liveData/scoreboard/todaysScoreboard_00.json`.
+     Network divided by ~100.
+   - [ ] **A daily window with no runs at all.** No NBA game can end between the latest finish (~1:30 a.m. ET with
+     overtime, ~06:30 UTC) and the earliest tip-off (noon ET on weekends and holidays = 16:00 UTC in summer time,
+     17:00 UTC in winter; games in Europe tip around 19:00–20:00 local time = 18:00–19:00 UTC).
+     Candidate: no runs from 08:00 to 15:00 UTC, on cron-job.org and in GitHub's schedule (`*/15 15-23,0-7 * * *`).
+     About 30% fewer runs. To check against the season's real schedule before switching it on.
+   - [ ] **GitHub's own schedule down to once an hour** once cron-job.org has proved reliable: it's only the fallback.
+   - With all three: under ~20 kWh a year.
+3. **High priority — "Night of X" and "Next", no "Previous".** Unmissable isn't an archive: one night on
+   screen, plus a peek at the next one. Two pages, never more.
+   - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
+   - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain.
+     The label is always the home page night, so the link says where it leads.
+   - **URL: `unmissable.watch/next`.** GitHub Pages only serves files that exist, so the build copies
+     `dist/index.html` to `dist/next/index.html` (one line after `vite build`); the app reads
+     `location.pathname` to know which page it's on. No router library needed for two pages.
+   - **If "Next" isn't obvious enough as a link**: underlined and in white. Decide at design time.
+   - **The logo (`UNMISSABLE` in the header) links to the home page**, on the Next page and everywhere else.
+     The burger menu has the link too.
+   - **"Next" = the next calendar night, only if it has games.** No games tomorrow: no "Next" button. No skipping
+     ahead, so "Next" always means tomorrow night and needs no date.
+   - **The home page night expires after 24 hours.** It stays on screen until the next night's first tip-off,
+     but if no new night has started 24 hours after it ended (day off, All-Star break, off-season), the home
+     page switches to the "No more games" screen (GIFs).
+   - **The site restarts on its own** at the next night's first tip-off: that night becomes the home page.
+   - **Next page content**: the "Coming up" cards only (tip-off times in the visitor's time zone), neutral,
+     no rating. Details in the "Next night" page section below.
+   - **Data**: the script publishes `public/data/next.json` (teams + tip-off times, nothing else), from the
+     schedule read once a day (see item 2). When the next night's first game tips off, it becomes the home page.
+   - Replaces the old three-night idea (Yesterday / Tonight / Tomorrow with two arrows).
+4. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
@@ -31,9 +66,9 @@ Rules for every GIF: official GIPHY embed (no self-hosted copy), the light video
 (MP4/WebM) rather than the .gif, alt text, and a still image under `prefers-reduced-motion`.
 Pick one at random among several so returning visitors don't always see the same one.
 
-- **No games** — same treatment for **yesterday and tomorrow**: the arrow towards an empty night is disabled,
-  and anyone reaching that night anyway sees the no-games screen, with a copy adapted to the direction
-  ("No games last night." / "No games tomorrow.") and the same GIF rotation.
+- **No more games** — shown when the home page night is over 24 hours old and no new night has started
+  (day off, All-Star break, off-season), until the next night's first tip-off. Also for an old link to an empty
+  night. Same GIF rotation.
 - **No games last night** (All-Star break, off days)
   - **Nick Young celebrating a three that misses.** The user opened the site sure there'd be a game… and there isn't.
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
@@ -64,15 +99,11 @@ Pick one at random among several so returning visitors don't always see the same
   - **Far left**: the burger menu, before the name (on desktop too).
   - **Left**: "unmissable.watch", link to the home page (= the current night).
   - **Centre**: "Last update X min ago", with the night label ("Night of October 20–21") just under it.
-  - **Right**: the two navigation arrows (back / forward one night).
+  - **Right**: the night switch, "Night of X" and "Next" side by side (see "Next up").
   - **As the screen narrows, items move into the burger** (the "priority+" pattern): on mobile, none of it fits.
-    On mobile, keep only **the burger, the name and the two navigation arrows**; "Last update" and the
-    night label go into the burger.
+    On mobile, keep only **the burger, the name and the night switch**; "Last update" goes into the burger.
   - **Navigating from night to night updates the header**: the night label and "Last update" always describe
     the night on screen (each night's JSON carries its own date and `updatedAt`).
-    On mobile, keep a **short label always visible, right under the two arrows** ("Yesterday" / "Tonight" /
-    "Tomorrow"): it sits next to the control that changes it, so tapping an arrow and seeing the label
-    change go together. With the full night label in the burger, nothing else would say which night you're on.
   - Implementation: simplest and most robust is to have each item in both places (header and menu) and
     show one or the other with media queries (or container queries on the header). No JavaScript moving
     elements around. Hidden copies use `display: none`, so screen readers don't read them twice.
@@ -93,8 +124,16 @@ Pick one at random among several so returning visitors don't always see the same
     Say "check", not "update": a check only updates the site if a game has finished since the last one.
     The schedule then lives in three places (front, workflow, cron-job.org): keep the front's copy in one
     shared constant, and update all three together.
-  - **How the rating works** (the text in `how-it-works.txt`).
-  - **About**: not affiliated with the NBA, no cookies, link to the GitHub repo.
+  - **How the rating works** — a page of its own, from `how-it-works.txt`. Its name, to pick among:
+    **The Playbook** (working title: a team's book of plays, "how we play"), **Chalk Talk** (the coach at the
+    whiteboard), **Film Room** (where players rewatch games), **Why 100?**.
+  - **Next night** (link to `/next`; on the Next page, the link back to the home page instead).
+  - **Legal notice** (mandatory in France, even for a personal site): publisher (name, or a contact with the
+    details left with the host), host (GitHub, with its address), no cookies, visit counter without personal
+    data, not affiliated with the NBA, a line on team names and the data used. To check with the official
+    wording before launch.
+- **Small footer with the same links** (rating page, Next night, Legal notice), plus the "Not affiliated with
+  the NBA" line already there. On desktop, where the burger isn't needed, it's the main way to reach them.
 
 - **Tags per game** (tap a card to reveal them). Only on-court facts, never prestige ("top clash", rivalry…).
   Rate each tag's spoiler risk; a spoiler tag needs an explicit second action.
@@ -235,8 +274,9 @@ To do after the box score is validated (October 21) and the current algorithm is
   — a 100 always involves at least one exceptional individual night.
   If there are more than 1–2 per week, don't touch the 80: raise the performance divisor in
   `src/config/scoring.ts` (20 today). At 25: EFF 50 → 16 points instead of 20, EFF 60 → 36 instead of 45.
-- **Favicon — done (October 19)**: the note box with "100" in the display font. Still to do: a social preview
-  image (link shared on WhatsApp, Messenger…) with the same mark, neutral, nothing about results.
+- **Favicon — done (October 19)**: a plain dark square with "100" in the display font (no border, square corners),
+  as `favicon.svg`, `favicon.ico` and `apple-touch-icon.png`. Still to do: a social preview image (link shared on
+  WhatsApp, Messenger…) with the same mark, neutral, nothing about results.
 - **Visit counter — the simplest and least invasive possible: GoatCounter.**
   - One `<script>` line in `index.html`, free for non-commercial use, open source, no cookies, no personal data
     stored, no cross-site tracking. Gives the essentials only: visits per day, pages, referrers, screen sizes.
@@ -244,9 +284,9 @@ To do after the box score is validated (October 21) and the current algorithm is
   - Even lighter option: GoatCounter can count with a tiny image instead of JavaScript.
   - Alternatives considered: Cloudflare Web Analytics (needs a Cloudflare account), Umami (more to set up).
 
-## Much later — "Next night" page
+## "Next night" page — details
 
-Not before the progressive updates are in place. The site could also become the place to check
+Now high priority (see "Next up"). The site could also become the place to check
 what's on tonight, in your own time. Partly covered by the main page from the first tip-off ("Coming up"
 cards); this separate page is for checking tonight's slate earlier in the day, before any game has started.
 Same card design as the "Coming up" state.
@@ -277,22 +317,7 @@ because of their Paris tip-off times. Same night, two days. Unmissable groups by
   shows the local tip-off time ("01:30") instead of a rating, with "Paris time · in 6 h 30 min" as a small line.
   Do both, so a time is never read as a rating: an outlined box instead of a filled one, and a clear page
   title ("Tonight" vs "Last night").
-- **Navigation: three nights, no more — a back arrow and a forward arrow side by side in the header.**
-  Unmissable is not an archive site: you can go one night back and one night forward, that's it.
-  - Strictly the **calendar nights next to the one on screen**: the arrows only ever move one night back or
-    one night forward. Both targets update at the first tip-off, together with the main page.
-  - **If the adjacent night has no games, its arrow is disabled** (greyed, not clickable), in both directions.
-    E.g. during the All-Star break, no forward arrow at all — we don't jump to the next night with games.
-    Someone reaching an empty night anyway (old link, typed URL) gets the no-games screen.
-  - Labels (relative to now, everyday words): **"Yesterday" / "Tonight" / "Tomorrow"** — symmetric, and a
-    little wink to an audience that watches games at 3 a.m. and for whom time stopped meaning much anyway.
-    Since the arrows never skip a night, "Yesterday" and "Tomorrow" are always true.
-  - On the "Last night" page, the back button is disabled (no further back); on the "Next night" page, the
-    forward button is disabled. Each page has a way back to the main page.
-  - Technically easy: every night is already saved as its own JSON (`public/data/YYYY-MM-DD.json`, empty
-    nights included) and the page already reads `?date=YYYY-MM-DD`. "Last night" = the calendar night
-    before; the page reads its JSON and disables the button if `games` is empty.
-  - A toggle between "current" and "next" was considered and dropped: harder to fit in the header.
+- **Navigation: see "Next up" — "Night of X" and "Next", no "Previous".**
 
 ## Launch
 
