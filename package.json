@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "fetch": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts",
     "fetch:fixture": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts --fixture",
-    "test": "node --experimental-strip-types --no-warnings --test scripts/nba/plan.test.ts scripts/nba/order.test.ts"
+    "test": "node --experimental-strip-types --no-warnings --test scripts/nba/plan.test.ts scripts/nba/order.test.ts src/lib/colors.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.2.0",

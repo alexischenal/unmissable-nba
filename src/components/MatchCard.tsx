@@ -6,6 +6,7 @@
 
 import type { CSSProperties } from 'react';
 import { TEAMS, type Team } from '../config/teams.ts';
+import { cardColors, type Colors } from '../lib/colors.ts';
 import type { GameState, PublicGame } from '../types/public.ts';
 
 const FALLBACK_TEAM: Team = { location: '', name: '?', primary: '#5C5A55', secondary: '#141414' };
@@ -23,12 +24,12 @@ function teamFor(abbr: string): Team {
   return TEAMS[abbr] ?? { ...FALLBACK_TEAM, name: abbr };
 }
 
-type TeamSideProps = { side: 'away' | 'home'; abbr: string; team: Team };
+type TeamSideProps = { side: 'away' | 'home'; abbr: string; team: Team; colors: Colors };
 
-function TeamSide({ side, abbr, team }: TeamSideProps) {
-  const colors = { '--primary': team.primary, '--secondary': team.secondary } as CSSProperties;
+function TeamSide({ side, abbr, team, colors }: TeamSideProps) {
+  const style = { '--primary': colors.primary, '--secondary': colors.secondary } as CSSProperties;
   return (
-    <div className={`card__side card__side--${side}`} style={colors}>
+    <div className={`card__side card__side--${side}`} style={style}>
       <span className="card__abbr" aria-hidden="true">{abbr}</span>
       <span className="card__location">{team.location}</span>
       <span className="card__name">{SOFT_BREAKS[team.name] ?? team.name}</span>
@@ -54,6 +55,8 @@ type MatchCardProps = { game: PublicGame; state: GameState; rank: number; featur
 export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   const away = teamFor(game.away);
   const home = teamFor(game.home);
+  // Two teams with the same color (PHI and NYK): one switches, so the diagonal stays visible
+  const colors = cardColors(away, home);
 
   const classes = ['card', featured && 'card--featured', state !== 'rated' && `card--${state}`];
   const teams = `${away.location} ${away.name} at ${home.location} ${home.name}`;
@@ -66,8 +69,8 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   // whatever the result (otherwise the layout would spoil the winner).
   return (
     <article className={classes.filter(Boolean).join(' ')} aria-label={label}>
-      <TeamSide side="away" abbr={game.away} team={away} />
-      <TeamSide side="home" abbr={game.home} team={home} />
+      <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
+      <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
       {/* In progress: no block in the middle at all */}
       {state !== 'live' && (
         <div className="card__note" aria-hidden="true">
