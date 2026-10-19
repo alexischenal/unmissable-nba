@@ -274,8 +274,9 @@ To do after the box score is validated (October 21) and the current algorithm is
   — a 100 always involves at least one exceptional individual night.
   If there are more than 1–2 per week, don't touch the 80: raise the performance divisor in
   `src/config/scoring.ts` (20 today). At 25: EFF 50 → 16 points instead of 20, EFF 60 → 36 instead of 45.
-- **Favicon — done (October 19)**: the note box with "100" in the display font. Still to do: a social preview
-  image (link shared on WhatsApp, Messenger…) with the same mark, neutral, nothing about results.
+- **Favicon — done (October 19)**: a plain dark square with "100" in the display font (no border, square corners),
+  as `favicon.svg`, `favicon.ico` and `apple-touch-icon.png`. Still to do: a social preview image (link shared on
+  WhatsApp, Messenger…) with the same mark, neutral, nothing about results.
 - **Visit counter — the simplest and least invasive possible: GoatCounter.**
   - One `<script>` line in `index.html`, free for non-commercial use, open source, no cookies, no personal data
     stored, no cross-site tracking. Gives the essentials only: visits per day, pages, referrers, screen sizes.
