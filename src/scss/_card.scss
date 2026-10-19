@@ -54,13 +54,13 @@
   }
 
   // Phones: half a card is ~190px wide, so the name size follows the width of its half
-  // (23cqi = 23% of the half), capped by --name-max
+  // (20cqi = 20% of the half), capped by --name-max. The featured card goes up to 23cqi / 32px.
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
     --location-size: 12px;
-    --name-size: 23cqi;
-    --name-max: 32px;
+    --name-size: 20cqi;
+    --name-max: 28px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 60px;
     --note-h: 58px;
@@ -225,7 +225,7 @@
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
-    // Same names as the other cards on phones: no room for bigger ones
+    // Slightly bigger names than the other cards on phones
     --location-size: 12px;
     --name-size: 23cqi;
     --name-max: 32px;
