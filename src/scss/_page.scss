@@ -1,19 +1,9 @@
-// Page: design tokens, base styles, page layout, list of games
+// Page: card size tokens, base styles, page layout, list of games
+
+@use "variables" as *;
 
 :root {
-  --bg: #f3f1ec;
-  --ink: #141414;
-  --muted: #5c5a55;
-
-  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
-  --font-text: "Barlow Condensed", "Arial Narrow", sans-serif;
-
-  --gap: 12px;
-  --radius: 6px;
-  --stripe: 7px;   /* secondary color stripe */
-  --diag: 28px;    /* horizontal offset of the diagonal cut */
-
-  /* Standard card */
+  /* Card sizes: custom properties, because the featured card and wider screens override them */
   --card-h: 104px;
   --note-w: 72px;
   --note-h: 78px;
@@ -30,9 +20,9 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-text);
+  background: $bg;
+  color: $ink;
+  font-family: $font-text;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -45,7 +35,7 @@ body {
 .page__status {
   margin: 0 4px 16px;
   font-size: 18px;
-  color: var(--muted);
+  color: $muted;
 }
 
 .page__status[hidden] {
@@ -56,7 +46,7 @@ body {
   margin: 24px 4px 0;
   font-size: 13px;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: $muted;
 }
 
 /* ---------- List ---------- */
@@ -67,12 +57,15 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: $gap;
+
+  @media (min-width: $breakpoint-tablet) {
+    gap: $gap-tablet;
+  }
 }
 
-@media (min-width: 560px) {
+@media (min-width: $breakpoint-tablet) {
   :root {
-    --gap: 14px;
     --card-h: 112px;
   }
 }

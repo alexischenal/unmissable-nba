@@ -1,5 +1,7 @@
 // Game card: the two team halves, the note block, the three states
 
+@use "variables" as *;
+
 /* ---------- Card ---------- */
 
 .card {
@@ -19,7 +21,7 @@
 }
 
 .card__side {
-  /* The two halves overlap by --diag to form the diagonal */
+  /* The two halves overlap by $diag to form the diagonal */
   flex: 1 1 50%;
   min-width: 0;
   position: relative;
@@ -35,27 +37,27 @@
 
 .card__side--away {
   align-items: flex-start;
-  border-radius: var(--radius) 0 0 var(--radius);
-  box-shadow: inset var(--stripe) 0 0 var(--secondary);
-  clip-path: polygon(0 0, 100% 0, calc(100% - var(--diag)) 100%, 0 100%);
-  padding-inline: calc(var(--stripe) + 12px) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
+  border-radius: $radius 0 0 $radius;
+  box-shadow: inset $stripe 0 0 var(--secondary);
+  clip-path: polygon(0 0, 100% 0, calc(100% - $diag) 100%, 0 100%);
+  padding-inline: calc($stripe + 12px) calc($diag / 2 + var(--note-w) / 2 + 6px);
 }
 
 .card__side--home {
-  margin-left: calc(-1 * var(--diag));
+  margin-left: -$diag;
   align-items: flex-end;
   text-align: right;
-  border-radius: 0 var(--radius) var(--radius) 0;
-  box-shadow: inset calc(-1 * var(--stripe)) 0 0 var(--secondary);
-  clip-path: polygon(var(--diag) 0, 100% 0, 100% 100%, 0 100%);
-  padding-inline: calc(var(--diag) / 2 + var(--note-w) / 2 + 6px) calc(var(--stripe) + 12px);
+  border-radius: 0 $radius $radius 0;
+  box-shadow: inset (-$stripe) 0 0 var(--secondary);
+  clip-path: polygon($diag 0, 100% 0, 100% 100%, 0 100%);
+  padding-inline: calc($diag / 2 + var(--note-w) / 2 + 6px) calc($stripe + 12px);
 }
 
 /* Watermark abbreviation on the inner side (stands in for a logo) */
 .card__abbr {
   position: absolute;
   bottom: -0.24em;
-  font-family: var(--font-display);
+  font-family: $font-display;
   font-weight: 900;
   font-size: calc(var(--card-h) * 0.95);
   line-height: 1;
@@ -65,11 +67,11 @@
 }
 
 .card__side--away .card__abbr {
-  right: calc(var(--diag) / 2 + 4px);
+  right: calc($diag / 2 + 4px);
 }
 
 .card__side--home .card__abbr {
-  left: calc(var(--diag) / 2 + 4px);
+  left: calc($diag / 2 + 4px);
 }
 
 .card__location {
@@ -84,7 +86,7 @@
 .card__name {
   position: relative;
   max-width: 100%;
-  font-family: var(--font-display);
+  font-family: $font-display;
   font-weight: 900;
   font-size: min(var(--name-max), var(--name-size));
   line-height: 0.95;
@@ -104,18 +106,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ink);
-  border: 3px solid var(--bg);
+  background: $ink;
+  border: 3px solid $bg;
   border-radius: 4px;
 }
 
 .card__note-value {
-  font-family: var(--font-display);
+  font-family: $font-display;
   font-weight: 900;
   font-size: var(--note-size);
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: var(--bg);
+  color: $bg;
 }
 
 /* Not started yet: the tip-off time, local to the visitor, instead of the rating */

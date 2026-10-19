@@ -10,7 +10,7 @@
   align-items: center;
   padding: 20px;
   .header__brand {
-    font-family: var(--font-display);
+    font-family: $font-display;
     color: $white;
     font-weight: 900;
     font-size: 40px;
@@ -24,12 +24,12 @@
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: $muted;
   }
 
   .header__heading {
     margin: 2px 0 0;
-    font-family: var(--font-display);
+    font-family: $font-display;
     font-weight: 900;
     font-size: clamp(36px, 10vw, 56px);
     line-height: 1;
