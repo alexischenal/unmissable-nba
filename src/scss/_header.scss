@@ -30,9 +30,9 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
 
-    // Phones: a bit smaller than the team names of the regular cards (~27px at 390px)
+    // Phones: a bit smaller than the team names of the regular cards, which shrink with the screen
     @media (max-width: $breakpoint-mobile) {
-      font-size: 24px;
+      font-size: min(24px, 6.2vw);
     }
   }
 
