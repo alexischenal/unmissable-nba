@@ -55,9 +55,11 @@ export function App() {
                 {heading}
                 {/* Three dots appearing one after the other: games still going */}
                 {groupState === 'live' && (
-                  <span className="games__dots" aria-hidden="true">
-                    <span>.</span><span>.</span><span>.</span>
-                  </span>
+                  <svg className="games__dots" viewBox="0 0 30 6" aria-hidden="true">
+                    <circle cx="3" cy="3" r="3" />
+                    <circle cx="15" cy="3" r="3" />
+                    <circle cx="27" cy="3" r="3" />
+                  </svg>
                 )}
               </h2>
             )}
