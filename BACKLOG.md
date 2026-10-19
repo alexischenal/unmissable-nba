@@ -5,7 +5,7 @@
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
    GitHub API. GitHub's schedule stays as a fallback.
-   - [ ] Merge PR #22 first (dispatched runs only redeploy when there's new data).
+   - [x] Merge PR #22 first (dispatched runs only redeploy when there's new data).
    - [ ] GitHub token: *Settings → Developer settings → Personal access tokens → Fine-grained*, repository
      `unmissable-nba` only, permission *Actions: Read and write* only, expiration 1 year (date in the calendar).
      Never paste it anywhere else than cron-job.org.
@@ -15,7 +15,20 @@
    - [ ] Check: *Actions* shows `workflow_dispatch` runs every 5 minutes (~20 s when idle), cron-job.org gets a 204.
    - Duplicates with GitHub's schedule are harmless: the `data` and `pages` concurrency groups never run twice
      at once, and the script does nothing when the night is up to date.
-2. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+2. **High priority — fewer, lighter runs (ecological footprint).** ~400 runs a day (cron-job.org every 5 min +
+   GitHub every 15 min), ~40–60 kWh a year (rough estimate). Most of it is wasted:
+   - [ ] **Read the full-season schedule once a day, not on every run.** `scheduleLeagueV2.json` weighs several MB
+     and is downloaded ~400 times a day to read three lines. Cache it between runs (e.g. a daily copy of the
+     current night's games), or use the small daily file `liveData/scoreboard/todaysScoreboard_00.json`.
+     Network divided by ~100.
+   - [ ] **A daily window with no runs at all.** No NBA game can end between the latest finish (~1:30 a.m. ET with
+     overtime, ~06:30 UTC) and the earliest tip-off (noon ET on weekends and holidays = 16:00 UTC in summer time,
+     17:00 UTC in winter; games in Europe tip around 19:00–20:00 local time = 18:00–19:00 UTC).
+     Candidate: no runs from 08:00 to 15:00 UTC, on cron-job.org and in GitHub's schedule (`*/15 15-23,0-7 * * *`).
+     About 30% fewer runs. To check against the season's real schedule before switching it on.
+   - [ ] **GitHub's own schedule down to once an hour** once cron-job.org has proved reliable: it's only the fallback.
+   - With all three: under ~20 kWh a year.
+3. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
    `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
