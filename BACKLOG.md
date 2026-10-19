@@ -8,6 +8,7 @@
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
    record in the meantime: it stops anyone else from claiming the domain on GitHub Pages.
+
 ---
 
 Ideas parked for later. Nothing below is needed for v1.
