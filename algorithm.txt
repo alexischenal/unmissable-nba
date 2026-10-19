@@ -1,0 +1,159 @@
+UNMISSABLE — THE RATING ALGORITHM, IN DETAIL
+=============================================
+
+Principle: the rating only measures what happened on the court, never who was playing.
+A thrilling Hornets–Jazz must rank above a Lakers–Celtics decided at halftime.
+
+Every number below lives in src/config/scoring.ts; the logic is in src/lib/scoring.ts.
+
+
+STEP 1 — COMPETITIVE OR BLOWOUT?
+--------------------------------
+
+A game is COMPETITIVE if at least one of these is true:
+
+  - margin at the end of regulation (after Q4, before any overtime) ........ <= 10
+  - margin at the end of Q3 (the 4th quarter was still up for grabs) ........ <= 5
+  - biggest lead of the team that LOST (a real comeback happened) .......... >= 12
+
+Otherwise it's a BLOWOUT.
+
+  competitive  ->  rating = 50 + C + P          (uncapped)
+  blowout      ->  rating = min(49, C + P)      (a blowout stays a blowout)
+
+  C = competitiveness and entertainment points (0 to 30)
+  P = performance points (0 to infinity)
+
+
+STEP 2a — COMPETITIVENESS AND ENTERTAINMENT (C, max 30)
+-------------------------------------------------------
+
+Each criterion becomes a value between 0 and 1, then is multiplied by its weight.
+Values are clamped: past the "zero" threshold -> 0, past the "full" threshold -> 1,
+linear in between.
+
+  Criterion   Weight   Measured on                        0 at   1 at
+  ---------   ------   --------------------------------   ----   ----
+  Suspense      12     margin at the end of regulation      15      3
+  Scenario       6     lead changes + times tied             0     20
+  Comeback       6     biggest lead of the losing team       0     15
+  Offense        6     total points per 48 minutes         210    260
+
+  suspense = clamp((15 - regulationMargin) / (15 - 3))
+  scenario = clamp((leadChanges + timesTied) / 20)
+  comeback = clamp(loserBiggestLead / 15)
+  offense  = clamp((pointsPer48 - 210) / (260 - 210))
+
+  pointsPer48 = (homeScore + awayScore) x 48 / (48 + 5 x overtimes)
+
+  C = 12 x suspense + 6 x scenario + 6 x comeback + 6 x offense
+
+Notes:
+  - Overtime has no bonus of its own. An overtime means a tie at the end of
+    regulation, i.e. a regulation margin of 0, so it already gets full suspense.
+    A one-point regulation game gets almost the same, so a high rating doesn't
+    give away an overtime.
+  - Points are normalized to 48 minutes, otherwise an overtime would inflate
+    the total and reward the game twice.
+
+
+STEP 2b — INDIVIDUAL PERFORMANCES (P, uncapped)
+-----------------------------------------------
+
+Each player's efficiency (the standard NBA "EFF"):
+
+  EFF = PTS + REB + AST + STL + BLK - (FGA - FGM) - (FTA - FTM) - TOV
+
+Every player above 30 adds points, on a curve that accelerates:
+
+  P = sum over all players of  max(0, EFF - 30)^2 / 20
+
+  Player EFF   Points
+  ----------   ------
+      30         0
+      35         1.25
+      40         5
+      50        20
+      60        45
+
+Good games barely count, exceptional ones count a lot, and a 60 alone can push
+a competitive game to 100. Every player counts, on both teams, so a duel of two
+stars is rewarded naturally.
+
+
+STEP 3 — RANKING AND DISPLAY
+----------------------------
+
+  - Games are ranked on the RAW rating, which can exceed 100
+    (two games both shown at "100" keep their order).
+  - The displayed rating is min(100, round(raw)).
+  - The public JSON only contains the teams and the displayed rating,
+    already sorted. Never the score.
+
+
+WORKED EXAMPLES — NIGHT OF APRIL 4, 2026
+========================================
+
+SAN ANTONIO @ DENVER, 136-134 OT
+--------------------------------
+Competitive: tied 124-124 at the end of regulation.
+
+  Suspense    regulation margin 0               clamp((15 - 0) / 12) = 1       12.00
+  Scenario    6 lead changes + 4 ties = 10      10 / 20 = 0.5                    3.00
+  Comeback    Spurs (lost) led by 13            13 / 15 = 0.867                  5.20
+  Offense     270 pts in 53 min = 244.5 / 48    (244.5 - 210) / 50 = 0.69        4.14
+                                                                           C = 24.34
+
+  Wembanyama  34 pts, 18 reb, 7 ast, 1 stl, 5 blk,
+              8/17 FG, 16/17 FT, 1 TOV -> EFF 54       (54 - 30)^2 / 20        28.80
+  Jokic       40 pts, 8 reb, 13 ast, 0 stl, 3 blk,
+              13/25 FG, 13/15 FT, 0 TOV -> EFF 50      (50 - 30)^2 / 20        20.00
+  (nobody else above 30)                                                   P = 48.80
+
+  Rating = 50 + 24.34 + 48.80 = 123.14  ->  shown 100
+
+
+WASHINGTON @ MIAMI, 136-152
+---------------------------
+Blowout: 16 at the end of regulation, 31 after Q3, Washington's biggest lead only 2.
+
+  Suspense    regulation margin 16              >= 15 -> 0                       0.00
+  Scenario    10 lead changes + 4 ties = 14     14 / 20 = 0.7                    4.20
+  Comeback    Wizards (lost) led by 2           2 / 15 = 0.133                   0.80
+  Offense     288 pts in 48 min                 >= 260 -> 1                      6.00
+                                                                           C = 11.00
+
+  Ware        24 pts, 19 reb, 2 ast, 7 blk,
+              10/15 FG, 1/2 FT, 1 TOV -> EFF 45        (45 - 30)^2 / 20        11.25
+  Riley       31 pts, 5 reb, 5 stl,
+              12/17 FG, 5/6 FT, 0 TOV -> EFF 35        (35 - 30)^2 / 20         1.25
+  Jaquez Jr.  32 pts, 3 reb, 4 ast, 1 stl,
+              12/18 FG, 7/7 FT, 2 TOV -> EFF 32        (32 - 30)^2 / 20         0.20
+                                                                           P = 12.70
+
+  Rating = min(49, 11.00 + 12.70) = 23.70  ->  shown 24
+
+  A 45-efficiency monster game, and the game still sits far below:
+  a blowout stays a blowout.
+
+
+DETROIT @ PHILADELPHIA, 116-93
+------------------------------
+Blowout: 23 at the end of regulation.
+
+  Suspense    regulation margin 23              >= 15 -> 0                       0.00
+  Scenario    5 lead changes + 5 ties = 10      10 / 20 = 0.5                    3.00
+  Comeback    76ers (lost) led by 2             2 / 15 = 0.133                   0.80
+  Offense     209 pts in 48 min                 <= 210 -> 0                      0.00
+                                                                           C =  3.80
+  (nobody above 30)                                                        P =  0.00
+
+  Rating = min(49, 3.80) = 3.80  ->  shown 4
+
+
+TUNING
+======
+
+All thresholds are first guesses, to be calibrated on real nights — especially
+the scenario ceiling (20) and the efficiency threshold (30). Change them in
+src/config/scoring.ts; nothing else needs to move.

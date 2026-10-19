@@ -68,15 +68,17 @@ The rating only measures what happened on the court, never who was playing.
 
 Games are ranked on the raw rating (which can exceed 100); the display is capped at 100.
 
+Full formulas and worked examples on real games: [`algorithm.txt`](algorithm.txt).
+
 ## Deployment
 
 `.github/workflows/daily.yml` runs on GitHub Actions:
 
-- **every morning** (06:15 and 09:15 UTC): fetches last night's games, commits `public/data/*.json`, rebuilds and deploys to GitHub Pages;
+- **every morning**, every 30 minutes from 05:00 to 09:30 UTC: fetches last night's games, commits `public/data/*.json`, rebuilds and deploys to GitHub Pages. Once the night is published, the following runs stop right away;
 - **on every push to `main`**: rebuilds and deploys (no fetch);
 - **manually** (*Actions → Daily update and deploy → Run workflow*), with an optional date.
 
-If a game isn't over, the run keeps the previous data and the 09:15 run retries. A postponed game is skipped.
+If a game isn't over, the run keeps the previous data and the next run retries. A postponed game is skipped.
 
 **Pre-launch:** the site carries a `noindex` meta tag and a blocking `robots.txt`. At launch, remove the meta tag in `index.html` and allow crawling in `public/robots.txt`.
 
