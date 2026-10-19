@@ -33,8 +33,12 @@
    - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
    - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain, with
      that night's date somewhere visible (e.g. `Next · October 21–22`). The site name also leads home.
-   - **"Next" = the next night with games**, not the next calendar day: during a day off it skips ahead, and the
-     date says which night it is. No next night with games (All-Star break, off-season): no "Next" at all.
+   - **"Next" = the next calendar night, only if it has games.** No games tomorrow: no "Next" button. No skipping
+     ahead, so "Next" always means tomorrow night and needs no date.
+   - **The home page night expires after 24 hours.** It stays on screen until the next night's first tip-off,
+     but if no new night has started 24 hours after it ended (day off, All-Star break, off-season), the home
+     page switches to the "No more games" screen (GIFs).
+   - **The site restarts on its own** at the next night's first tip-off: that night becomes the home page.
    - **Next page content**: the "Coming up" cards only (tip-off times in the visitor's time zone), neutral,
      no rating. Details in the "Next night" page section below.
    - **Data**: the script publishes `public/data/next.json` (teams + tip-off times, nothing else), from the
@@ -56,8 +60,9 @@ Rules for every GIF: official GIPHY embed (no self-hosted copy), the light video
 (MP4/WebM) rather than the .gif, alt text, and a still image under `prefers-reduced-motion`.
 Pick one at random among several so returning visitors don't always see the same one.
 
-- **No games** — with "Next" skipping to the next night with games, the no-games screen only shows when there's
-  no next night at all (All-Star break, off-season), or for an old link to an empty night. Same GIF rotation.
+- **No more games** — shown when the home page night is over 24 hours old and no new night has started
+  (day off, All-Star break, off-season), until the next night's first tip-off. Also for an old link to an empty
+  night. Same GIF rotation.
 - **No games last night** (All-Star break, off days)
   - **Nick Young celebrating a three that misses.** The user opened the site sure there'd be a game… and there isn't.
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
