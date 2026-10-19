@@ -55,11 +55,7 @@ export function App() {
                 {heading}
                 {/* Three dots appearing one after the other: games still going */}
                 {groupState === 'live' && (
-                  <svg className="games__dots" viewBox="0 0 30 6" aria-hidden="true">
-                    <circle cx="3" cy="3" r="3" />
-                    <circle cx="15" cy="3" r="3" />
-                    <circle cx="27" cy="3" r="3" />
-                  </svg>
+                  <svg className="games__dots" aria-hidden="true"><use href="/sprite.svg#dots" /></svg>
                 )}
               </h2>
             )}
