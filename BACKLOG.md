@@ -74,8 +74,11 @@ Pick one at random among several so returning visitors don't always see the same
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
   - **John Travolta looking around an empty room** (*Pulp Fiction*). Literally the emptiness.
   - **Crying Jordan.** The sports despair classic (a bit overused).
-  - **"The vast emptiness" (*Futurama*).** The user's pick for the moments with nothing to show. Find the official
-    GIPHY version of the scene (check the exact quote and episode before using it).
+  - **"Oh, the vast emptiness" (*Futurama*).** The user's pick for the moments with nothing to show. A character
+    watches the universe literally come to an end, says *"Oh, the vast emptiness"* and shakes his empty beer can;
+    another one answers *"I can take a hint"* and hands him a full one. Perfect for "no games": nothing left to
+    watch… so grab a drink. Probably *The Late Philip J. Fry* (the end-of-the-universe episode), to confirm.
+    Use the official GIPHY version of the scene.
   - Other options: Michael Scott "No, God! No, God, please, no!" (*The Office*), "This is fine" dog,
     Squidward at his window (*SpongeBob*).
 - **Error state** (data couldn't be loaded)
