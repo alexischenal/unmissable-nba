@@ -1,2 +1,27 @@
+// Design tokens, fixed at compile time.
+// Load them at the top of each partial that needs them:  @use "variables" as *;
+//
+// What stays a CSS custom property (var(--…)) instead, because it changes while the page runs:
+//   --primary, --secondary   team colors, set per card by the React code
+//   --card-h, --note-*, --name-*   card sizes: different on the featured card and on wider screens
+
+// Colors
 $black: #000;
 $white: #fff;
+$bg: #f3f1ec;
+$ink: #141414;
+$muted: #5c5a55;
+
+// Fonts
+$font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+$font-text: "Barlow Condensed", "Arial Narrow", sans-serif;
+
+// Layout
+$gap: 12px;
+$gap-tablet: 14px;
+$radius: 6px;
+$stripe: 7px; // secondary color stripe on the card edges
+$diag: 28px;  // horizontal offset of the diagonal cut
+
+// Breakpoints
+$breakpoint-tablet: 560px;
