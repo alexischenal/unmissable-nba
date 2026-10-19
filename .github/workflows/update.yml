@@ -46,6 +46,8 @@ jobs:
       - name: Fetch the night's games
         env:
           DATE: ${{ github.event.inputs.date }}
+          # The real settings of the algorithm (Settings → Secrets and variables → Actions)
+          SCORING_CONFIG: ${{ secrets.SCORING_CONFIG }}
         run: |
           if [ -n "$DATE" ]; then ARGS="--date=$DATE"; else ARGS=""; fi
           node --experimental-strip-types --no-warnings scripts/fetch-night.ts $ARGS

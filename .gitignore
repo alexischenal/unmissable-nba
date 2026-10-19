@@ -4,3 +4,5 @@ dist
 .DS_Store
 # Local demo nights (see README)
 public/data/2099-*.json
+# The real settings of the algorithm (see src/config/scoring.ts)
+scoring.secret.json
