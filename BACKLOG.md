@@ -2,25 +2,15 @@
 
 ## Next up — Monday
 
-1. **React migration — done on the `react` branch.** Vite + React 19 + TypeScript; renders the exact same
-   pixels as before (checked on April 4, an empty night and the error state, mobile and desktop). Merge it.
-2. **Good moment for the HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the
-   markup lives in components.
-3. **Switch the main domain to `unmissable.watch`** ("an unmissable watch": a real English phrase, universal,
-   any time of day). The site isn't launched yet: cheapest moment to change.
-   - Redo for `.watch` what was done for `.am`: TXT verification (GitHub account → Pages), A + AAAA records
-     and the `www` CNAME at OVH, *Custom domain* in the repo's Pages settings, then *Enforce HTTPS*.
-     Expect the same GitHub DNS-check delay as on October 17.
-   - Then redirect `unmissable.am` → `unmissable.watch` (OVH, permanent redirect). The "a.m." joke stays as a bonus.
-   - Replace "unmissable.am" in the README, the header and anywhere else in the code.
-4. **Move the styles to SCSS.**
-   - Setup is one command: `npm install -D sass-embedded` (or `sass`). Vite compiles `.scss` files by itself:
-     no extra config, no separate watcher. `npm run dev` and `npm run build` keep working as they are.
-   - Rename `styles.css` → `styles.scss`, then split into partials (`_tokens.scss`, `_card.scss`, `_page.scss`…).
-   - Use `@use` / `@forward`, not `@import` (deprecated in Dart Sass, being removed).
-   - Keep CSS custom properties for **runtime** values — team colors set from the code (`--primary`,
-     `--secondary`) and sizes that change per card (`--card-h`). Use SCSS for structure: nesting, partials,
-     mixins (breakpoints, the card halves).
+1. **HTML/CSS redesign** (grid, card heights in `svh` with `clamp()`), now that the markup lives in components.
+2. **Redirect `unmissable.am` → `unmissable.watch`** — low priority: nobody knows the `.am`, and the site is
+   `noindex`. At OVH: remove the GitHub A/AAAA/`www` records, add a visible permanent (301) redirect for
+   `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
+   certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
+   record in the meantime: it stops anyone else from claiming the domain on GitHub Pages.
+3. **Split the SCSS into partials** (`_tokens.scss`, `_card.scss`, `_page.scss`…). Setup done: `sass-embedded`
+   is installed, Vite compiles `src/styles.scss` on its own. Use `@use` / `@forward`, not `@import`. Keep CSS
+   custom properties for runtime values (`--primary`, `--secondary`, `--card-h`).
 
 ---
 
@@ -63,7 +53,7 @@ Pick one at random among several so returning visitors don't always see the same
   - Implementation hint (`src/main.ts`, `renderCard`): `card--featured` when `game.note === 100 || index === 0`.
 - **Header layout** (one row):
   - **Far left**: the burger menu, before the name (on desktop too).
-  - **Left**: "unmissable.am", link to the home page (= the current night).
+  - **Left**: "unmissable.watch", link to the home page (= the current night).
   - **Centre**: "Last update X min ago", with the night label ("Night of October 20–21") just under it.
   - **Right**: the two navigation arrows (back / forward one night).
   - **As the screen narrows, items move into the burger** (the "priority+" pattern): on mobile, none of it fits.
