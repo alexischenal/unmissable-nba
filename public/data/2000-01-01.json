@@ -2,7 +2,7 @@
   "version": 2,
   "date": "2000-01-01",
   "games": [
-    { "away": "SAS", "home": "DEN", "tipOff": "2000-01-02T01:00:00Z", "note": 100 },
+    { "away": "DAL", "home": "CLE", "tipOff": "2000-01-02T01:00:00Z", "note": 100 },
     { "away": "MIN", "home": "POR", "tipOff": "2000-01-02T03:00:00Z", "note": 74 },
     { "away": "PHI", "home": "NYK", "tipOff": "2000-01-02T00:00:00Z", "note": 52 },
     { "away": "WAS", "home": "MIA", "tipOff": "2000-01-02T00:30:00Z", "note": 24 },
