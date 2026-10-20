@@ -5,7 +5,9 @@
     {
       "away": "BOS",
       "home": "DET",
-      "tipOff": "2026-10-20T19:00:00Z"
+      "tipOff": "2026-10-20T19:00:00Z",
+      "note": 76,
+      "raw": 75.9
     },
     {
       "away": "PHI",
