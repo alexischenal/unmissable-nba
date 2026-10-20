@@ -1,5 +1,21 @@
 {
-  "version": 1,
-  "date": "2026-10-17",
-  "games": []
+  "version": 2,
+  "date": "2026-10-20",
+  "games": [
+    {
+      "away": "BOS",
+      "home": "DET",
+      "tipOff": "2026-10-20T19:00:00Z"
+    },
+    {
+      "away": "PHI",
+      "home": "NYK",
+      "tipOff": "2026-10-20T23:00:00Z"
+    },
+    {
+      "away": "OKC",
+      "home": "SAS",
+      "tipOff": "2026-10-21T01:30:00Z"
+    }
+  ]
 }
