@@ -46,9 +46,9 @@ export function Menu({ items }: { items: MenuItem[] }) {
       >
         {/* Three bars, as tall as the brand's capital letters (0.8em, see _header.scss) */}
         <svg className="header__burger-icon" viewBox="0 0 32 32" aria-hidden="true">
-          <rect x="0" y="0" width="32" height="5" fill="currentColor" />
-          <rect x="0" y="13.5" width="32" height="5" fill="currentColor" />
-          <rect x="0" y="27" width="32" height="5" fill="currentColor" />
+          <rect x="0" y="0" width="32" height="4" fill="currentColor" />
+          <rect x="0" y="14" width="32" height="4" fill="currentColor" />
+          <rect x="0" y="28" width="32" height="4" fill="currentColor" />
         </svg>
       </button>
 
