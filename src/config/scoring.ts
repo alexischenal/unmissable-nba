@@ -17,6 +17,9 @@ export type ScoringConfig = {
   };
   // Rating ranges
   disputedBase: number; // where a competitive game starts (uncapped, display capped at 100)
+  // Where a game starts when it's competitive ONLY through the margin after Q3:
+  // tight for three quarters, decided in the fourth. Lower than disputedBase.
+  q3OnlyBase: number;
   blowoutMax: number;   // a blowout stays a blowout, even if someone scores 80
   // Step 2: competitiveness and entertainment
   suspense: { weight: number; fullAt: number; zeroAt: number }; // margin at the end of regulation
@@ -34,6 +37,7 @@ export type ScoringConfig = {
 export const EXAMPLE_SCORING: ScoringConfig = {
   disputed: { maxRegulationMargin: 12, maxMarginAfterQ3: 6, minLoserBiggestLead: 10 },
   disputedBase: 50,
+  q3OnlyBase: 42,
   blowoutMax: 49,
   suspense: { weight: 10, fullAt: 2, zeroAt: 16 },
   scenario: { weight: 8, fullAt: 18 },

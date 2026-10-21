@@ -13,7 +13,7 @@ import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  competitivenessDetails, competitivenessPoints, displayScore, efficiency, finalScore, isDisputed,
+  competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
   loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore,
   regulationMargin,
 } from '../src/lib/scoring.ts';
@@ -35,7 +35,8 @@ function explain(g: Game): void {
   console.log(`\n${g.away} ${f.away} @ ${g.home} ${f.home}${ot ? ` (${ot} OT)` : ''}`);
   console.log('-'.repeat(60));
 
-  console.log(`Step 1 — close game? ${disputed ? 'YES' : 'NO, blowout'}`);
+  const q3Only = disputed && disputedBaseFor(g) !== SCORING.disputedBase;
+  console.log(`Step 1 — close game? ${disputed ? (q3Only ? 'YES, only after Q3 (lower base)' : 'YES') : 'NO, blowout'}`);
   console.log(`  ${check(regulationMargin(g) <= c.maxRegulationMargin)}  margin end of regulation  ${regulationMargin(g)} (≤ ${c.maxRegulationMargin})`);
   console.log(`  ${check(marginAfterQ3(g) <= c.maxMarginAfterQ3)}  margin after Q3           ${marginAfterQ3(g)} (≤ ${c.maxMarginAfterQ3})`);
   console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead})`);
@@ -63,7 +64,7 @@ function explain(g: Game): void {
   }
   console.log(`  total            ${n1(perfs).padStart(5)}`);
 
-  const base = disputed ? `${s.disputedBase} + ${n1(competitivenessPoints(g))} + ${n1(perfs)}`
+  const base = disputed ? `${disputedBaseFor(g)} + ${n1(competitivenessPoints(g))} + ${n1(perfs)}`
     : `min(${s.blowoutMax}, ${n1(competitivenessPoints(g))} + ${n1(perfs)})`;
   console.log(`Rating: ${base} = ${n1(raw)} → ${displayScore(g)}`);
 }
