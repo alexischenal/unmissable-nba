@@ -17,7 +17,7 @@
     "check-window": "node --experimental-strip-types --no-warnings scripts/check-window.ts",
     "explain": "node --experimental-strip-types --no-warnings scripts/explain.ts",
     "fetch:fixture": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts --fixture",
-    "test": "node --experimental-strip-types --no-warnings --test scripts/nba/plan.test.ts scripts/nba/order.test.ts scripts/nba/schedule-cache.test.ts src/lib/colors.test.ts"
+    "test": "node --experimental-strip-types --no-warnings --test scripts/nba/plan.test.ts scripts/nba/order.test.ts scripts/nba/schedule-cache.test.ts scripts/nba/adapter.test.ts src/lib/colors.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.2.0",

@@ -24,11 +24,20 @@ export const scheduleDateToIso = (raw: string): string => {
   return match ? `${match[3]}-${match[1]}-${match[2]}` : raw.slice(0, 10);
 };
 
-export function gamesOnDate(schedule: RawSchedule, isoDate: string): RawScheduleGame[] {
+// Teams still to be decided (e.g. the games set after the NBA Cup group stage) come with null
+// tricodes and a placeholder tip-off: never published until the NBA fills them in.
+export const teamsKnown = (g: RawScheduleGame): boolean =>
+  Boolean(g.homeTeam?.teamTricode && g.awayTeam?.teamTricode);
+
+export function allGamesOnDate(schedule: RawSchedule, isoDate: string): RawScheduleGame[] {
   const day = schedule.leagueSchedule.gameDates.find((d) => scheduleDateToIso(d.gameDate) === isoDate);
   const games = day?.games ?? [];
   return games.filter((g) => RANKED_PREFIXES.some((prefix) => g.gameId.startsWith(prefix)));
 }
+
+// The night's games the site can show: ranked, with both teams known.
+export const gamesOnDate = (schedule: RawSchedule, isoDate: string): RawScheduleGame[] =>
+  allGamesOnDate(schedule, isoDate).filter(teamsKnown);
 
 export const isFinal = (box: RawBoxscore): boolean => box.game.gameStatus === 3;
 
