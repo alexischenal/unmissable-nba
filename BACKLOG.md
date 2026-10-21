@@ -209,6 +209,20 @@ Pick one at random among several so returning visitors don't always see the same
   and doesn't wait for the web font. It doesn't fix the burger issue above by itself: that comes from fluid
   sizes, not from the font. Keep a text alternative (`<h1>` with `aria-label`, or a visually hidden text).
 
+## Food for thought
+
+Ideas to think over, not tasks.
+
+- **A fixed-size brand on phones, so everything in the header lands on whole pixels.** Today the brand is
+  fluid on phones (`min(24px, 6.2vw)`), and the burger follows it between pixels. With fixed sizes, the
+  burger gets its own whole-pixel drawing, like on tablets. No SVG needed: font or SVG, what matters is the
+  fixed size. Two options:
+  - **20px on every phone**: capitals 16px tall, burger 16px (2px bars, 5px gaps). Fits at 320px (the brand
+    is already 19.8px there) and stays smaller than the team names everywhere. On big phones (390–430px) the
+    brand goes from 24 to 20px: a bit quieter than today.
+  - **Two steps**: 20px up to 389px, 25px above (capitals 20px, burger 2px bars, 7px gaps). Bigger on big
+    phones, a bit more CSS.
+
 ## Updates during the day — rate each game as soon as it ends
 
 Goal: games that end in the European evening (US weekend afternoons, Christmas Day, NBA Cup,
