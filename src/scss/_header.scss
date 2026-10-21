@@ -138,11 +138,12 @@ $burger-gap: $gap-ratio * 1em;
     color: $muted;
   }
 
-  // Phones: the label sits under the brand. It starts where the brand's letters start,
-  // not under the burger.
+  // Phones: the label and the menu links start where the brand's letters start, not under the burger.
+  // A margin, not a padding: the menu link's ::after underline spans its box, so with a padding
+  // it started under the burger, before the text.
   @media (max-width: $breakpoint-mobile) {
     .header__night {
-      padding-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
+      margin-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
     }
   }
 
