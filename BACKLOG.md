@@ -68,6 +68,22 @@
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
    record in the meantime: it stops anyone else from claiming the domain on GitHub Pages.
+6. **High priority — the repo as a showcase (job hunt).** It's the first thing a recruiter sees.
+   - [ ] **About** (gear icon next to "About" on the repo page): the link still says `unmissable.am` →
+     `https://unmissable.watch/`. Description: "Last night's NBA games, rated without spoilers."
+     Topics: `react`, `typescript`, `vite`, `scss`, `nba`, `github-actions` (GitHub shows TypeScript, not
+     React: React is a library, the code is `.tsx`).
+   - [ ] **`.idea/` is committed** (JetBrains config): remove it from the repo (`git rm -r --cached .idea`),
+     add `.idea/` to `.gitignore`. Local files stay.
+   - [ ] **Merged branches** (54): delete them, and turn on *Settings → General → Automatically delete head
+     branches* so GitHub cleans up after every merge.
+   - [ ] **`how-it-works.txt` is out of date**: says competitive games start at 50 (games close only after Q3
+     now start lower), and opens with "Every morning" (the US use cases aren't mornings). Rewrite it when the
+     presentation page is built. Ingredients only, never the settings.
+   - [ ] **"Contributors: Claude"** shows on the repo page (from the `Co-Authored-By` lines). Decide whether
+     that's fine for the portfolio. Removing it from past commits means rewriting the whole history (heavy,
+     risky): the realistic option is only to stop adding the line from now on.
+   - The "main branch isn't protected" banner: harmless for a personal project, dismiss it.
 
 ---
 
