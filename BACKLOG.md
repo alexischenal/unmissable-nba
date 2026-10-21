@@ -248,6 +248,21 @@ Things that need a human, to check every summer before the new season:
   *Actions → Update and deploy → Enable workflow* if GitHub disabled it.
 - **NBA data**: quick test run at the start of the season — the schedule file switches to the new season.
 
+## Algorithm tuning — after two weeks of real nights (early November)
+
+No real settings in this file: the repo is public. Run `npm run explain -- <date>` locally on every night
+since October 20, then decide with the real games in front of you.
+
+- [ ] **Comeback: does the "full" threshold saturate too often?** BOS@DET (October 20): the Pistons came back
+  from 22 points down, and got exactly the same comeback points as a much smaller comeback would have.
+  List the loser's biggest lead on every close game: if many reach the maximum, raise the threshold
+  (bigger comebacks stand out, smaller ones earn less).
+- [ ] **Scenario: same question.** BOS@DET also maxed it out.
+- [ ] **Margin after Q3: is the threshold right?** The test only matters for games lost by more than the
+  end-of-regulation threshold, where the loser never had a big lead: tight for three quarters, decided in
+  the fourth. List those games, with their margin after Q3 and the rating they would get with a few
+  candidate thresholds. Raising it a lot would let half-blowouts start from 50.
+
 ## Algorithm v2 — play-by-play data
 
 Today the script only fetches each game's box score: quarter scores, player stats, and the
