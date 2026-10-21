@@ -1,6 +1,7 @@
 @use "variables" as *;
 
 $brand-size: 40px;
+$brand-size-tablet: 32px;
 $brand-size-mobile: min(24px, 6.2vw);
 $burger-ratio: 0.775;
 $burger-width-ratio: 0.625;
@@ -31,6 +32,10 @@ $burger-gap: $gap-ratio * 1em;
     align-items: center;
     gap: $burger-gap;
     font-size: $brand-size;
+
+    @media (max-width: $breakpoint-tablet) {
+      font-size: $brand-size-tablet;
+    }
 
     @media (max-width: $breakpoint-mobile) {
       font-size: $brand-size-mobile;
@@ -101,6 +106,10 @@ $burger-gap: $gap-ratio * 1em;
     margin: 0;
     padding: 0 0 0 calc(#{$brand-size} * #{$burger-width-ratio + $gap-ratio});
     list-style: none;
+
+    @media (max-width: $breakpoint-tablet) {
+      padding-left: calc(#{$brand-size-tablet} * #{$burger-width-ratio + $gap-ratio});
+    }
 
     @media (max-width: $breakpoint-mobile) {
       padding-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
