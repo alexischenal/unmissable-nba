@@ -76,7 +76,7 @@ export function App() {
           </h1>
         </div>
         {/* Where you are, in plain text. The other night is in the menu. */}
-        <p className="header__night">
+        <p className="header__night header__current">
           {PAGE === 'next' ? 'Next night' : homeNight ? <NightName date={homeNight.date} /> : '\u00A0'}
         </p>
       </header>
