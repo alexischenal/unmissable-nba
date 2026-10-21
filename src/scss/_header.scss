@@ -1,54 +1,43 @@
-// Header: burger and menu, brand (link home), where you are ("Night of X" or "Next night"), title
-
 @use "variables" as *;
 
-// The brand's size, and the burger in em of it (so it follows the brand on every screen)
 $brand-size: 40px;
 $brand-size-mobile: min(24px, 6.2vw);
-// The brand's capitals are 32px tall at 40px. The burger is 31px: an odd height, so three 3px bars
-// with two 11px gaps fall on whole pixels (viewBox 25 × 31, see Menu.tsx).
 $burger-ratio: 0.775;
-$burger-width-ratio: 0.625; // 25px at 40px
+$burger-width-ratio: 0.625;
 $gap-ratio: 0.4;
 $burger-size: $burger-ratio * 1em;
 $burger-width: $burger-width-ratio * 1em;
 $burger-gap: $gap-ratio * 1em;
 
 .header {
-  // The menu is positioned against the header, and lays over the cards
   position: relative;
   z-index: 10;
   background-color: $black;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  // Left and right edges line up with the cards' secondary color stripe
   padding: 20px var(--stripe);
   margin-bottom: -1px;
 
   @media (max-width: $breakpoint-mobile) {
-    // Brand on top, night label below: side by side, they don't fit on a phone
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
     padding: 16px var(--stripe);
   }
 
-  // Burger + brand. The brand's size is set here, so the burger can follow it in em.
   .header__title {
     display: flex;
     align-items: center;
     gap: $burger-gap;
     font-size: $brand-size;
 
-    // Phones: a bit smaller than the team names of the regular cards, which shrink with the screen
     @media (max-width: $breakpoint-mobile) {
       font-size: $brand-size-mobile;
     }
   }
 
   .header__brand {
-    // It's an <h1>: the browser gives h1s a default margin (0.67em above and below) and size (2em)
     margin: 0;
     font-size: inherit;
     line-height: 1;
@@ -61,7 +50,6 @@ $burger-gap: $gap-ratio * 1em;
 
   .header__burger {
     display: flex;
-    // Buttons don't inherit the font by default: without this, 0.8em would follow the browser's 13px
     font: inherit;
     padding: 0;
     border: 0;
@@ -70,29 +58,20 @@ $burger-gap: $gap-ratio * 1em;
     cursor: pointer;
   }
 
-  // As tall as the brand's capital letters: 0.8em in this font (measured: 32px for 40px)
   .header__burger-icon {
     display: block;
     width: $burger-width;
     height: $burger-size;
-    // On phones the size isn't a whole number of pixels: the box gets rounded and could shave
-    // the bottom bar. Let the drawing overflow its box instead.
     overflow: visible;
-    // Centered, it lands half a pixel lower than the letters (at 40px): on whole pixels, bottom
-    // lined up with the letters' baseline instead (otherwise every bar edge is blurred)
     margin-top: -0.0375em;
   }
 
-  // The menu: under the header, full width, over the cards (it never pushes them down).
-  // Unfolds from top to bottom: the clip goes from "everything cut from the bottom" to "nothing cut".
-  // visibility follows, so a closed menu can't be reached with the keyboard or a screen reader.
   .header__menu {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     padding: 8px var(--stripe) 24px;
-    // It sits in .header__title: without this, it inherits the brand's 40px and its line height
     font-size: 13px;
     line-height: 1.2;
     background-color: $black;
@@ -114,7 +93,6 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
-  // The links start where the brand's letters start, on every screen (burger width + gap, in px)
   .header__menu-list {
     display: flex;
     flex-direction: column;
@@ -129,7 +107,6 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
-  // The brand is also the link to the home page: it keeps its look
   .header__home {
     color: inherit;
     text-decoration: none;
@@ -144,16 +121,12 @@ $burger-gap: $gap-ratio * 1em;
     color: $muted;
   }
 
-  // Phones: the label sits under the brand, and starts where the brand's letters start, not under
-  // the burger. A margin, not a padding: if it ever lands on a link, its ::after underline spans the
-  // box, and would start before the text.
   @media (max-width: $breakpoint-mobile) {
     .header__current {
       margin-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
     }
   }
 
-  // The night label: long on wide screens, short on phones
   .header__short {
     display: none;
   }
@@ -168,8 +141,6 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
-  // A link to another page (in the menu): same type and size, in white, underlined. The underline is an ::after,
-  // so it can be erased on hover, from left to right.
   .header__link {
     position: relative;
     color: $white;
@@ -180,7 +151,6 @@ $burger-gap: $gap-ratio * 1em;
     content: "";
     position: absolute;
     left: 0;
-    // The letter-spacing also adds space after the last letter: stop the line under it, not past it
     right: 0.18em;
     bottom: -4px;
     height: 1px;

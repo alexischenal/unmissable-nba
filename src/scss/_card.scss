@@ -1,18 +1,12 @@
-// Game card: the two team halves, the note block, the three states
-
 @use "variables" as *;
 
 .card {
-  // Card sizes: custom properties (not Sass variables), because the featured card and wider
-  // screens override them, and every element of the card reads them.
   --card-h: 200px;
   --note-w: 104px;
   --note-h: 100px;
   --note-size: 52px;
   --name-size: 22cqi;
   --name-max: 30px;
-  // Horizontal offset of the diagonal, proportional to the height: the angle stays the same
-  // on every card, whatever its height (featured, wide screens).
   --diag: calc(var(--card-h) * #{$diag-ratio});
 
   --side-padding: 100px;
@@ -23,7 +17,6 @@
   display: flex;
   height: var(--card-h);
 
-  // Desktop first: each breakpoint adjusts the sizes at that width and below (largest to smallest)
   @media (max-width: $breakpoint-laptop) {
     --card-h: 180px;
     --side-padding: 72px;
@@ -51,8 +44,6 @@
     --note-size: 40px;
   }
 
-  // Phones: half a card is ~190px wide, so the name size follows the width of its half
-  // (20cqi = 20% of the half), capped by --name-max. The featured card goes up to 23cqi / 32px.
   @media (max-width: $breakpoint-mobile) {
     --card-h: 104px;
     --side-padding: 12px;
@@ -65,7 +56,6 @@
     --note-size: 28px;
   }
 
-  // The two halves overlap by --diag: the home half, cut on the diagonal, sits on top of the away half
   .card__side {
     flex: 1 1 50%;
     min-width: 0;
@@ -76,15 +66,12 @@
     flex-direction: column;
     justify-content: center;
     background: var(--primary);
-    // White text everywhere: all 30 primary colors pass contrast for the team names
     color: $white;
   }
 
   .card__side--away {
     align-items: flex-start;
     box-shadow: inset var(--stripe) 0 0 var(--secondary);
-    // No clip-path here: the home half covers it. Two cuts meeting on the same line leave a
-    // hairline gap (anti-aliasing), more visible on tall cards.
     padding-inline: calc(var(--stripe) + var(--side-padding)) calc(var(--diag) / 2 + var(--note-w) / 2 + 6px);
 
     .card__abbr {
@@ -105,7 +92,6 @@
     }
   }
 
-  // Watermark abbreviation on the inner side (stands in for a logo)
   .card__abbr {
     position: absolute;
     bottom: -0.24em;
@@ -136,10 +122,9 @@
     line-height: 0.95;
     text-transform: uppercase;
     text-wrap: balance;
-    hyphens: manual; // never adds hyphens on its own
+    hyphens: manual;
   }
 
-  // The rating: an upright, vertical block in the middle of the card
   .card__note {
     position: absolute;
     left: 50%;
@@ -164,7 +149,6 @@
     color: $bg;
   }
 
-  // Not started yet: the tip-off time, local to the visitor, instead of the rating
   .card__note-value--time {
     font-size: calc(var(--note-size) * 0.55);
     text-align: center;
@@ -175,7 +159,6 @@
     font-size: 0.6em;
   }
 
-  // Small "%" after the rating, sitting on the baseline (bottom of the digits)
   .card__note-unit {
     margin-left: 0.04em;
     font-size: 0.35em;
@@ -183,8 +166,6 @@
   }
 }
 
-// Best game of the night: featured, taller card.
-// Must stay after .card, so it wins over .card's sizes at every width.
 .card--featured {
   --card-h: 350px;
   --note-w: 144px;
@@ -192,11 +173,9 @@
   --note-size: 72px;
   --name-size: 26cqi;
   --name-max: 38px;
-  // Names 25% bigger than on the other cards (they are 20% smaller), except on phones
   --location-size: 24px;
   --name-font: 70px;
 
-  // Its own breakpoints: written after .card's, they win on the featured card
   @media (max-width: $breakpoint-laptop) {
     --card-h: 300px;
     --location-size: 20px;
@@ -223,7 +202,6 @@
 
   @media (max-width: $breakpoint-mobile) {
     --card-h: 150px;
-    // Slightly bigger names than the other cards on phones
     --location-size: 12px;
     --name-size: 23cqi;
     --name-max: 32px;
