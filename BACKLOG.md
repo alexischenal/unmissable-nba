@@ -89,6 +89,20 @@
      that's fine for the portfolio. Removing it from past commits means rewriting the whole history (heavy,
      risky): the realistic option is only to stop adding the line from now on.
    - The "main branch isn't protected" banner: harmless for a personal project, dismiss it.
+7. **High priority — accessibility (audit of October 21: axe-core, keyboard, structure).**
+   - [ ] **Header label contrast**: "Night of…" / "Next night" is `$muted` (`#5c5a55`) on black: **3.04:1**, 4.5 needed
+     at 13px. Use a lighter grey in the header only (`$muted` stays right on the light page): `#7a776f` (4.7:1,
+     closest to today) or `#86837b` (5.55:1, more comfortable). To pick.
+   - [ ] **City name on some reds: 4.34:1** (4.5 needed, small text): white on ATL/POR `#E03A3E`, and on the Sixers'
+     red when they switch colors (PHI@NYK). Team names (large text) pass. Fixing means darkening those reds very
+     slightly, away from the official colors: decide whether the 0.16 gap is worth it.
+   - [ ] **Move `<header>` out of `<main>`**: inside it, screen readers don't announce it as the site's banner.
+   - [ ] **Headings for screen readers**: no `h2` before the rated games, none on the Next page. Add visually hidden
+     ones (e.g. "Last night's games", "Next night's games"): screen reader users navigate by headings.
+   - [ ] **Test with a real screen reader** (VoiceOver on iPhone, 5 minutes): automated tools only catch part of it.
+   - Already fine: keyboard (burger, menu, Escape back to the burger, closed menu unreachable), visible focus,
+     `lang="en"`, every card described ("1. Boston Celtics at Detroit Pistons, rated 76 out of 100").
+   - False positive to ignore: the big watermark abbreviations (decorative, `aria-hidden`), flagged by axe anyway.
 
 ---
 
