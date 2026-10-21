@@ -262,6 +262,10 @@ since October 20, then decide with the real games in front of you.
   end-of-regulation threshold, where the loser never had a big lead: tight for three quarters, decided in
   the fourth. List those games, with their margin after Q3 and the rating they would get with a few
   candidate thresholds. Raising it a lot would let half-blowouts start from 50.
+- [ ] **Individual performances: is a very good night worth enough?** Paul George (BOS@DET): a big scoring
+  night, and it earned only a few points. Before changing anything, measure how often efficiency goes above
+  35, 40, 45 and 50 in a season: a rating should reward what's rare, so the threshold and the divisor
+  follow from that distribution.
 
 ## Algorithm v2 — play-by-play data
 
