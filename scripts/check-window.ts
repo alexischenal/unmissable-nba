@@ -9,7 +9,7 @@
 // A game caught in the window wouldn't be lost (the next run catches up on the night), only late.
 
 import { fetchSchedule } from './nba/client.ts';
-import { gamesOnDate, scheduleDateToIso } from './nba/adapter.ts';
+import { allGamesOnDate, gamesOnDate, scheduleDateToIso, teamsKnown } from './nba/adapter.ts';
 
 const NEEDS_RUNS_FOR_H = 4;
 
@@ -36,9 +36,23 @@ const tips = games.map(({ g }) => minutesOfDay(new Date(g.gameDateTimeUTC!)));
 // Tip-offs after noon UTC are "early" (US afternoon), the others "late" (US evening, past midnight UTC)
 const early = tips.filter((m) => m >= 12 * 60);
 const late = tips.filter((m) => m < 12 * 60);
+const tbd = dates.flatMap((date) => allGamesOnDate(schedule, date).filter((g) => !teamsKnown(g)).map(() => date));
 console.log(`${schedule.leagueSchedule.seasonYear}: ${games.length} games with a tip-off time.`);
-if (early.length) console.log(`Earliest tip-off: ${hhmm(Math.min(...early))} UTC`);
-if (late.length) console.log(`Latest tip-off:   ${hhmm(Math.max(...late))} UTC (needs runs until ~${hhmm(Math.max(...late) + NEEDS_RUNS_FOR_H * 60)} UTC)`);
+if (tbd.length) {
+  console.log(`Left out: ${tbd.length} game(s) with teams still to be decided (placeholder tip-offs): ${[...new Set(tbd)].join(', ')}.`);
+}
+// Which games: the matchups at the earliest and the latest time of day
+const at = (m: number) => games.filter(({ g }) => minutesOfDay(new Date(g.gameDateTimeUTC!)) === m)
+  .map(({ date, g }) => `${date} ${g.awayTeam.teamTricode}@${g.homeTeam.teamTricode}`);
+const list = (items: string[]) => (items.length > 6 ? `${items.slice(0, 6).join(', ')}… (${items.length} games)` : items.join(', '));
+if (early.length) {
+  const m = Math.min(...early);
+  console.log(`Earliest tip-off: ${hhmm(m)} UTC — ${list(at(m))}`);
+}
+if (late.length) {
+  const m = Math.max(...late);
+  console.log(`Latest tip-off:   ${hhmm(m)} UTC (needs runs until ~${hhmm(m + NEEDS_RUNS_FOR_H * 60)} UTC) — ${list(at(m))}`);
+}
 
 const caught = games.filter(({ g }) => overlaps(minutesOfDay(new Date(g.gameDateTimeUTC!)), NEEDS_RUNS_FOR_H * 60));
 console.log(`\nWindow ${hhmm(startH * 60)}–${hhmm(endH * 60)} UTC: ${caught.length === 0 ? 'SAFE, no game needs runs during it.' : `${caught.length} game(s) need runs during it:`}`);
