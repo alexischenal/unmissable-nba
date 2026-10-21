@@ -16,7 +16,7 @@
   position: relative;
   display: flex;
   height: var(--card-h);
-  margin-bottom: -1px;
+  margin-bottom: -2px;
 
   @media (max-width: $breakpoint-laptop) {
     --card-h: 180px;
