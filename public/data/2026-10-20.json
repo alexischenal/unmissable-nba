@@ -12,7 +12,9 @@
     {
       "away": "PHI",
       "home": "NYK",
-      "tipOff": "2026-10-20T23:00:00Z"
+      "tipOff": "2026-10-20T23:00:00Z",
+      "note": 66,
+      "raw": 66.4
     },
     {
       "away": "OKC",
