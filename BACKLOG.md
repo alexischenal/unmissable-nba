@@ -17,15 +17,16 @@
      at once, and the script does nothing when the night is up to date.
 2. **High priority — fewer, lighter runs (ecological footprint).** ~400 runs a day (cron-job.org every 5 min +
    GitHub every 15 min), ~40–60 kWh a year (rough estimate). Most of it is wasted:
-   - [ ] **Read the full-season schedule once a day, not on every run.** `scheduleLeagueV2.json` weighs several MB
-     and is downloaded ~400 times a day to read three lines. Cache it between runs (e.g. a daily copy of the
-     current night's games), or use the small daily file `liveData/scoreboard/todaysScoreboard_00.json`.
-     Network divided by ~100.
+   - [x] **Done (October 21): the schedule is downloaded once per night** (first run after 06:00 New York),
+     trimmed to the 4 nights the script can need (a few KB) and kept between runs with `actions/cache`.
+     See `scripts/nba/schedule-cache.ts`. Trade-off: a tip-off time changed during the day waits for the next night.
    - [ ] **A daily window with no runs at all.** No NBA game can end between the latest finish (~1:30 a.m. ET with
      overtime, ~06:30 UTC) and the earliest tip-off (noon ET on weekends and holidays = 16:00 UTC in summer time,
      17:00 UTC in winter; games in Europe tip around 19:00–20:00 local time = 18:00–19:00 UTC).
      Candidate: no runs from 08:00 to 15:00 UTC, on cron-job.org and in GitHub's schedule (`*/15 15-23,0-7 * * *`).
-     About 30% fewer runs. To check against the season's real schedule before switching it on.
+     About 30% fewer runs. To check against the season's real schedule before switching it on:
+     `npm run check-window`, on your own machine, lists every game of the season that needs runs inside the
+     window. A game caught in it isn't lost, only rated later (the next run catches up on the night).
    - [ ] **GitHub's own schedule down to once an hour** once cron-job.org has proved reliable: it's only the fallback.
    - With all three: under ~20 kWh a year.
 3. **High priority — "Night of X" and "Next", no "Previous".** Unmissable isn't an archive: one night on

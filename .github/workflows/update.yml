@@ -43,6 +43,19 @@ jobs:
         with:
           node-version: 22
 
+      # The schedule is downloaded once per night, then kept here between runs (a few KB, see
+      # scripts/nba/schedule-cache.ts). A night starts at 06:00 New York time, like in plan.ts.
+      - name: Night key
+        id: night
+        run: echo "night=$(TZ=America/New_York date -d '-6 hours' +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the night's schedule
+        id: schedule
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/schedule.json
+          key: schedule-${{ steps.night.outputs.night }}
+
       - name: Fetch the night's games
         env:
           DATE: ${{ github.event.inputs.date }}
@@ -51,6 +64,15 @@ jobs:
         run: |
           if [ -n "$DATE" ]; then ARGS="--date=$DATE"; else ARGS=""; fi
           node --experimental-strip-types --no-warnings scripts/fetch-night.ts $ARGS
+
+      # Only after the first run of a night (no copy for that night yet), and only if the script
+      # succeeded: the copy it wrote is then the fresh one.
+      - name: Keep the night's schedule
+        if: steps.schedule.outputs.cache-hit != 'true' && hashFiles('.cache/schedule.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/schedule.json
+          key: schedule-${{ steps.night.outputs.night }}
 
       - name: Commit new data
         id: commit
