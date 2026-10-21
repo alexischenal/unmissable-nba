@@ -336,6 +336,5 @@ because of their Paris tip-off times. Same night, two days. Unmissable groups by
 ## Launch
 
 - Remove the `noindex` meta in `index.html` and allow crawling in `public/robots.txt`.
-- Remove the demo night `public/data/2000-01-01.json` (every card state at once, at `?date=2000-01-01`).
 - README for the portfolio: screenshot, the zero-spoiler architecture, the adapter, the two-step algorithm,
   and how it differs from Thuuz (2014 app that rated game excitement live; Unmissable is for the morning after).
