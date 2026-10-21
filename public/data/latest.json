@@ -6,22 +6,19 @@
       "away": "BOS",
       "home": "DET",
       "tipOff": "2026-10-20T19:00:00Z",
-      "note": 76,
-      "raw": 75.9
+      "note": 76
     },
     {
       "away": "PHI",
       "home": "NYK",
       "tipOff": "2026-10-20T23:00:00Z",
-      "note": 66,
-      "raw": 66.4
+      "note": 66
     },
     {
       "away": "OKC",
       "home": "SAS",
       "tipOff": "2026-10-21T01:30:00Z",
-      "note": 9,
-      "raw": 9.2
+      "note": 9
     }
   ]
 }

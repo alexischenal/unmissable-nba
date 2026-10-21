@@ -75,8 +75,8 @@ The rating only measures what happened on the court, never who was playing.
 2. **How good was it?** Suspense, twists (lead changes, ties), comebacks, offense, and big individual performances
    (the bigger, the more it counts).
 
-Games are ranked on the raw rating (which can exceed 100); the display is capped at 100. The raw rating is in the
-public JSON (`raw`), never shown on the site: it says nothing about the winner.
+The display is capped at 100. Two games on the same rating are ranked on the raw rating (which can exceed 100);
+it is never published, nor are the details in the GitHub logs.
 
 **The code is open, the settings are not.** `src/lib/scoring.ts` is the whole algorithm, but the values in
 `src/config/scoring.ts` are examples. The real ones live in the `SCORING_CONFIG` secret on GitHub Actions
