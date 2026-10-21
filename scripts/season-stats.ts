@@ -1,0 +1,174 @@
+// scripts/season-stats.ts
+// A whole season through the algorithm, to calibrate the settings on real data.
+// Local only: the output says a lot about the settings (the logs of a public repo are public).
+//
+// Usage:
+//   npm run season-stats -- 2025-26            → downloads what's missing, then the report
+//   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
+//
+// The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
+// the first run takes 10 to 15 minutes, the next ones a second. Change scoring.secret.json,
+// run again, compare.
+
+import { existsSync } from 'node:fs';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { fetchBoxscore, pause } from './nba/client.ts';
+import { isFinal, toGame } from './nba/adapter.ts';
+import { loadScoring } from './load-scoring.ts';
+import { SCORING } from '../src/config/scoring.ts';
+import {
+  competitivenessDetails, displayScore, efficiency, finalScore, loserBiggestLead, marginAfterQ3,
+  playerPoints, rawScore, regulationMargin,
+} from '../src/lib/scoring.ts';
+import type { Game } from '../src/types/game.ts';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+type CachedGame = Game & { id: string; date?: string };
+
+// Regular season IDs: '002' + the season's first year on 2 digits + a 5-digit number.
+// 82 games × 30 teams / 2 = 1,230 games.
+const GAMES_PER_SEASON = 1230;
+const seasonIds = (season: string) => {
+  const yy = season.slice(2, 4);
+  return Array.from({ length: GAMES_PER_SEASON }, (_, i) => `002${yy}${String(i + 1).padStart(5, '0')}`);
+};
+
+async function download(season: string, dir: string): Promise<void> {
+  const ids = seasonIds(season).filter((id) => !existsSync(path.join(dir, `${id}.json`)));
+  if (ids.length === 0) return;
+  console.log(`Downloading ${ids.length} box score(s), one every ~0.5 s…`);
+  let failures = 0;
+  let done = 0;
+  for (const id of ids) {
+    try {
+      const box = await fetchBoxscore(id);
+      if (isFinal(box)) {
+        const game: CachedGame = { id, ...(box.game.gameTimeUTC ? { date: box.game.gameTimeUTC.slice(0, 10) } : {}), ...toGame(box) };
+        await writeFile(path.join(dir, `${id}.json`), JSON.stringify(game));
+      }
+      failures = 0;
+    } catch (error) {
+      failures++;
+      console.warn(`  ${id}: ${error instanceof Error ? error.message : error}`);
+      // Many failures in a row: blocked, or the end of the season. Stop, the cache keeps what's done.
+      if (failures >= 15) {
+        console.warn('15 failures in a row: stopping. Run again later; what is downloaded is kept.');
+        return;
+      }
+    }
+    if (++done % 100 === 0) console.log(`  ${done} / ${ids.length}`);
+    await pause(400);
+  }
+}
+
+// --- Report ---------------------------------------------------------------------------
+
+const pct = (part: number, total: number) => (total ? `${((100 * part) / total).toFixed(1)}%` : '-');
+const label = (g: CachedGame) => `${g.date ?? g.id} ${g.away}@${g.home}`;
+const n1 = (x: number) => x.toFixed(1);
+
+function title(text: string): void {
+  console.log(`\n=== ${text} ${'='.repeat(Math.max(0, 70 - text.length))}`);
+}
+
+function report(games: CachedGame[]): void {
+  const s = SCORING;
+  const c = s.disputed;
+  const n = games.length;
+  // About 165 nights in a regular season: "per night" makes frequencies easy to picture
+  const nights = new Set(games.map((g) => g.date).filter(Boolean)).size || 165;
+  console.log(`\n${n} games, ${nights} nights.`);
+
+  // 1. Ratings
+  title('Ratings');
+  const notes = games.map(displayScore);
+  const buckets = [[0, 19], [20, 34], [35, 49], [50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]];
+  for (const [lo, hi] of buckets) {
+    const k = notes.filter((x) => x >= lo! && x <= hi!).length;
+    console.log(`  ${`${lo}–${hi}`.padEnd(8)} ${String(k).padStart(5)}  ${pct(k, n).padStart(6)}  ${'█'.repeat(Math.round((60 * k) / n))}`);
+  }
+  const fifty = notes.filter((x) => x >= 50).length;
+  const hundreds = notes.filter((x) => x === 100).length;
+  console.log(`  50 or more: ${pct(fifty, n)} of games. 100s: ${hundreds} (one every ${n1(nights / Math.max(1, hundreds))} nights).`);
+
+  // 2. Individual performances
+  title('Individual performances (efficiency)');
+  const lines = games.flatMap((g) => g.players.map((p) => ({ g, p, eff: efficiency(p) })));
+  for (const t of [30, 35, 40, 45, 50, 55, 60]) {
+    const k = lines.filter((x) => x.eff >= t).length;
+    console.log(`  ≥ ${t}: ${String(k).padStart(5)} player-games  ≈ ${n1(k / nights).padStart(5)} per night  ${k ? `(one every ${n1(n / k)} games)` : ''}`);
+  }
+  console.log(`  Points with the current settings (threshold ${s.performance.threshold}, ÷ ${s.performance.divisor}):`);
+  console.log(`    ${[35, 38, 40, 45, 50, 55, 60].map((e) => `${e} → ${n1(Math.max(0, e - s.performance.threshold) ** 2 / s.performance.divisor)}`).join('   ')}`);
+  console.log('  Top 15:');
+  for (const { g, p, eff } of [...lines].sort((a, b) => b.eff - a.eff).slice(0, 15)) {
+    const team = p.team === 'home' ? g.home : g.away;
+    console.log(`    ${String(eff).padStart(3)}  ${(p.name ?? '?').padEnd(24)} ${team}  ${p.pts} pts ${p.reb} reb ${p.ast} ast  ${label(g).padEnd(22)} → ${displayScore(g)}`);
+  }
+
+  // 3. Saturated ingredients, among close games
+  const close = games.filter((g) => regulationMargin(g) <= c.maxRegulationMargin
+    || marginAfterQ3(g) <= c.maxMarginAfterQ3 || loserBiggestLead(g) >= c.minLoserBiggestLead);
+  title(`Ingredients at their maximum (${close.length} close games)`);
+  for (const key of ['suspense', 'scenario', 'comeback', 'offense'] as const) {
+    const k = close.filter((g) => competitivenessDetails(g)[key].share >= 1).length;
+    console.log(`  ${key.padEnd(9)} ${pct(k, close.length).padStart(6)} at 100%`);
+  }
+  const leads = close.map(loserBiggestLead).sort((a, b) => a - b);
+  const q = (f: number) => leads[Math.min(leads.length - 1, Math.floor(f * leads.length))] ?? 0;
+  console.log(`  Loser's biggest lead: median ${q(0.5)}, 75th pct ${q(0.75)}, 90th pct ${q(0.9)}, max ${q(1)}  (comeback full at ${s.comeback.fullAt})`);
+  const twists = close.map((g) => g.leadChanges + g.timesTied).sort((a, b) => a - b);
+  const qt = (f: number) => twists[Math.min(twists.length - 1, Math.floor(f * twists.length))] ?? 0;
+  console.log(`  Lead changes + ties:  median ${qt(0.5)}, 75th pct ${qt(0.75)}, 90th pct ${qt(0.9)}, max ${qt(1)}  (scenario full at ${s.scenario.fullAt})`);
+
+  // 4. The margin-after-Q3 test
+  title('Margin after Q3: games close ONLY thanks to this test');
+  const onlyQ3 = (g: Game, t: number) => regulationMargin(g) > c.maxRegulationMargin
+    && loserBiggestLead(g) < c.minLoserBiggestLead && marginAfterQ3(g) <= t;
+  for (const t of [3, 4, 5, 6, 7, 8, 10, 12]) {
+    const k = games.filter((g) => onlyQ3(g, t)).length;
+    console.log(`  threshold ${String(t).padStart(2)}${t === c.maxMarginAfterQ3 ? ' (current)' : '          '}  ${String(k).padStart(4)} games  ${pct(k, n).padStart(6)}`);
+  }
+  const current = games.filter((g) => onlyQ3(g, c.maxMarginAfterQ3));
+  if (current.length > 0) {
+    console.log('  With the current threshold (final margin, margin after Q3, rating):');
+    for (const g of current.slice(0, 25)) {
+      const f = finalScore(g);
+      console.log(`    ${label(g).padEnd(22)} final ${String(Math.abs(f.home - f.away)).padStart(2)}  after Q3 ${String(marginAfterQ3(g)).padStart(2)}  → ${displayScore(g)}`);
+    }
+  }
+
+  // 5. Best games of the season
+  title('Top 10 games');
+  for (const g of [...games].sort((a, b) => rawScore(b) - rawScore(a)).slice(0, 10)) {
+    const best = [...g.players].sort((a, b) => playerPoints(b) - playerPoints(a))[0];
+    console.log(`  ${n1(rawScore(g)).padStart(6)}  ${label(g).padEnd(22)} margin ${regulationMargin(g)}  best eff ${best ? efficiency(best) : '-'}`);
+  }
+}
+
+async function main(): Promise<void> {
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    throw new Error('season-stats prints the details of the settings: never on GitHub Actions (public logs).');
+  }
+  const args = process.argv.slice(2);
+  const season = args.find((a) => /^\d{4}-\d{2}$/.test(a));
+  if (!season) throw new Error('Usage: npm run season-stats -- 2025-26 [--offline]');
+  loadScoring();
+
+  const dir = path.join(ROOT, '.cache', 'boxscores', season);
+  await mkdir(dir, { recursive: true });
+  if (!args.includes('--offline')) await download(season, dir);
+
+  const files = (await readdir(dir)).filter((f) => f.endsWith('.json'));
+  const games = await Promise.all(files.map(async (f) => JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame));
+  if (games.length === 0) throw new Error(`No box score in ${dir}.`);
+  report(games.sort((a, b) => a.id.localeCompare(b.id)));
+}
+
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});

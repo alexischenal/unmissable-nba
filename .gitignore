@@ -6,3 +6,5 @@ dist
 public/data/2099-*.json
 # The real settings of the algorithm (see src/config/scoring.ts)
 scoring.secret.json
+# Box scores downloaded by npm run season-stats
+.cache/
