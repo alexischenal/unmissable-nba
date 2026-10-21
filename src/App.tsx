@@ -69,8 +69,8 @@ export function App() {
     <main className="page">
       <header className="header">
         <div className="header__title">
-          {/* No burger while there's nothing to put in it */}
-          {menuItems.length > 0 && <Menu items={menuItems} />}
+          {/* Always there: the presentation page will always be in it */}
+          <Menu items={menuItems} />
           <h1 className="header__brand">
             <a className="header__home" href={HOME_URL}>Unmissable</a>
           </h1>

@@ -130,10 +130,10 @@ $burger-gap: $gap-ratio * 1em;
     color: $muted;
   }
 
-  // Phones: the label sits under the brand. With a burger, it starts where the brand's letters
-  // start, not under the burger.
+  // Phones: the label sits under the brand. It starts where the brand's letters start,
+  // not under the burger.
   @media (max-width: $breakpoint-mobile) {
-    &:has(.header__burger) .header__night {
+    .header__night {
       padding-left: calc(#{$brand-size-mobile} * #{$burger-ratio + $gap-ratio});
     }
   }
