@@ -1,21 +1,21 @@
 // src/hooks/useNight.ts
-// Loads the night once and exposes where we are: loading, ready or error.
+// Loads a night once and exposes where we are: loading, ready or error.
 
 import { useEffect, useState } from 'react';
-import { loadNight } from '../lib/night.ts';
+import { loadNextNight, loadNight } from '../lib/night.ts';
 import type { NightJson } from '../types/public.ts';
 
-export type NightState =
+export type Loaded<T> =
   | { status: 'loading' }
-  | { status: 'ready'; night: NightJson }
+  | { status: 'ready'; night: T }
   | { status: 'error' };
 
-export function useNight(): NightState {
-  const [state, setState] = useState<NightState>({ status: 'loading' });
+function useLoaded<T>(load: (signal: AbortSignal) => Promise<T>): Loaded<T> {
+  const [state, setState] = useState<Loaded<T>>({ status: 'loading' });
 
   useEffect(() => {
     const controller = new AbortController();
-    loadNight(controller.signal)
+    load(controller.signal)
       .then((night) => setState({ status: 'ready', night }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return; // unmounted (or StrictMode's double run in dev)
@@ -23,7 +23,13 @@ export function useNight(): NightState {
         setState({ status: 'error' });
       });
     return () => controller.abort();
-  }, []);
+  }, [load]);
 
   return state;
 }
+
+// The home page night
+export const useNight = (): Loaded<NightJson> => useLoaded(loadNight);
+
+// The next night: null when it has no games
+export const useNextNight = (): Loaded<NightJson | null> => useLoaded(loadNextNight);

@@ -1,4 +1,4 @@
-// Header: brand, night label, title
+// Header: brand (link home), the night switch ("Night of X" · "Next"), title
 
 @use "variables" as *;
 
@@ -36,6 +36,19 @@
     }
   }
 
+  // The brand is also the link to the home page: it keeps its look
+  .header__home {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // "Night of X" and "Next", side by side, on the same baseline
+  .header__nav {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+  }
+
   .header__night {
     margin: 0;
     font-size: 13px;
@@ -43,6 +56,37 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: $muted;
+  }
+
+  // The other page: same type and size, in white, underlined. The underline is an ::after,
+  // so it can be erased on hover, from left to right.
+  .header__link {
+    position: relative;
+    color: $white;
+    text-decoration: none;
+  }
+
+  .header__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    // The letter-spacing also adds space after the last letter: stop the line under it, not past it
+    right: 0.18em;
+    bottom: -4px;
+    height: 1px;
+    background-color: currentColor;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+  }
+
+  .header__link:hover::after {
+    transform: scaleX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__link::after {
+      transition: none;
+    }
   }
 
   .header__heading {

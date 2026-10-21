@@ -28,11 +28,14 @@ export function currentNight(now: Date): string {
   }).format(shifted);
 }
 
-export function previousDay(isoDate: string): string {
+function shiftDay(isoDate: string, days: number): string {
   const d = new Date(`${isoDate}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() - 1);
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+export const previousDay = (isoDate: string) => shiftDay(isoDate, -1);
+export const nextDay = (isoDate: string) => shiftDay(isoDate, 1);
 
 export function planRun(
   now: Date,

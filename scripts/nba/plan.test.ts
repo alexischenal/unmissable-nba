@@ -1,7 +1,7 @@
 // scripts/nba/plan.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { currentNight, planRun, type NightGame, type Published } from './plan.ts';
+import { currentNight, nextDay, planRun, type NightGame, type Published } from './plan.ts';
 
 // Opening night 2026: Tuesday October 20 (US), tip-offs at 3 p.m., 7 p.m. and 9:30 p.m. ET (UTC-4).
 const OPENING: NightGame[] = [
@@ -53,4 +53,9 @@ test('a day without games is skipped: the site keeps the last night', () => {
 test('missing tip-off times: fall back to asking the NBA', () => {
   const plan = planRun(at('2026-10-20T12:00:00Z'), () => [{ tipOff: undefined }], nothing);
   assert.equal(plan.action, 'process');
+});
+
+test('nextDay: across a month and a year', () => {
+  assert.equal(nextDay('2026-10-31'), '2026-11-01');
+  assert.equal(nextDay('2026-12-31'), '2027-01-01');
 });

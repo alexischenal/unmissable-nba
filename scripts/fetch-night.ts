@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { orderGames, type Entry } from './nba/order.ts';
-import { planRun, type Published } from './nba/plan.ts';
+import { nextDay, planRun, type Published } from './nba/plan.ts';
 import {
   competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
@@ -164,6 +164,25 @@ async function save(night: NightJson, { forceLatest = false } = {}): Promise<voi
   }
 }
 
+// The next calendar night after the one on the home page: teams and tip-off times, nothing else.
+// Always written, even with no games (then "games" is empty and the site shows no "Next" link).
+// The schedule is already downloaded, so this costs nothing, and it follows latest.json wherever it goes.
+async function saveNext(schedule: RawSchedule): Promise<void> {
+  const latest = await readNight(path.join(OUT_DIR, 'latest.json'));
+  if (!latest) return;
+  const date = nextDay(latest.date);
+  const entries = gamesOnDate(schedule, date).map((g) => ({
+    away: g.awayTeam.teamTricode,
+    home: g.homeTeam.teamTricode,
+    ...(g.gameDateTimeUTC ? { tipOff: g.gameDateTimeUTC } : {}),
+  }));
+  const json = JSON.stringify({ version: 2, date, games: orderGames([], entries) } satisfies NightJson, null, 2) + '\n';
+  const file = path.join(OUT_DIR, 'next.json');
+  if ((existsSync(file) ? await readFile(file, 'utf8') : null) === json) return;
+  await writeFile(file, json);
+  console.log(`Written: public/data/next.json (${date}, ${entries.length} game(s))`);
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const useFixture = args.includes('--fixture');
@@ -191,14 +210,16 @@ async function main(): Promise<void> {
     );
     if (plan.action === 'idle') {
       console.log(`Nothing to do: ${plan.reason}.`);
-      return;
+      dates = [];
+    } else {
+      dates = plan.dates;
     }
-    dates = plan.dates;
   }
 
   for (const date of dates) {
     await save(await updateNight(schedule, date, now.getTime()));
   }
+  await saveNext(schedule);
 }
 
 main().catch((error: unknown) => {
