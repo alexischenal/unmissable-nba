@@ -5,6 +5,7 @@
 // The header always names the home page night, so its link says where it leads.
 
 import { MatchCard } from './components/MatchCard.tsx';
+import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
 import { HOME_URL, NEXT_URL, PAGE, nightLabel } from './lib/night.ts';
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
@@ -59,25 +60,25 @@ export function App() {
     else if (!nextNight) status = 'No games on the next night.';
   }
 
+  // The menu: the other night first, then the pages to come (rating, legal notice…)
+  const menuItems: MenuItem[] = [];
+  if (PAGE === 'home' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: 'Next night' });
+  if (PAGE === 'next' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
+
   return (
     <main className="page">
       <header className="header">
         <div className="header__title">
+          {/* No burger while there's nothing to put in it */}
+          {menuItems.length > 0 && <Menu items={menuItems} />}
           <h1 className="header__brand">
             <a className="header__home" href={HOME_URL}>Unmissable</a>
           </h1>
         </div>
-        <nav className="header__nav" aria-label="Nights">
-          {/* Where you are: plain. The other page: a link. */}
-          {homeNight && (PAGE === 'home'
-            ? <span className="header__night" aria-current="page"><NightName date={homeNight.date} /></span>
-            : <a className="header__night header__link" href={HOME_URL}><NightName date={homeNight.date} /></a>)}
-          {/* "Next night" only when the next calendar night has games */}
-          {nextNight && (PAGE === 'next'
-            ? <span className="header__night" aria-current="page">Next night</span>
-            : <a className="header__night header__link" href={NEXT_URL}>Next night</a>)}
-          {!homeNight && <span className="header__night">{' '}</span>}
-        </nav>
+        {/* Where you are, in plain text. The other night is in the menu. */}
+        <p className="header__night">
+          {PAGE === 'next' ? 'Next night' : homeNight ? <NightName date={homeNight.date} /> : '\u00A0'}
+        </p>
       </header>
 
       <p className="page__status" role="status" hidden={status === null}>{status}</p>
