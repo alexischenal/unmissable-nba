@@ -143,8 +143,10 @@ Pick one at random among several so returning visitors don't always see the same
     whiteboard), **Film Room** (where players rewatch games), **Why 100?**.
     **Opening pitch** (top of that page, and the social preview text): one question, asked on both sides
     of the Atlantic — is this game worth an effort? In Europe, the effort is the alarm at 6 a.m. instead of
-    7:30. In the US, it's dodging spoilers all day at work, until the replay in the evening. Talk about that
-    situation, not about the product. Drafts:
+    7:30. In the US, it's dodging spoilers all day at work, until the replay in the evening. On the West Coast,
+    a third one, the same evening: East Coast games tip at 4 p.m. Pacific and are over by ~6:30 p.m., so
+    coming home from work, you already know whether one is worth watching from tip-off (the site rates each
+    game as soon as it ends). Talk about those situations, not about the product. Drafts:
     > **Was last night worth it?**
     > In Europe: worth setting the alarm for 6 a.m.?
     > In the US: worth dodging spoilers all day?
