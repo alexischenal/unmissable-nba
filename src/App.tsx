@@ -7,7 +7,7 @@
 import { MatchCard } from './components/MatchCard.tsx';
 import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
-import { HOME_URL, NEXT_URL, PAGE, nightLabel } from './lib/night.ts';
+import { HOME_URL, NEXT_URL, PAGE, nightDates, nightLabel } from './lib/night.ts';
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
@@ -28,6 +28,16 @@ function NightName({ date }: { date: string }) {
     <>
       <span className="header__long">{nightLabel(date)}</span>
       <span className="header__short">{nightLabel(date, { short: true })}</span>
+    </>
+  );
+}
+
+// "Next night · October 23–24": with its date, since it isn't always tomorrow (days off are skipped)
+function NextNightName({ date }: { date: string }) {
+  return (
+    <>
+      <span className="header__long">Next night · {nightDates(date)}</span>
+      <span className="header__short">Next night · {nightDates(date, { short: true })}</span>
     </>
   );
 }
@@ -62,7 +72,7 @@ export function App() {
 
   // The menu: the other night first, then the pages to come (rating, legal notice…)
   const menuItems: MenuItem[] = [];
-  if (PAGE === 'home' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: 'Next night' });
+  if (PAGE === 'home' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: <NextNightName date={nextNight.date} /> });
   if (PAGE === 'next' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
 
   return (
@@ -77,7 +87,9 @@ export function App() {
         </div>
         {/* Where you are, in plain text. The other night is in the menu. */}
         <p className="header__night header__current">
-          {PAGE === 'next' ? 'Next night' : homeNight ? <NightName date={homeNight.date} /> : '\u00A0'}
+          {PAGE === 'next'
+            ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
+            : homeNight ? <NightName date={homeNight.date} /> : '\u00A0'}
         </p>
       </header>
 

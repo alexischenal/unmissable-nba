@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
-import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
+import { gamesOnDate, isFinal, nextNightWithGames, toGame } from './nba/adapter.ts';
 import { loadSchedule } from './nba/schedule-cache.ts';
 import { orderGames, type Entry } from './nba/order.ts';
 import { nextDay, planRun, type Published } from './nba/plan.ts';
@@ -165,13 +165,13 @@ async function save(night: NightJson, { forceLatest = false } = {}): Promise<voi
   }
 }
 
-// The next calendar night after the one on the home page: teams and tip-off times, nothing else.
-// Always written, even with no games (then "games" is empty and the site shows no "Next" link).
-// The schedule is already downloaded, so this costs nothing, and it follows latest.json wherever it goes.
+// The next night with games after the one on the home page (days off are skipped): teams and
+// tip-off times, nothing else. Always written: with no night left in the schedule (end of the
+// season), "games" is empty and the site shows no "Next night" link.
 async function saveNext(schedule: RawSchedule): Promise<void> {
   const latest = await readNight(path.join(OUT_DIR, 'latest.json'));
   if (!latest) return;
-  const date = nextDay(latest.date);
+  const date = nextNightWithGames(schedule, latest.date) ?? nextDay(latest.date);
   const entries = gamesOnDate(schedule, date).map((g) => ({
     away: g.awayTeam.teamTricode,
     home: g.homeTeam.teamTricode,

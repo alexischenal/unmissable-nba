@@ -2,7 +2,8 @@
 // The season schedule (several MB) is only downloaded once per night, not on every run.
 //
 // The first run of a night (from 06:00 New York time, see plan.ts) downloads it and keeps only the
-// nights the script can need: the previous one, the current one and the next two. That small copy
+// nights the script can need: the previous one, the current one and the next two with games (for
+// next.json, which skips days off). That small copy
 // (a few KB) is .cache/schedule.json, which GitHub Actions keeps between runs (actions/cache, keyed
 // by night). Every other run of that night reads it instead of calling nba.com.
 //
@@ -13,19 +14,21 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { fetchSchedule } from './client.ts';
-import { scheduleDateToIso } from './adapter.ts';
-import { currentNight, nextDay, previousDay } from './plan.ts';
+import { nextNightWithGames, scheduleDateToIso } from './adapter.ts';
+import { currentNight, previousDay } from './plan.ts';
 import type { RawSchedule } from './types.ts';
 
 type Cached = { night: string; schedule: RawSchedule };
 
-export function nightsKept(night: string): string[] {
-  return [previousDay(night), night, nextDay(night), nextDay(nextDay(night))];
+export function nightsKept(full: RawSchedule, night: string): string[] {
+  const first = nextNightWithGames(full, night);
+  const second = first ? nextNightWithGames(full, first) : null;
+  return [previousDay(night), night, ...(first ? [first] : []), ...(second ? [second] : [])];
 }
 
 // Only the game days the script can need, in the same format as the full schedule
 export function trimSchedule(full: RawSchedule, night: string): RawSchedule {
-  const keep = new Set(nightsKept(night));
+  const keep = new Set(nightsKept(full, night));
   return {
     leagueSchedule: {
       ...full.leagueSchedule,
