@@ -19,7 +19,7 @@ const num = (value: unknown, label: string): number => {
 };
 
 // '10/20/2026 00:00:00' → '2026-10-20'
-const scheduleDateToIso = (raw: string): string => {
+export const scheduleDateToIso = (raw: string): string => {
   const match = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(raw);
   return match ? `${match[3]}-${match[1]}-${match[2]}` : raw.slice(0, 10);
 };

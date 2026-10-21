@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
+import { loadSchedule } from './nba/schedule-cache.ts';
 import { orderGames, type Entry } from './nba/order.ts';
 import { nextDay, planRun, type Published } from './nba/plan.ts';
 import {
@@ -195,9 +196,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  console.log('NBA schedule…');
-  const schedule = await fetchSchedule();
   const now = new Date();
+  // An explicit date can be any night of the season: the full schedule. Otherwise, the small copy
+  // downloaded once per night (scripts/nba/schedule-cache.ts).
+  const schedule = dateArg ? await fetchSchedule() : await loadSchedule(now, path.join(ROOT, '.cache', 'schedule.json'));
 
   let dates: string[];
   if (dateArg) {
