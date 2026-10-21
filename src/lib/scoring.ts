@@ -35,14 +35,18 @@ export const efficiency = (p: PlayerLine) =>
 
 // --- Step 1: competitive game or blowout? --------------------------------------
 
-export const isDisputed = (g: Game) => {
+// Close at the end, or a big comeback: the game stayed alive until the end.
+const closeToTheEnd = (g: Game) => {
   const c = SCORING.disputed;
-  return (
-    regulationMargin(g) <= c.maxRegulationMargin ||
-    marginAfterQ3(g) <= c.maxMarginAfterQ3 ||
-    loserBiggestLead(g) >= c.minLoserBiggestLead
-  );
+  return regulationMargin(g) <= c.maxRegulationMargin || loserBiggestLead(g) >= c.minLoserBiggestLead;
 };
+
+export const isDisputed = (g: Game) =>
+  closeToTheEnd(g) || marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
+
+// Where a competitive game starts: lower when it was only close after Q3, then decided in the fourth.
+export const disputedBaseFor = (g: Game) =>
+  closeToTheEnd(g) ? SCORING.disputedBase : SCORING.q3OnlyBase;
 
 // --- Step 2: refine -------------------------------------------------------------
 
@@ -85,7 +89,7 @@ export const performancePoints = (g: Game) => sum(g.players.map(playerPoints));
 export const rawScore = (g: Game) => {
   const points = competitivenessPoints(g) + performancePoints(g);
   return isDisputed(g)
-    ? SCORING.disputedBase + points
+    ? disputedBaseFor(g) + points
     : Math.min(SCORING.blowoutMax, points);
 };
 
