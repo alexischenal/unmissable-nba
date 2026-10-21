@@ -72,10 +72,10 @@ export function App() {
           {homeNight && (PAGE === 'home'
             ? <span className="header__night" aria-current="page"><NightName date={homeNight.date} /></span>
             : <a className="header__night header__link" href={HOME_URL}><NightName date={homeNight.date} /></a>)}
-          {/* "Next" only when the next calendar night has games */}
+          {/* "Next night" only when the next calendar night has games */}
           {nextNight && (PAGE === 'next'
-            ? <span className="header__night" aria-current="page">Next</span>
-            : <a className="header__night header__link" href={NEXT_URL}>Next</a>)}
+            ? <span className="header__night" aria-current="page">Next night</span>
+            : <a className="header__night header__link" href={NEXT_URL}>Next night</a>)}
           {!homeNight && <span className="header__night">{' '}</span>}
         </nav>
       </header>
