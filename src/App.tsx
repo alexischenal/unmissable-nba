@@ -20,6 +20,17 @@ const GROUPS: { state: GameState; heading: string | null; label: string }[] = [
   { state: 'upcoming', heading: 'Coming up', label: 'Games not started yet' },
 ];
 
+// The night label, twice: long on wide screens, short on phones (CSS shows one, display: none hides the other,
+// so screen readers only read one).
+function NightName({ date }: { date: string }) {
+  return (
+    <>
+      <span className="header__long">{nightLabel(date)}</span>
+      <span className="header__short">{nightLabel(date, { short: true })}</span>
+    </>
+  );
+}
+
 export function App() {
   const home = useNight();
   const next = useNextNight();
@@ -59,8 +70,8 @@ export function App() {
         <nav className="header__nav" aria-label="Nights">
           {/* Where you are: plain. The other page: a link. */}
           {homeNight && (PAGE === 'home'
-            ? <span className="header__night" aria-current="page">{nightLabel(homeNight.date)}</span>
-            : <a className="header__night header__link" href={HOME_URL}>{nightLabel(homeNight.date)}</a>)}
+            ? <span className="header__night" aria-current="page"><NightName date={homeNight.date} /></span>
+            : <a className="header__night header__link" href={HOME_URL}><NightName date={homeNight.date} /></a>)}
           {/* "Next" only when the next calendar night has games */}
           {nextNight && (PAGE === 'next'
             ? <span className="header__night" aria-current="page">Next</span>
@@ -74,8 +85,8 @@ export function App() {
       {GROUPS.map(({ state: groupState, heading, label }) => {
         const games = byState.get(groupState) ?? [];
         if (games.length === 0) return null;
-        // On the Next page, the list is that night's slate: its heading names the night
-        const title = PAGE === 'next' && groupState === 'upcoming' && night ? nightLabel(night.date) : heading;
+        // On the Next page, no heading: the header already says where you are
+        const title = PAGE === 'next' ? null : heading;
         return (
           <section className="games" key={groupState}>
             {title && (

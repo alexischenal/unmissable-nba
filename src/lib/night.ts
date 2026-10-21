@@ -9,12 +9,16 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-// "Night of October 20–21", "Night of October 31 – November 1"
-export function nightLabel(isoDate: string): string {
+// "Night of October 20–21", "Night of October 31 – November 1".
+// short: "Night of Oct 20–21", "Night of Oct 31 – Nov 1", for phones (the long one wraps at 320px).
+export function nightLabel(isoDate: string, { short = false } = {}): string {
   const [y, m, d] = isoDate.split('-').map(Number) as [number, number, number];
   const start = new Date(Date.UTC(y, m - 1, d));
   const end = new Date(Date.UTC(y, m - 1, d + 1));
-  const month = (x: Date) => MONTHS[x.getUTCMonth()];
+  const month = (x: Date) => {
+    const name = MONTHS[x.getUTCMonth()]!;
+    return short ? name.slice(0, 3) : name;
+  };
   return start.getUTCMonth() === end.getUTCMonth()
     ? `Night of ${month(start)} ${start.getUTCDate()}–${end.getUTCDate()}`
     : `Night of ${month(start)} ${start.getUTCDate()} – ${month(end)} ${end.getUTCDate()}`;

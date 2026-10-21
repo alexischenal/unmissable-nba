@@ -58,6 +58,21 @@
     color: $muted;
   }
 
+  // The night label: long on wide screens, short on phones
+  .header__short {
+    display: none;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    .header__long {
+      display: none;
+    }
+
+    .header__short {
+      display: inline;
+    }
+  }
+
   // The other page: same type and size, in white, underlined. The underline is an ::after,
   // so it can be erased on hover, from left to right.
   .header__link {
