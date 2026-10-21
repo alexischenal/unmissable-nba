@@ -30,8 +30,9 @@
    - With all three: under ~20 kWh a year.
 3. **High priority — "Night of X" and "Next", no "Previous".** Unmissable isn't an archive: one night on
    screen, plus a peek at the next one. Two pages, never more.
-   - **Done (October 21)**: `/next`, the header switch (link in white, `::after` underline erased on hover),
-     the logo linking home, `next.json` written on every run, "Next" hidden when the next night has no games.
+   - **Done (October 21)**: `/next`, the logo linking home, `next.json` written on every run, "Next night"
+     hidden when the next night has no games. The switch moved into a burger menu (too eye-catching in the
+     header): the header only says where you are, the menu links to the other night.
      Still to do: the 24-hour expiry and the "No more games" screen.
    - **Home page**: `Night of October 20–21` (plain: it's where you are) · `Next` (underlined: a link).
    - **Next page**: the opposite. `Night of October 20–21` underlined (link back home) · `Next` plain.
