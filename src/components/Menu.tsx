@@ -52,6 +52,13 @@ export function Menu({ items }: { items: MenuItem[] }) {
           <rect x="0" y="14" width="25" height="3" fill="currentColor" />
           <rect x="0" y="28" width="25" height="3" fill="currentColor" />
         </svg>
+        {/* Tablets (brand at 32px): the drawing above would land between pixels and the middle bar
+            would look thicker. Its own drawing, in whole pixels: 26px tall, 2px bars, 10px gaps. */}
+        <svg className="header__burger-icon-tablet" viewBox="0 0 21 26" aria-hidden="true">
+          <rect x="0" y="0" width="21" height="2" fill="currentColor" />
+          <rect x="0" y="12" width="21" height="2" fill="currentColor" />
+          <rect x="0" y="24" width="21" height="2" fill="currentColor" />
+        </svg>
       </button>
 
       {/* Closed: hidden from view, from the keyboard and from screen readers (visibility in the CSS) */}

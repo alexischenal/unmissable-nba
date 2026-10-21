@@ -69,6 +69,21 @@ $burger-gap: $gap-ratio * 1em;
     height: $burger-size;
     overflow: visible;
     margin-top: -0.0375em;
+
+    @media (max-width: $breakpoint-tablet) and (min-width: $breakpoint-mobile + 1) {
+      display: none;
+    }
+  }
+
+  .header__burger-icon-tablet {
+    display: none;
+    width: 21px;
+    height: 26px;
+    margin-top: -2px;
+
+    @media (max-width: $breakpoint-tablet) and (min-width: $breakpoint-mobile + 1) {
+      display: block;
+    }
   }
 
   .header__menu {
@@ -108,7 +123,7 @@ $burger-gap: $gap-ratio * 1em;
     list-style: none;
 
     @media (max-width: $breakpoint-tablet) {
-      padding-left: calc(#{$brand-size-tablet} * #{$burger-width-ratio + $gap-ratio});
+      padding-left: calc(21px + #{$brand-size-tablet} * #{$gap-ratio});
     }
 
     @media (max-width: $breakpoint-mobile) {
