@@ -154,6 +154,17 @@ Pick one at random among several so returning visitors don't always see the same
 - **Reveal the score on tap**, as a deliberate action (never on hover or scroll).
 - **Other sports**: the home page becomes "best game of the night, all sports", sports move to `/basketball`, `/football`…
 - **Dark mode.**
+- **Low priority — notify when a game reaches 80 or more.** Fits the three use cases (6 a.m. alarm in Europe,
+  a day without spoilers in the US, coming home on the West Coast). No server on GitHub Pages, and no
+  personal data wanted (legal notice: "none"), so in this order:
+  1. **ntfy.sh** (free, open source): the workflow sends one `curl` to a public topic when a game is rated
+     80+. Users subscribe in the ntfy app; nothing is stored on our side. Three topics (`unmissable-80`,
+     `-90`, `-100`) let each user pick a threshold. Quiet hours are set in the app. About half a day.
+  2. **An RSS feed** of 80+ games, written by the script next to the JSON. Static, free, works with any reader.
+  3. **Real web push**, only if the site takes off: needs a backend storing subscriptions (personal data,
+     GDPR, legal notice to update), and on iPhone only works once the site is added to the home screen.
+     Hard to undo: don't start here.
+  Never notify a game twice, and never the score: the title is the matchup, the body the rating.
 
 ## Updates during the day — rate each game as soon as it ends
 
