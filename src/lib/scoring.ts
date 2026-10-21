@@ -46,25 +46,38 @@ export const isDisputed = (g: Game) => {
 
 // --- Step 2: refine -------------------------------------------------------------
 
-export const competitivenessPoints = (g: Game) => {
-  const { suspense, scenario, comeback, offense } = SCORING;
-
-  const s = clamp01((suspense.zeroAt - regulationMargin(g)) / (suspense.zeroAt - suspense.fullAt));
-  const sc = clamp01((g.leadChanges + g.timesTied) / scenario.fullAt);
-  const cb = clamp01(loserBiggestLead(g) / comeback.fullAt);
-
+export const pointsPer48 = (g: Game) => {
   const f = finalScore(g);
-  const minutes = 48 + 5 * overtimes(g);
-  const per48 = ((f.home + f.away) * 48) / minutes;
-  const off = clamp01((per48 - offense.zeroAt) / (offense.fullAt - offense.zeroAt));
-
-  return suspense.weight * s + scenario.weight * sc + comeback.weight * cb + offense.weight * off;
+  return ((f.home + f.away) * 48) / (48 + 5 * overtimes(g));
 };
 
-export const performancePoints = (g: Game) => {
+// Each ingredient: its share (0 to 1) and its points. Detailed for scripts/explain.ts.
+export const competitivenessDetails = (g: Game) => {
+  const { suspense, scenario, comeback, offense } = SCORING;
+  const share = {
+    suspense: clamp01((suspense.zeroAt - regulationMargin(g)) / (suspense.zeroAt - suspense.fullAt)),
+    scenario: clamp01((g.leadChanges + g.timesTied) / scenario.fullAt),
+    comeback: clamp01(loserBiggestLead(g) / comeback.fullAt),
+    offense: clamp01((pointsPer48(g) - offense.zeroAt) / (offense.fullAt - offense.zeroAt)),
+  };
+  return {
+    suspense: { share: share.suspense, points: suspense.weight * share.suspense },
+    scenario: { share: share.scenario, points: scenario.weight * share.scenario },
+    comeback: { share: share.comeback, points: comeback.weight * share.comeback },
+    offense: { share: share.offense, points: offense.weight * share.offense },
+  };
+};
+
+export const competitivenessPoints = (g: Game) =>
+  sum(Object.values(competitivenessDetails(g)).map((d) => d.points));
+
+// One player's points: nothing below the threshold, then the square of what's above it.
+export const playerPoints = (p: PlayerLine) => {
   const { threshold, divisor } = SCORING.performance;
-  return sum(g.players.map((p) => Math.max(0, efficiency(p) - threshold) ** 2 / divisor));
+  return Math.max(0, efficiency(p) - threshold) ** 2 / divisor;
 };
+
+export const performancePoints = (g: Game) => sum(g.players.map(playerPoints));
 
 // --- Final rating ---------------------------------------------------------------
 

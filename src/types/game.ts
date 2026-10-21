@@ -6,6 +6,7 @@ export type Side = 'home' | 'away';
 
 export type PlayerLine = {
   team: Side;
+  name?: string; // only for the developer's explanations, never used by the rating
   pts: number;
   reb: number;
   ast: number;

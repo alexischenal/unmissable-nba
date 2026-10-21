@@ -38,7 +38,7 @@ export type RawBoxscoreTeam = {
   teamTricode: string;
   score: number;
   periods: { period: number; periodType: string; score: number }[];
-  players: { statistics: RawPlayerStatistics }[];
+  players: { name?: string; statistics: RawPlayerStatistics }[];
   statistics: {
     biggestLead: number;
     leadChanges: number;
