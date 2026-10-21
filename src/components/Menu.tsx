@@ -44,11 +44,13 @@ export function Menu({ items }: { items: MenuItem[] }) {
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
       >
-        {/* Three bars, as tall as the brand's capital letters (0.8em, see _header.scss) */}
-        <svg className="header__burger-icon" viewBox="0 0 26 32" aria-hidden="true">
-          <rect x="0" y="0" width="26" height="3.2" fill="currentColor" />
-          <rect x="0" y="14.4" width="26" height="3.2" fill="currentColor" />
-          <rect x="0" y="28.8" width="26" height="3.2" fill="currentColor" />
+        {/* Three bars, as tall as the brand's capital letters (see _header.scss).
+            Whole numbers on purpose: drawn at 31px (desktop), each bar falls on exactly 3 rows of
+            pixels. With 3.2-tall bars, the middle one straddled 4 rows and looked thicker. */}
+        <svg className="header__burger-icon" viewBox="0 0 25 31" aria-hidden="true">
+          <rect x="0" y="0" width="25" height="3" fill="currentColor" />
+          <rect x="0" y="14" width="25" height="3" fill="currentColor" />
+          <rect x="0" y="28" width="25" height="3" fill="currentColor" />
         </svg>
       </button>
 

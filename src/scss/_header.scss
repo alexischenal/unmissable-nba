@@ -5,8 +5,10 @@
 // The brand's size, and the burger in em of it (so it follows the brand on every screen)
 $brand-size: 40px;
 $brand-size-mobile: min(24px, 6.2vw);
-$burger-ratio: 0.8; // as tall as the brand's capitals in this font (measured: 32px for 40px)
-$burger-width-ratio: $burger-ratio * 0.8125; // a bit narrower than tall (viewBox 26 × 32 = 0.8125)
+// The brand's capitals are 32px tall at 40px. The burger is 31px: an odd height, so three 3px bars
+// with two 11px gaps fall on whole pixels (viewBox 25 × 31, see Menu.tsx).
+$burger-ratio: 0.775;
+$burger-width-ratio: 0.625; // 25px at 40px
 $gap-ratio: 0.4;
 $burger-size: $burger-ratio * 1em;
 $burger-width: $burger-width-ratio * 1em;
@@ -73,8 +75,12 @@ $burger-gap: $gap-ratio * 1em;
     display: block;
     width: $burger-width;
     height: $burger-size;
-    // Centered, it sits 1px lower than the letters (at 40px): lined up on them instead
-    margin-top: -0.05em;
+    // On phones the size isn't a whole number of pixels: the box gets rounded and could shave
+    // the bottom bar. Let the drawing overflow its box instead.
+    overflow: visible;
+    // Centered, it lands half a pixel lower than the letters (at 40px): on whole pixels, bottom
+    // lined up with the letters' baseline instead (otherwise every bar edge is blurred)
+    margin-top: -0.0375em;
   }
 
   // The menu: under the header, full width, over the cards (it never pushes them down).
