@@ -38,6 +38,7 @@ function toPlayers(team: RawBoxscoreTeam, side: Side): PlayerLine[] {
     const label = `${team.teamTricode} player ${i}`;
     return {
       team: side,
+      ...(p.name ? { name: p.name } : {}),
       pts: num(s.points, `${label} points`),
       reb: num(s.reboundsTotal, `${label} reboundsTotal`),
       ast: num(s.assists, `${label} assists`),
