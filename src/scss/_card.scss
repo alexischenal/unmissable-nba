@@ -149,11 +149,18 @@
     line-height: 1;
     font-variant-numeric: tabular-nums;
     color: $bg;
+    position: relative;
+    top: 0.02em;
+
+    @media (max-width: $breakpoint-mobile) {
+      top: 0;
+    }
   }
 
   .card__note-value--time {
     font-size: calc(var(--note-size) * 0.55);
     text-align: center;
+    top: 0;
   }
 
   .card__note-period {
