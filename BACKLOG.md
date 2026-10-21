@@ -148,10 +148,12 @@ Pick one at random among several so returning visitors don't always see the same
   - **Next night** (link to `/next`; on the Next page, the link back to the home page instead).
   - **Legal notice** (mandatory in France, even for a personal site): publisher (name, or a contact with the
     details left with the host), host (GitHub, with its address), no cookies, visit counter without personal
-    data, not affiliated with the NBA, a line on team names and the data used. To check with the official
-    wording before launch.
-- **Small footer with the same links** (rating page, Next night, Legal notice), plus the "Not affiliated with
-  the NBA" line already there. On desktop, where the burger isn't needed, it's the main way to reach them.
+    data, **"Not affiliated with the NBA"** (it was in the footer until October 21: removed, this page is now
+    its only place), a line on team names and the data used. To check with the official wording before launch.
+- **Footer removed (October 21)**: it said "Not affiliated with the NBA. Ratings only measure what happened on
+  the court." The first sentence moves to the legal notice, the second to the presentation page.
+  Option if the disclaimer ever needs to be more visible: a small footer with a "Legal notice" link only,
+  so it's one click away on every page.
 
 - **Tags per game** (tap a card to reveal them). Only on-court facts, never prestige ("top clash", rivalry…).
   Rate each tag's spoiler risk; a spoiler tag needs an explicit second action.

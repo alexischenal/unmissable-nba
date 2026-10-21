@@ -116,9 +116,6 @@ export function App() {
         );
       })}
 
-      <footer className="page__footer">
-        Not affiliated with the NBA. Ratings only measure what happened on the court.
-      </footer>
     </main>
   );
 }
