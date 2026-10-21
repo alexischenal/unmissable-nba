@@ -1,10 +1,6 @@
-// Page: base styles, page layout, list of games
-
 @use "variables" as *;
 
 :root {
-  // Width of the secondary color stripe on the card edges. On :root, not on .card: the header and
-  // the section headings align on it too (left edge of UNMISSABLE / IN PROGRESS, right edge of NIGHT OF).
   --stripe: #{$stripe};
 
   @media (max-width: $breakpoint-tablet) {
@@ -41,8 +37,6 @@ body {
 }
 
 .games {
-  // One group of games: rated, in progress, coming up
-
   .games__heading {
     margin: 0;
     padding: 28px var(--stripe) 12px;
@@ -60,8 +54,6 @@ body {
     }
   }
 
-  // "In progress..." — the dots come from public/sprite.svg (#dots), which also holds their animation.
-  // Sized in em, so they follow the heading's font size; they take its color (currentColor).
   .games__dots {
     width: 0.8em;
     height: 0.16em;

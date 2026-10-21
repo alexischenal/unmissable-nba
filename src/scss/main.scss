@@ -1,9 +1,3 @@
-// Entry point of the styles, imported by src/main.tsx. Vite compiles it: nothing to run.
-// Partials start with "_" and are loaded with @use (never @import, deprecated in Sass).
-// Variables aren't global with @use: each partial that needs them starts with
-//   @use "variables" as *;
-// (_variables.scss outputs no CSS, so it isn't listed here.)
-
 @use "page";
 @use "header";
 @use "card";
