@@ -1,10 +1,13 @@
 // src/App.tsx
-// The page: header, the night's games (best first), footer.
+// Two pages, same app:
+//   - home: the night on screen (best games first), from latest.json;
+//   - next (/next): the next calendar night's games, with their tip-off times, from next.json.
+// The header always names the home page night, so its link says where it leads.
 
 import { MatchCard } from './components/MatchCard.tsx';
-import { useNight } from './hooks/useNight.ts';
-import { nightLabel } from './lib/night.ts';
-import { gameState, nightIsComplete, type GameState, type PublicGame } from './types/public.ts';
+import { useNextNight, useNight } from './hooks/useNight.ts';
+import { HOME_URL, NEXT_URL, PAGE, nightLabel } from './lib/night.ts';
+import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
 const LOADED_AT = Date.now();
@@ -18,8 +21,13 @@ const GROUPS: { state: GameState; heading: string | null; label: string }[] = [
 ];
 
 export function App() {
-  const state = useNight();
-  const night = state.status === 'ready' ? state.night : null;
+  const home = useNight();
+  const next = useNextNight();
+
+  const homeNight = home.status === 'ready' ? home.night : null;
+  const nextNight = next.status === 'ready' ? next.night : null;
+  // The night on screen
+  const night: NightJson | null = PAGE === 'next' ? nextNight : homeNight;
   const complete = night !== null && nightIsComplete(night);
 
   // The games split by state, keeping the JSON's order (rated: best first; others: by tip-off)
@@ -30,17 +38,35 @@ export function App() {
   });
 
   let status: string | null = null;
-  if (state.status === 'loading') status = 'Loading games…';
-  else if (state.status === 'error') status = "Last night's games aren't available yet. Try again in a little while.";
-  else if (night?.games.length === 0) status = 'No games last night. Come back tomorrow morning.';
+  if (PAGE === 'home') {
+    if (home.status === 'loading') status = 'Loading games…';
+    else if (home.status === 'error') status = "Last night's games aren't available yet. Try again in a little while.";
+    else if (homeNight?.games.length === 0) status = 'No games last night. Come back tomorrow morning.';
+  } else {
+    if (next.status === 'loading') status = 'Loading games…';
+    else if (next.status === 'error') status = "The next night's games aren't available yet. Try again in a little while.";
+    else if (!nextNight) status = 'No games on the next night.';
+  }
 
   return (
     <main className="page">
       <header className="header">
         <div className="header__title">
-          <h1 className="header__brand">Unmissable</h1>
+          <h1 className="header__brand">
+            <a className="header__home" href={HOME_URL}>Unmissable</a>
+          </h1>
         </div>
-        <p className="header__night">{night ? nightLabel(night.date) : '\u00A0'}</p>
+        <nav className="header__nav" aria-label="Nights">
+          {/* Where you are: plain. The other page: a link. */}
+          {homeNight && (PAGE === 'home'
+            ? <span className="header__night" aria-current="page">{nightLabel(homeNight.date)}</span>
+            : <a className="header__night header__link" href={HOME_URL}>{nightLabel(homeNight.date)}</a>)}
+          {/* "Next" only when the next calendar night has games */}
+          {nextNight && (PAGE === 'next'
+            ? <span className="header__night" aria-current="page">Next</span>
+            : <a className="header__night header__link" href={NEXT_URL}>Next</a>)}
+          {!homeNight && <span className="header__night">{' '}</span>}
+        </nav>
       </header>
 
       <p className="page__status" role="status" hidden={status === null}>{status}</p>
@@ -48,11 +74,13 @@ export function App() {
       {GROUPS.map(({ state: groupState, heading, label }) => {
         const games = byState.get(groupState) ?? [];
         if (games.length === 0) return null;
+        // On the Next page, the list is that night's slate: its heading names the night
+        const title = PAGE === 'next' && groupState === 'upcoming' && night ? nightLabel(night.date) : heading;
         return (
           <section className="games" key={groupState}>
-            {heading && (
+            {title && (
               <h2 className="games__heading">
-                {heading}
+                {title}
                 {/* Three dots appearing one after the other: games still going */}
                 {groupState === 'live' && (
                   <svg className="games__dots" aria-hidden="true"><use href="/sprite.svg#dots" /></svg>
@@ -67,7 +95,7 @@ export function App() {
                     state={groupState}
                     rank={index + 1}
                     // A 100 is featured right away; otherwise the best game, once the whole night is rated.
-                    featured={game.note === 100 || (complete && index === 0)}
+                    featured={game.note === 100 || (complete && index === 0 && game.note !== undefined)}
                   />
                 </li>
               ))}
