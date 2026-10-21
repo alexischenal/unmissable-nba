@@ -7,18 +7,21 @@ import path from 'node:path';
 import { loadSchedule, nightsKept, trimSchedule } from './schedule-cache.ts';
 import type { RawSchedule } from './types.ts';
 
-const day = (mmddyyyy: string) => ({ gameDate: `${mmddyyyy} 00:00:00`, games: [] });
-const FULL: RawSchedule = {
+const game = { gameId: '0022600001', gameStatus: 1, awayTeam: { teamTricode: 'BOS' }, homeTeam: { teamTricode: 'NYK' } };
+const day = (mmddyyyy: string, withGames = true) => ({ gameDate: `${mmddyyyy} 00:00:00`, games: withGames ? [game] : [] });
+// October 22 is a day off
+const FULL = {
   leagueSchedule: {
     seasonYear: '2026-27',
-    gameDates: ['10/19/2026', '10/20/2026', '10/21/2026', '10/22/2026', '10/23/2026', '10/24/2026'].map(day),
+    gameDates: [day('10/19/2026'), day('10/20/2026'), day('10/21/2026'), day('10/22/2026', false),
+      day('10/23/2026'), day('10/24/2026'), day('10/25/2026')],
   },
-};
+} as unknown as RawSchedule;
 
-test('keeps the previous night, the current one and the next two', () => {
-  assert.deepEqual(nightsKept('2026-10-21'), ['2026-10-20', '2026-10-21', '2026-10-22', '2026-10-23']);
+test('keeps the previous night, the current one and the next two with games', () => {
+  assert.deepEqual(nightsKept(FULL, '2026-10-21'), ['2026-10-20', '2026-10-21', '2026-10-23', '2026-10-24']);
   const kept = trimSchedule(FULL, '2026-10-21').leagueSchedule.gameDates.map((d) => d.gameDate.slice(0, 10));
-  assert.deepEqual(kept, ['10/20/2026', '10/21/2026', '10/22/2026', '10/23/2026']);
+  assert.deepEqual(kept, ['10/20/2026', '10/21/2026', '10/23/2026', '10/24/2026']);
 });
 
 test('a copy of the current night is used without calling nba.com', async () => {

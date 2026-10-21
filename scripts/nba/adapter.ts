@@ -39,6 +39,14 @@ export function allGamesOnDate(schedule: RawSchedule, isoDate: string): RawSched
 export const gamesOnDate = (schedule: RawSchedule, isoDate: string): RawScheduleGame[] =>
   allGamesOnDate(schedule, isoDate).filter(teamsKnown);
 
+// The first night after isoDate with games the site can show (days off, the All-Star break and the
+// like are skipped), or null when the schedule has none left (end of the season).
+export function nextNightWithGames(schedule: RawSchedule, isoDate: string): string | null {
+  const later = schedule.leagueSchedule.gameDates.map((d) => scheduleDateToIso(d.gameDate))
+    .filter((date) => date > isoDate).sort();
+  return later.find((date) => gamesOnDate(schedule, date).length > 0) ?? null;
+}
+
 export const isFinal = (box: RawBoxscore): boolean => box.game.gameStatus === 3;
 
 function toPlayers(team: RawBoxscoreTeam, side: Side): PlayerLine[] {

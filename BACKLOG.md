@@ -48,8 +48,9 @@
    - **If "Next" isn't obvious enough as a link**: underlined and in white. Decide at design time.
    - **The logo (`UNMISSABLE` in the header) links to the home page**, on the Next page and everywhere else.
      The burger menu has the link too.
-   - **"Next" = the next calendar night, only if it has games.** No games tomorrow: no "Next" button. No skipping
-     ahead, so "Next" always means tomorrow night and needs no date.
+   - **"Next night" = the next night with games** (changed October 21): days off and the All-Star break are
+     skipped, so it carries its date: "Next night · October 23–24" in the menu and on the Next page header.
+     No night left in the schedule (end of the season): no link.
    - **The home page night expires after 24 hours.** It stays on screen until the next night's first tip-off,
      but if no new night has started 24 hours after it ended (day off, All-Star break, off-season), the home
      page switches to the "No more games" screen (GIFs).
