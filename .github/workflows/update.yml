@@ -1,4 +1,5 @@
-# Wakes up every 15 minutes: puts a night on the site at its first tip-off, rates each game
+# Started every 5 minutes by cron-job.org (GitHub's own schedule, hourly, is only a fallback):
+# puts a night on the site at its first tip-off, rates each game
 # as soon as it's over, then rebuilds and redeploys the site. Also redeploys on every push to main.
 #
 # Most runs have nothing to do (no game under way, night already fully rated): the script
@@ -8,8 +9,10 @@ name: Update and deploy
 
 on:
   schedule:
-    # Cron times are UTC. GitHub may start scheduled runs a few minutes late.
-    - cron: "*/15 * * * *"
+    # Fallback only: once an hour (minute 7, away from GitHub's busy :00), never between 08:00 and
+    # 15:00 UTC, when no game can need a run (checked on the 2026-27 schedule: npm run check-window).
+    # Cron times are UTC. cron-job.org follows the same window.
+    - cron: "7 0-7,15-23 * * *"
   push:
     branches: [main]
   # Also started every 5 minutes by cron-job.org through the GitHub API (more punctual than

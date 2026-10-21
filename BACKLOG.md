@@ -20,14 +20,18 @@
    - [x] **Done (October 21): the schedule is downloaded once per night** (first run after 06:00 New York),
      trimmed to the 4 nights the script can need (a few KB) and kept between runs with `actions/cache`.
      See `scripts/nba/schedule-cache.ts`. Trade-off: a tip-off time changed during the day waits for the next night.
-   - [ ] **A daily window with no runs at all.** No NBA game can end between the latest finish (~1:30 a.m. ET with
+   - [x] **Checked (October 21): 08:00–15:00 UTC is safe for the whole 2026-27 season** (`npm run check-window`).
+     Latest tip-offs 04:00 UTC (runs needed until ~08:00), earliest 15:30 UTC (SAS@NOP, January 17).
+     GitHub's schedule follows it. **cron-job.org: to set by hand** (every 5 min, hours 0–7 and 15–23, time zone
+     UTC). Re-run the check when next season's schedule comes out.
+   - [ ] ~~**A daily window with no runs at all.**~~ No NBA game can end between the latest finish (~1:30 a.m. ET with
      overtime, ~06:30 UTC) and the earliest tip-off (noon ET on weekends and holidays = 16:00 UTC in summer time,
      17:00 UTC in winter; games in Europe tip around 19:00–20:00 local time = 18:00–19:00 UTC).
      Candidate: no runs from 08:00 to 15:00 UTC, on cron-job.org and in GitHub's schedule (`*/15 15-23,0-7 * * *`).
      About 30% fewer runs. To check against the season's real schedule before switching it on:
      `npm run check-window`, on your own machine, lists every game of the season that needs runs inside the
      window. A game caught in it isn't lost, only rated later (the next run catches up on the night).
-   - [ ] **GitHub's own schedule down to once an hour** once cron-job.org has proved reliable: it's only the fallback.
+   - [x] **GitHub's own schedule down to once an hour** (October 21, `7 0-7,15-23 * * *`): it's only the fallback.
    - With all three: under ~20 kWh a year.
 3. **High priority — "Night of X" and "Next", no "Previous".** Unmissable isn't an archive: one night on
    screen, plus a peek at the next one. Two pages, never more.
