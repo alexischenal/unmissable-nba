@@ -160,6 +160,15 @@ Pick one at random among several so returning visitors don't always see the same
 - **Reveal the score on tap**, as a deliberate action (never on hover or scroll).
 - **Other sports**: the home page becomes "best game of the night, all sports", sports move to `/basketball`, `/football`…
 - **Dark mode.**
+- **Eventually — the burger on phones, in whole pixels.** On phones the brand is fluid (`min(24px, 6.2vw)`),
+  so the burger (in em of it) lands between pixels: each bar has the same total weight, but spread over
+  different rows (the middle one blurrier). Barely visible on 3x screens. Fix like tablets: a fixed-size
+  drawing in whole pixels (e.g. 16px tall: 2px bars, 5px gaps), at the cost of a small height mismatch with
+  the brand on some widths. Desktop (40px) and tablets (32px, own drawing) are already pixel-exact.
+- **Eventually — the brand as an SVG** (the "UNMISSABLE" letters as paths, like the favicon). Pros: its exact
+  height is known (no font metrics), so burger alignment needs no tuning; it looks the same in every browser,
+  and doesn't wait for the web font. It doesn't fix the burger issue above by itself: that comes from fluid
+  sizes, not from the font. Keep a text alternative (`<h1>` with `aria-label`, or a visually hidden text).
 
 ## Updates during the day — rate each game as soon as it ends
 
