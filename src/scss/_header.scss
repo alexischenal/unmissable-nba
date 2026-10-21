@@ -114,13 +114,19 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
+  // The links start where the brand's letters start, on every screen (burger width + gap, in px)
   .header__menu-list {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 18px;
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 calc(#{$brand-size} * #{$burger-width-ratio + $gap-ratio});
     list-style: none;
+
+    @media (max-width: $breakpoint-mobile) {
+      padding-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
+    }
   }
 
   // The brand is also the link to the home page: it keeps its look
@@ -138,11 +144,11 @@ $burger-gap: $gap-ratio * 1em;
     color: $muted;
   }
 
-  // Phones: the label and the menu links start where the brand's letters start, not under the burger.
-  // A margin, not a padding: the menu link's ::after underline spans its box, so with a padding
-  // it started under the burger, before the text.
+  // Phones: the label sits under the brand, and starts where the brand's letters start, not under
+  // the burger. A margin, not a padding: if it ever lands on a link, its ::after underline spans the
+  // box, and would start before the text.
   @media (max-width: $breakpoint-mobile) {
-    .header__night {
+    .header__current {
       margin-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
     }
   }
