@@ -50,6 +50,7 @@ export type RawBoxscore = {
   game: {
     gameId: string;
     gameStatus: number;
+    gameTimeUTC?: string; // tip-off, e.g. '2026-10-20T19:00:00Z'
     homeTeam: RawBoxscoreTeam;
     awayTeam: RawBoxscoreTeam;
   };
