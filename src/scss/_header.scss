@@ -6,8 +6,10 @@
 $brand-size: 40px;
 $brand-size-mobile: min(24px, 6.2vw);
 $burger-ratio: 0.8; // as tall as the brand's capitals in this font (measured: 32px for 40px)
+$burger-width-ratio: $burger-ratio * 0.8125; // a bit narrower than tall (viewBox 26 × 32 = 0.8125)
 $gap-ratio: 0.4;
 $burger-size: $burger-ratio * 1em;
+$burger-width: $burger-width-ratio * 1em;
 $burger-gap: $gap-ratio * 1em;
 
 .header {
@@ -69,7 +71,7 @@ $burger-gap: $gap-ratio * 1em;
   // As tall as the brand's capital letters: 0.8em in this font (measured: 32px for 40px)
   .header__burger-icon {
     display: block;
-    width: $burger-size;
+    width: $burger-width;
     height: $burger-size;
     // Centered, it sits 1px lower than the letters (at 40px): lined up on them instead
     margin-top: -0.05em;
@@ -134,7 +136,7 @@ $burger-gap: $gap-ratio * 1em;
   // not under the burger.
   @media (max-width: $breakpoint-mobile) {
     .header__night {
-      padding-left: calc(#{$brand-size-mobile} * #{$burger-ratio + $gap-ratio});
+      padding-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
     }
   }
 
