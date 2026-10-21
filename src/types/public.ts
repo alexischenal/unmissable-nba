@@ -7,9 +7,7 @@ export type PublicGame = {
   home: string; // e.g. 'DEN'
   tipOff?: string; // ISO time in UTC (version 2). Missing in version 1 files.
   note?: number; // displayed rating, 0 to 100 — only once the game is over
-  // Raw rating, can exceed 100 (one decimal). Not shown on the site: it ranks games with the
-  // same displayed rating (two 100s) from one run to the next. Says nothing about the winner.
-  raw?: number;
+  // No raw rating here (some files from October 20, 2026 had one): see scripts/nba/order.ts.
 };
 
 export type NightJson = {

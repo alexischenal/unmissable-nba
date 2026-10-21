@@ -47,7 +47,12 @@ function publishedState(date: string): Published {
 }
 
 function logRated(game: Game): void {
-  // Developer-only details: never published
+  // The logs of a public repo are public: on GitHub, only the displayed rating.
+  // The details (they say a lot about the settings) only show on a local run.
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    console.log(`  ${game.away}@${game.home} → ${displayScore(game)}`);
+    return;
+  }
   console.log(
     `  ${`${game.away}@${game.home}`.padEnd(8)}`,
     isDisputed(game) ? 'close  ' : 'blowout',
@@ -81,7 +86,7 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
 
     const rated = alreadyRated.get(label);
     if (rated) {
-      entries.push({ ...base, note: rated.note, ...(rated.raw !== undefined ? { raw: rated.raw } : {}) });
+      entries.push({ ...base, note: rated.note });
       continue;
     }
     if (base.tipOff && Date.parse(base.tipOff) > now) {
