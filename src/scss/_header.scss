@@ -2,6 +2,14 @@
 
 @use "variables" as *;
 
+// The brand's size, and the burger in em of it (so it follows the brand on every screen)
+$brand-size: 40px;
+$brand-size-mobile: min(24px, 6.2vw);
+$burger-ratio: 0.8; // as tall as the brand's capitals in this font (measured: 32px for 40px)
+$gap-ratio: 0.4;
+$burger-size: $burger-ratio * 1em;
+$burger-gap: $gap-ratio * 1em;
+
 .header {
   // The menu is positioned against the header, and lays over the cards
   position: relative;
@@ -26,12 +34,12 @@
   .header__title {
     display: flex;
     align-items: center;
-    gap: 0.4em;
-    font-size: 40px;
+    gap: $burger-gap;
+    font-size: $brand-size;
 
     // Phones: a bit smaller than the team names of the regular cards, which shrink with the screen
     @media (max-width: $breakpoint-mobile) {
-      font-size: min(24px, 6.2vw);
+      font-size: $brand-size-mobile;
     }
   }
 
@@ -61,8 +69,8 @@
   // As tall as the brand's capital letters: 0.8em in this font (measured: 32px for 40px)
   .header__burger-icon {
     display: block;
-    width: 0.8em;
-    height: 0.8em;
+    width: $burger-size;
+    height: $burger-size;
     // Centered, it sits 1px lower than the letters (at 40px): lined up on them instead
     margin-top: -0.05em;
   }
@@ -120,6 +128,14 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: $muted;
+  }
+
+  // Phones: the label sits under the brand. With a burger, it starts where the brand's letters
+  // start, not under the burger.
+  @media (max-width: $breakpoint-mobile) {
+    &:has(.header__burger) .header__night {
+      padding-left: calc(#{$brand-size-mobile} * #{$burger-ratio + $gap-ratio});
+    }
   }
 
   // The night label: long on wide screens, short on phones
