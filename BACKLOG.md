@@ -68,6 +68,22 @@
    `unmissable.am` and `www.unmissable.am`. OVH's redirect has no HTTPS (https://unmissable.am would show a
    certificate error); Cloudflare's free plan if that ever matters. Keep the `_github-pages-challenge` TXT
    record in the meantime: it stops anyone else from claiming the domain on GitHub Pages.
+6. **High priority — the repo as a showcase (job hunt).** It's the first thing a recruiter sees.
+   - [ ] **About** (gear icon next to "About" on the repo page): the link still says `unmissable.am` →
+     `https://unmissable.watch/`. Description: "Last night's NBA games, rated without spoilers."
+     Topics: `react`, `typescript`, `vite`, `scss`, `nba`, `github-actions` (GitHub shows TypeScript, not
+     React: React is a library, the code is `.tsx`).
+   - [ ] **`.idea/` is committed** (JetBrains config): remove it from the repo (`git rm -r --cached .idea`),
+     add `.idea/` to `.gitignore`. Local files stay.
+   - [ ] **Merged branches** (54): delete them, and turn on *Settings → General → Automatically delete head
+     branches* so GitHub cleans up after every merge.
+   - [ ] **`how-it-works.txt` is out of date**: says competitive games start at 50 (games close only after Q3
+     now start lower), and opens with "Every morning" (the US use cases aren't mornings). Rewrite it when the
+     presentation page is built. Ingredients only, never the settings.
+   - [ ] **"Contributors: Claude"** shows on the repo page (from the `Co-Authored-By` lines). Decide whether
+     that's fine for the portfolio. Removing it from past commits means rewriting the whole history (heavy,
+     risky): the realistic option is only to stop adding the line from now on.
+   - The "main branch isn't protected" banner: harmless for a personal project, dismiss it.
 
 ---
 
@@ -145,6 +161,18 @@ Pick one at random among several so returning visitors don't always see the same
   - **How the rating works** — a page of its own, from `how-it-works.txt`. Its name, to pick among:
     **The Playbook** (working title: a team's book of plays, "how we play"), **Chalk Talk** (the coach at the
     whiteboard), **Film Room** (where players rewatch games), **Why 100?**.
+    **Opening pitch** (top of that page, and the social preview text): one question, asked on both sides
+    of the Atlantic — is this game worth an effort? In Europe, the effort is the alarm at 6 a.m. instead of
+    7:30. In the US, it's dodging spoilers all day at work, until the replay in the evening. On the West Coast,
+    a third one, the same evening: East Coast games tip at 4 p.m. Pacific and are over by ~6:30 p.m., so
+    coming home from work, you already know whether one is worth watching from tip-off (the site rates each
+    game as soon as it ends). Talk about those situations, not about the product. Drafts:
+    > **Was last night worth it?**
+    > In Europe: worth setting the alarm for 6 a.m.?
+    > In the US: worth dodging spoilers all day?
+    > Every game rated on what happened on the court. No score, no winner.
+
+    Shorter: **Worth the early alarm? Worth avoiding spoilers all day?** Last night's games, rated without the score.
   - **Next night** (link to `/next`; on the Next page, the link back to the home page instead).
   - **Legal notice** (mandatory in France, even for a personal site): publisher (name, or a contact with the
     details left with the host), host (GitHub, with its address), no cookies, visit counter without personal
@@ -160,6 +188,40 @@ Pick one at random among several so returning visitors don't always see the same
 - **Reveal the score on tap**, as a deliberate action (never on hover or scroll).
 - **Other sports**: the home page becomes "best game of the night, all sports", sports move to `/basketball`, `/football`…
 - **Dark mode.**
+- **Low priority — notify when a game reaches 80 or more.** Fits the three use cases (6 a.m. alarm in Europe,
+  a day without spoilers in the US, coming home on the West Coast). No server on GitHub Pages, and no
+  personal data wanted (legal notice: "none"), so in this order:
+  1. **ntfy.sh** (free, open source): the workflow sends one `curl` to a public topic when a game is rated
+     80+. Users subscribe in the ntfy app; nothing is stored on our side. Three topics (`unmissable-80`,
+     `-90`, `-100`) let each user pick a threshold. Quiet hours are set in the app. About half a day.
+  2. **An RSS feed** of 80+ games, written by the script next to the JSON. Static, free, works with any reader.
+  3. **Real web push**, only if the site takes off: needs a backend storing subscriptions (personal data,
+     GDPR, legal notice to update), and on iPhone only works once the site is added to the home screen.
+     Hard to undo: don't start here.
+  Never notify a game twice, and never the score: the title is the matchup, the body the rating.
+- **Eventually — the burger on phones, in whole pixels.** On phones the brand is fluid (`min(24px, 6.2vw)`),
+  so the burger (in em of it) lands between pixels: each bar has the same total weight, but spread over
+  different rows (the middle one blurrier). Barely visible on 3x screens. Fix like tablets: a fixed-size
+  drawing in whole pixels (e.g. 16px tall: 2px bars, 5px gaps), at the cost of a small height mismatch with
+  the brand on some widths. Desktop (40px) and tablets (32px, own drawing) are already pixel-exact.
+- **Eventually — the brand as an SVG** (the "UNMISSABLE" letters as paths, like the favicon). Pros: its exact
+  height is known (no font metrics), so burger alignment needs no tuning; it looks the same in every browser,
+  and doesn't wait for the web font. It doesn't fix the burger issue above by itself: that comes from fluid
+  sizes, not from the font. Keep a text alternative (`<h1>` with `aria-label`, or a visually hidden text).
+
+## Food for thought
+
+Ideas to think over, not tasks.
+
+- **A fixed-size brand on phones, so everything in the header lands on whole pixels.** Today the brand is
+  fluid on phones (`min(24px, 6.2vw)`), and the burger follows it between pixels. With fixed sizes, the
+  burger gets its own whole-pixel drawing, like on tablets. No SVG needed: font or SVG, what matters is the
+  fixed size. Two options:
+  - **20px on every phone**: capitals 16px tall, burger 16px (2px bars, 5px gaps). Fits at 320px (the brand
+    is already 19.8px there) and stays smaller than the team names everywhere. On big phones (390–430px) the
+    brand goes from 24 to 20px: a bit quieter than today.
+  - **Two steps**: 20px up to 389px, 25px above (capitals 20px, burger 2px bars, 7px gaps). Bigger on big
+    phones, a bit more CSS.
 
 ## Updates during the day — rate each game as soon as it ends
 
