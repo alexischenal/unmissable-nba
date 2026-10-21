@@ -118,6 +118,8 @@ Pick one at random among several so returning visitors don't always see the same
 - **No more games** — shown when the home page night is over 24 hours old and no new night has started
   (day off, All-Star break, off-season), until the next night's first tip-off. Also for an old link to an empty
   night. Same GIF rotation.
+  **With a "Next night · February 18–19" button** (from `next.json`, same style as the menu link), so a break
+  says when the games come back. No button when the schedule has no night left (off-season).
 - **No games last night** (All-Star break, off days)
   - **Nick Young celebrating a three that misses.** The user opened the site sure there'd be a game… and there isn't.
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
@@ -312,6 +314,8 @@ games played in Europe…) should be rated right away, not the next morning.
   "Postponed"): to confirm on a real case. In v1 they're already skipped, but only once the night is surely over.
 - **All-Star break — dedicated screen.** Nobody cares about the games that weekend (All-Star Game, Rising Stars…):
   nothing ranked, a specific screen instead of the usual no-games one. Dates to define later (they change every season).
+  Same "Next night · …" button as the "No more games" screen: the first night after the break (`next.json` already
+  skips the All-Star games, gameId prefix `003`).
 - **New team (expansion)**: a team missing from `src/config/teams.ts` shows in default grey. Nothing breaks;
   add its colors when it happens.
 - **Off-season (June → October) — priority: very low.** A dedicated screen ("Season's over. See you in October.")
