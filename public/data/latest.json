@@ -3,15 +3,16 @@
   "date": "2026-10-21",
   "games": [
     {
+      "away": "ATL",
+      "home": "ORL",
+      "tipOff": "2026-10-21T23:00:00Z",
+      "note": 82
+    },
+    {
       "away": "MIL",
       "home": "WAS",
       "tipOff": "2026-10-21T23:00:00Z",
       "note": 59
-    },
-    {
-      "away": "ATL",
-      "home": "ORL",
-      "tipOff": "2026-10-21T23:00:00Z"
     },
     {
       "away": "CHA",
