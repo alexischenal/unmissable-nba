@@ -7,17 +7,15 @@
 // Usage:
 //   npm run explain -- 2026-10-20   → every game of that night that is over
 //   npm run explain -- --fixture    → the fixtures of April 4, 2026, no network
-//   npm run explain -- 2026-10-21 --clutch → also the play-by-play: clutch details, and each game's
-//                                             rating now and with the v2 variants A, B, C (see season-stats)
+//   npm run explain -- 2026-10-21 --v1     → the box score only (rating v1), no play-by-play
 
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { computeClutch, swings, toTimeline, weightedSwings, type RawPlayByPlay } from './nba/clutch.ts';
-import { rawWithClutch, SCENARIO_FULL_AT_2025_26, type Pbp } from './nba/clutch-rating.ts';
+import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
+  closeByClutch, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
   loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore,
   regulationMargin,
 } from '../src/lib/scoring.ts';
@@ -36,7 +34,7 @@ function explain(g: Game): void {
   const perfs = performancePoints(g);
   const raw = rawScore(g);
 
-  console.log(`\n${g.away} ${f.away} @ ${g.home} ${f.home}${ot ? ` (${ot} OT)` : ''}`);
+  console.log(`\n${g.away} ${f.away} @ ${g.home} ${f.home}${ot ? ` (${ot} OT)` : ''}   ${g.late ? 'v2 (play-by-play)' : 'v1 (box score only)'}`);
   console.log('-'.repeat(60));
 
   const q3Only = disputed && disputedBaseFor(g) !== SCORING.disputedBase;
@@ -44,11 +42,21 @@ function explain(g: Game): void {
   console.log(`  ${check(regulationMargin(g) <= c.maxRegulationMargin)}  margin end of regulation  ${regulationMargin(g)} (≤ ${c.maxRegulationMargin})`);
   console.log(`  ${check(marginAfterQ3(g) <= c.maxMarginAfterQ3)}  margin after Q3           ${marginAfterQ3(g)} (≤ ${c.maxMarginAfterQ3})`);
   console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead})`);
+  if (g.late) {
+    const k = SCORING.clutch;
+    console.log(`  ${check(closeByClutch(g))}  tight finish              clutch ${g.late.clutchSeconds} s (≥ ${k.closeSeconds}) or margin at 2:00 ${g.late.marginAt2} (≤ ${k.closeMarginAt2})`);
+  }
 
   console.log('Step 2 — competitiveness');
   const s = SCORING;
-  console.log(`  suspense  ${pct(compet.suspense.share)}  ${n1(compet.suspense.points).padStart(5)} / ${s.suspense.weight}   margin ${regulationMargin(g)} (full at ${s.suspense.fullAt}, zero at ${s.suspense.zeroAt})`);
-  console.log(`  scenario  ${pct(compet.scenario.share)}  ${n1(compet.scenario.points).padStart(5)} / ${s.scenario.weight}    ${g.leadChanges} lead changes + ${g.timesTied} ties (full at ${s.scenario.fullAt})`);
+  const suspenseWhy = g.late
+    ? `clutch ${g.late.clutchSeconds} s within 5 in the last 5 min + OT (full at ${s.clutch.fullAt} s)`
+    : `margin ${regulationMargin(g)} (full at ${s.suspense.fullAt}, zero at ${s.suspense.zeroAt})`;
+  const scenarioWhy = g.late
+    ? `${g.leadChanges + g.timesTied} lead changes + ties, weighted ${g.late.weightedSwings} (full at ${s.swings.fullAt})`
+    : `${g.leadChanges} lead changes + ${g.timesTied} ties (full at ${s.scenario.fullAt})`;
+  console.log(`  suspense  ${pct(compet.suspense.share)}  ${n1(compet.suspense.points).padStart(5)} / ${s.suspense.weight}   ${suspenseWhy}`);
+  console.log(`  scenario  ${pct(compet.scenario.share)}  ${n1(compet.scenario.points).padStart(5)} / ${s.scenario.weight}    ${scenarioWhy}`);
   console.log(`  comeback  ${pct(compet.comeback.share)}  ${n1(compet.comeback.points).padStart(5)} / ${s.comeback.weight}    loser led by ${loserBiggestLead(g)} (full at ${s.comeback.fullAt})`);
   console.log(`  offense   ${pct(compet.offense.share)}  ${n1(compet.offense.points).padStart(5)} / ${s.offense.weight}    ${n1(pointsPer48(g))} pts per 48 min (zero at ${s.offense.zeroAt}, full at ${s.offense.fullAt})`);
   console.log(`  total            ${n1(competitivenessPoints(g)).padStart(5)}`);
@@ -93,8 +101,7 @@ async function main(): Promise<void> {
   const date = args.find((a) => /^\d{4}-\d{2}-\d{2}$/.test(a));
   if (!date) throw new Error('Usage: npm run explain -- YYYY-MM-DD');
 
-  const withClutch = args.includes('--clutch');
-  const summary: string[] = [];
+  const v1Only = args.includes('--v1');
 
   const scheduled = gamesOnDate(await fetchSchedule(), date);
   console.log(`${date}: ${scheduled.length} game(s)`);
@@ -113,24 +120,18 @@ async function main(): Promise<void> {
       continue;
     }
     const game = toGame(box);
-    explain(game);
-
-    if (withClutch) {
-      const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
-      await pause(500);
-      const x: Pbp = { clutch: computeClutch(timeline, game.periods.length), weighted: weightedSwings(timeline), count: swings(timeline).length };
-      const c = x.clutch;
-      const v = (variant: 'A' | 'B' | 'C') => Math.min(100, Math.round(rawWithClutch(game, x, variant, SCENARIO_FULL_AT_2025_26)));
-      console.log(`Clutch: ${c.seconds} s within 5 in the last 5 min (+ OT) · margin at 2:00 ${c.marginAt2} · late lead changes + ties ${c.lateChanges} · last change ${c.lastChangeAt ?? '-'}`);
-      console.log(`Swings: ${x.count}, weighted ${x.weighted}`);
-      console.log(`v2: now ${displayScore(game)} → A ${v('A')} → B ${v('B')} → C ${v('C')}`);
-      summary.push(`${label.padEnd(8)} clutch ${String(c.seconds).padStart(3)} s  at 2:00 ${String(c.marginAt2).padStart(2)}   ${[displayScore(game), v('A'), v('B'), v('C')].map((n) => String(n).padStart(3)).join(' → ')}`);
+    // Rating v2, like the site: the play-by-play, when it's there and complete
+    if (!v1Only) {
+      try {
+        const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
+        const f = finalScore(game);
+        if (timelineMatches(timeline, f.home, f.away)) game.late = lateFrom(timeline, game.periods.length);
+        await pause(500);
+      } catch {
+        // No play-by-play: v1
+      }
     }
-  }
-
-  if (withClutch && summary.length) {
-    console.log('\n=== Now → A → B → C ===');
-    summary.forEach((l) => console.log('  ' + l));
+    explain(game);
   }
 }
 

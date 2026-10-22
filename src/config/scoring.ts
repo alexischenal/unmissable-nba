@@ -31,6 +31,14 @@ export type ScoringConfig = {
     threshold: number; // efficiency from which a player counts
     divisor: number;   // larger = less weight
   };
+  // v2, with the play-by-play. Without it, the v1 fields above are used instead.
+  clutch: {
+    fullAt: number;         // suspense: seconds of clutch for the full points (replaces the final margin)
+    closeSeconds: number;   // step 1: also a close game with that much clutch…
+    closeMarginAt2: number; // …or within this margin with 2:00 left, whatever the final margin
+  };
+  // Scenario: lead changes and ties weighted by when they happened (replaces the plain count)
+  swings: { fullAt: number; q1: number; q2: number; q3: number; q4: number; late: number };
 };
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
@@ -44,6 +52,8 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   comeback: { weight: 6, fullAt: 12 },
   offense: { weight: 6, zeroAt: 200, fullAt: 250 },
   performance: { threshold: 28, divisor: 25 },
+  clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
+  swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.

@@ -338,6 +338,20 @@ Things that need a human, to check every summer before the new season:
 
 ## Algorithm v2 — play-by-play data
 
+**Done (October 22).** Each game's play-by-play is fetched when it's rated:
+- **Suspense** = time spent within 5 points in the last 5 minutes of Q4 and of every overtime (the NBA's
+  "clutch"), instead of the final margin, often inflated by late free throws (e.g. CHA@BKN, October 21:
+  final margin 7, but 9 at 2:00 and no clutch at all: 67 → 58).
+- **Close-game test**: also close with enough clutch, or a small margin at 2:00, whatever the final margin
+  (BKN@SAS, DAL@DET, DET@TOR in 2025-26).
+- **Scenario**: lead changes and ties weighted by when they happened (early ones count less).
+- Settings in the secret (`clutch`, `swings`). The site waits for a complete play-by-play (its last score =
+  the final score), up to 4 hours after tip-off; without it, the game is rated with v1.
+- Evaluated on 2025-26 with `npm run season-stats -- 2025-26 --clutch` (v1 vs v2), and night by night
+  with `npm run explain -- <date>` (`--v1` for the old rating).
+
+What follows is the original note.
+
 Today the script only fetches each game's box score: quarter scores, player stats, and the
 **totals** of lead changes and ties, with no idea **when** they happened. Known flaw: early lead
 changes count as much as late ones (e.g. Pistons @ 76ers, April 4, 2026: 3 "scenario" points from

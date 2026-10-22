@@ -1,4 +1,7 @@
 // scripts/nba/clutch.ts
+import { SCORING } from '../../src/config/scoring.ts';
+import type { Game } from '../../src/types/game.ts';
+
 // "Clutch", the NBA's own definition: the last 5 minutes of the 4th quarter or of an overtime,
 // with the margin at 5 points or less. Measured from the play-by-play (every action, with the clock
 // and the score), reduced to a score timeline. Used by season-stats to compare with the final margin.
@@ -75,16 +78,10 @@ export function swings(timeline: Timeline): Swing[] {
 // In the last 5 minutes of Q4, or in an overtime
 const isLate = (w: { period: number; secondsLeft: number }) => w.period >= 4 && w.secondsLeft <= WINDOW;
 
-// Weights by moment of the game: early swings count less, late ones more
-export const SWING_WEIGHTS = { q1: 0.5, q2: 0.75, q3: 1, q4: 1.25, late: 2 };
-
-export function weightedSwings(timeline: Timeline): number {
-  return swings(timeline).reduce((sum, w) => sum + (
-    isLate(w) ? SWING_WEIGHTS.late
-    : w.period === 1 ? SWING_WEIGHTS.q1
-    : w.period === 2 ? SWING_WEIGHTS.q2
-    : w.period === 3 ? SWING_WEIGHTS.q3
-    : SWING_WEIGHTS.q4), 0);
+// Weighted by moment of the game (the weights are settings: SCORING.swings): early swings count less
+export function weightedSwings(timeline: Timeline, w = SCORING.swings): number {
+  return swings(timeline).reduce((sum, s) => sum + (
+    isLate(s) ? w.late : s.period === 1 ? w.q1 : s.period === 2 ? w.q2 : s.period === 3 ? w.q3 : w.q4), 0);
 }
 
 export function computeClutch(timeline: Timeline, periods: number): Clutch {
@@ -117,4 +114,16 @@ export function computeClutch(timeline: Timeline, periods: number): Clutch {
     marginAt2,
     lastChangeAt: lastChange ? label(lastChange.period, lastChange.secondsLeft) : null,
   };
+}
+
+// What the rating v2 reads from the play-by-play (Game.late)
+export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
+  const c = computeClutch(timeline, periods);
+  return { clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline) };
+}
+
+// The play-by-play is complete when its last score is the box score's final score
+export function timelineMatches(timeline: Timeline, home: number, away: number): boolean {
+  const last = timeline[timeline.length - 1];
+  return last !== undefined && last[2] === home && last[3] === away;
 }

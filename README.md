@@ -72,7 +72,8 @@ The rating only measures what happened on the court, never who was playing.
 1. **Competitive or blowout?** A game is competitive if it was close at the end of regulation, if the fourth
    quarter was still up for grabs, or if a team came back from a big deficit. Competitive games are rated from 50 up;
    blowouts never go above 49. A blowout stays a blowout, even with a monster stat line.
-2. **How good was it?** Suspense, twists (lead changes, ties), comebacks, offense, and big individual performances
+2. **How good was it?** Suspense (how tight the last minutes were), twists (lead changes and ties, the late ones
+   counting more), comebacks, offense, and big individual performances
    (the bigger, the more it counts).
 
 The display is capped at 100. Two games on the same rating are ranked on the raw rating (which can exceed 100);
