@@ -191,12 +191,21 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
   }
 }
 
-// The same rating, with the suspense taken from the clutch time instead of the final margin:
-// full suspense points at 5 minutes of clutch (overtimes included).
-function rawWithClutch(g: Game, c: Clutch): number {
+// Step 1 with the clutch: a game is also close if it had at least a minute of clutch, or was within
+// 5 points with 2:00 left (whatever the final margin). Such a game starts from the full base.
+const CLUTCH_CLOSE_SECONDS = 60;
+const CLUTCH_CLOSE_MARGIN_AT_2 = 5;
+const closeByClutch = (c: Clutch) => c.seconds >= CLUTCH_CLOSE_SECONDS || c.marginAt2 <= CLUTCH_CLOSE_MARGIN_AT_2;
+
+// The same rating, with the suspense taken from the clutch time instead of the final margin
+// (full suspense points at 5 minutes of clutch, overtimes included).
+//   A: only the suspense changes.
+//   B: A, and the clutch also counts in step 1 (close game or blowout).
+function rawWithClutch(g: Game, c: Clutch, variant: 'A' | 'B'): number {
   const share = Math.min(1, c.seconds / 300);
   const points = competitivenessPoints(g) - competitivenessDetails(g).suspense.points
     + SCORING.suspense.weight * share + performancePoints(g);
+  if (variant === 'B' && closeByClutch(c)) return SCORING.disputedBase + points;
   return isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
 }
 
@@ -206,10 +215,13 @@ function clutchReport(games: CachedGame[], clutch: Map<string, Clutch>): void {
   if (withPbp.length === 0) return;
   const rows = withPbp.map((g) => {
     const c = clutch.get(g.id)!;
-    const now = displayScore(g);
-    const alt = Math.min(100, Math.round(rawWithClutch(g, c)));
     const f = finalScore(g);
-    return { g, c, now, alt, final: Math.abs(f.home - f.away) };
+    return {
+      g, c, final: Math.abs(f.home - f.away),
+      now: displayScore(g),
+      a: Math.min(100, Math.round(rawWithClutch(g, c, 'A'))),
+      b: Math.min(100, Math.round(rawWithClutch(g, c, 'B'))),
+    };
   });
 
   const close = rows.filter((r) => isDisputed(r.g));
@@ -223,21 +235,29 @@ function clutchReport(games: CachedGame[], clutch: Map<string, Clutch>): void {
     console.log(`    ${name.padEnd(14)} ${String(k).padStart(4)}  ${pct(k, close.length).padStart(6)}`);
   }
 
-  console.log('  Ratings, now → with clutch:');
+  // Step 1 with the clutch: the blowouts that become close games
+  const rescued = rows.filter((r) => !isDisputed(r.g) && closeByClutch(r.c));
+  const bySeconds = rescued.filter((r) => r.c.seconds >= CLUTCH_CLOSE_SECONDS).length;
+  const byMargin = rescued.filter((r) => r.c.marginAt2 <= CLUTCH_CLOSE_MARGIN_AT_2).length;
+  console.log(`  B — blowouts today that become close games: ${rescued.length} (${pct(rescued.length, rows.length)} of all games)`);
+  console.log(`      with ≥ ${CLUTCH_CLOSE_SECONDS} s of clutch: ${bySeconds}, within ${CLUTCH_CLOSE_MARGIN_AT_2} at 2:00: ${byMargin}`);
+
+  console.log('  Ratings: now → A (suspense from clutch) → B (A + clutch in step 1):');
   const ranges = [[0, 19], [20, 34], [35, 49], [50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]];
+  const share = (key: 'now' | 'a' | 'b', lo: number, hi: number) => pct(rows.filter((r) => r[key] >= lo && r[key] <= hi).length, rows.length).padStart(6);
   for (const [lo, hi] of ranges) {
-    const a = rows.filter((r) => r.now >= lo! && r.now <= hi!).length;
-    const b = rows.filter((r) => r.alt >= lo! && r.alt <= hi!).length;
-    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${pct(a, rows.length).padStart(6)} → ${pct(b, rows.length).padStart(6)}`);
+    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${share('now', lo!, hi!)} → ${share('a', lo!, hi!)} → ${share('b', lo!, hi!)}`);
   }
-  console.log(`    100s: ${rows.filter((r) => r.now === 100).length} → ${rows.filter((r) => r.alt === 100).length}`);
+  const count = (key: 'now' | 'a' | 'b', test: (x: number) => boolean) => rows.filter((r) => test(r[key])).length;
+  console.log(`    50 or more: ${pct(count('now', (x) => x >= 50), rows.length)} → ${pct(count('a', (x) => x >= 50), rows.length)} → ${pct(count('b', (x) => x >= 50), rows.length)}`);
+  console.log(`    100s: ${count('now', (x) => x === 100)} → ${count('a', (x) => x === 100)} → ${count('b', (x) => x === 100)}`);
 
   const line = (r: (typeof rows)[number]) =>
-    `    ${label(r.g).padEnd(22)} final ${String(r.final).padStart(2)}  at 2:00 ${String(r.c.marginAt2).padStart(2)}  clutch ${String(r.c.seconds).padStart(3)} s  late changes ${r.c.lateChanges}  last ${r.c.lastChangeAt ?? '-'}  ${r.now} → ${r.alt}`;
-  console.log('  Biggest gains (tight finish, bigger final margin):');
-  [...rows].sort((a, b) => (b.alt - b.now) - (a.alt - a.now)).slice(0, 12).forEach((r) => console.log(line(r)));
+    `    ${label(r.g).padEnd(22)} final ${String(r.final).padStart(2)}  at 2:00 ${String(r.c.marginAt2).padStart(2)}  clutch ${String(r.c.seconds).padStart(3)} s  late changes ${r.c.lateChanges}  last ${(r.c.lastChangeAt ?? '-').padEnd(9)} ${String(r.now).padStart(3)} → ${String(r.a).padStart(3)} → ${String(r.b).padStart(3)}`;
+  console.log('  Biggest gains with B (tight finish, bigger final margin):');
+  [...rows].sort((x, y) => (y.b - y.now) - (x.b - x.now)).slice(0, 15).forEach((r) => console.log(line(r)));
   console.log('  Biggest drops (close final margin, but no real clutch):');
-  [...rows].sort((a, b) => (a.alt - a.now) - (b.alt - b.now)).slice(0, 12).forEach((r) => console.log(line(r)));
+  [...rows].sort((x, y) => (x.b - x.now) - (y.b - y.now)).slice(0, 12).forEach((r) => console.log(line(r)));
 }
 
 async function main(): Promise<void> {
