@@ -51,6 +51,12 @@
       "note": 9
     },
     {
+      "away": "SAC",
+      "home": "LAC",
+      "tipOff": "2026-10-22T02:30:00Z",
+      "note": 5
+    },
+    {
       "away": "CHI",
       "home": "TOR",
       "tipOff": "2026-10-21T23:30:00Z",
@@ -61,11 +67,6 @@
       "home": "POR",
       "tipOff": "2026-10-22T02:00:00Z",
       "note": 0
-    },
-    {
-      "away": "SAC",
-      "home": "LAC",
-      "tipOff": "2026-10-22T02:30:00Z"
     }
   ]
 }
