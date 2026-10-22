@@ -7,8 +7,12 @@
 // Usage:
 //   npm run explain -- 2026-10-20   → every game of that night that is over
 //   npm run explain -- --fixture    → the fixtures of April 4, 2026, no network
+//   npm run explain -- 2026-10-21 --clutch → also the play-by-play: clutch details, and each game's
+//                                             rating now and with the v2 variants A, B, C (see season-stats)
 
-import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
+import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
+import { computeClutch, swings, toTimeline, weightedSwings, type RawPlayByPlay } from './nba/clutch.ts';
+import { rawWithClutch, SCENARIO_FULL_AT_2025_26, type Pbp } from './nba/clutch-rating.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -89,6 +93,9 @@ async function main(): Promise<void> {
   const date = args.find((a) => /^\d{4}-\d{2}-\d{2}$/.test(a));
   if (!date) throw new Error('Usage: npm run explain -- YYYY-MM-DD');
 
+  const withClutch = args.includes('--clutch');
+  const summary: string[] = [];
+
   const scheduled = gamesOnDate(await fetchSchedule(), date);
   console.log(`${date}: ${scheduled.length} game(s)`);
   for (const g of scheduled) {
@@ -105,7 +112,25 @@ async function main(): Promise<void> {
       console.log(`\n${label}: not over, no rating.`);
       continue;
     }
-    explain(toGame(box));
+    const game = toGame(box);
+    explain(game);
+
+    if (withClutch) {
+      const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
+      await pause(500);
+      const x: Pbp = { clutch: computeClutch(timeline, game.periods.length), weighted: weightedSwings(timeline), count: swings(timeline).length };
+      const c = x.clutch;
+      const v = (variant: 'A' | 'B' | 'C') => Math.min(100, Math.round(rawWithClutch(game, x, variant, SCENARIO_FULL_AT_2025_26)));
+      console.log(`Clutch: ${c.seconds} s within 5 in the last 5 min (+ OT) · margin at 2:00 ${c.marginAt2} · late lead changes + ties ${c.lateChanges} · last change ${c.lastChangeAt ?? '-'}`);
+      console.log(`Swings: ${x.count}, weighted ${x.weighted}`);
+      console.log(`v2: now ${displayScore(game)} → A ${v('A')} → B ${v('B')} → C ${v('C')}`);
+      summary.push(`${label.padEnd(8)} clutch ${String(c.seconds).padStart(3)} s  at 2:00 ${String(c.marginAt2).padStart(2)}   ${[displayScore(game), v('A'), v('B'), v('C')].map((n) => String(n).padStart(3)).join(' → ')}`);
+    }
+  }
+
+  if (withClutch && summary.length) {
+    console.log('\n=== Now → A → B → C ===');
+    summary.forEach((l) => console.log('  ' + l));
   }
 }
 

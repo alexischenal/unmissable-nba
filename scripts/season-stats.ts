@@ -18,7 +18,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, pause } from './nba/client.ts';
-import { computeClutch, swings, toTimeline, weightedSwings, SWING_WEIGHTS, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { computeClutch, swings, toTimeline, weightedSwings, SWING_WEIGHTS, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { CLUTCH_CLOSE_MARGIN_AT_2, CLUTCH_CLOSE_SECONDS, closeByClutch, rawWithClutch, type Pbp } from './nba/clutch-rating.ts';
 import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -189,30 +190,6 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
     if (++done % 100 === 0) console.log(`  ${done} / ${missing.length}`);
     await pause(400);
   }
-}
-
-// Step 1 with the clutch: a game is also close if it had at least 3 minutes of clutch, or was within
-// 5 points with 2:00 left (whatever the final margin). Such a game starts from the full base.
-// (60 s was tested first: it rescued blowouts with one tight minute before a team pulled away.)
-const CLUTCH_CLOSE_SECONDS = 180;
-const CLUTCH_CLOSE_MARGIN_AT_2 = 5;
-const closeByClutch = (c: Clutch) => c.seconds >= CLUTCH_CLOSE_SECONDS || c.marginAt2 <= CLUTCH_CLOSE_MARGIN_AT_2;
-
-// The same rating, with the suspense taken from the clutch time instead of the final margin
-// (full suspense points at 5 minutes of clutch, overtimes included).
-//   A: only the suspense changes.
-//   B: A, and the clutch also counts in step 1 (close game or blowout).
-//   C: B, and the scenario counts lead changes and ties weighted by when they happened
-//      (SWING_WEIGHTS), full at scenarioFullAt (calibrated to keep today's share of games at the max).
-type Pbp = { clutch: Clutch; weighted: number; count: number };
-function rawWithClutch(g: Game, x: Pbp, variant: 'A' | 'B' | 'C', scenarioFullAt = 1): number {
-  const c = x.clutch;
-  const d = competitivenessDetails(g);
-  const suspense = SCORING.suspense.weight * Math.min(1, c.seconds / 300);
-  const scenario = variant === 'C' ? SCORING.scenario.weight * Math.min(1, x.weighted / scenarioFullAt) : d.scenario.points;
-  const points = competitivenessPoints(g) - d.suspense.points - d.scenario.points + suspense + scenario + performancePoints(g);
-  if (variant !== 'A' && closeByClutch(c)) return SCORING.disputedBase + points;
-  return isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
 }
 
 function clutchReport(games: CachedGame[], pbp: Map<string, Pbp>): void {
