@@ -39,15 +39,16 @@
       "note": 17
     },
     {
+      "away": "DAL",
+      "home": "HOU",
+      "tipOff": "2026-10-22T00:30:00Z",
+      "note": 9
+    },
+    {
       "away": "CHI",
       "home": "TOR",
       "tipOff": "2026-10-21T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "DAL",
-      "home": "HOU",
-      "tipOff": "2026-10-22T00:30:00Z"
     },
     {
       "away": "GSW",
