@@ -21,13 +21,14 @@
       "note": 59
     },
     {
-      "away": "CHI",
-      "home": "TOR",
-      "tipOff": "2026-10-21T23:30:00Z"
-    },
-    {
       "away": "MIN",
       "home": "MIA",
+      "tipOff": "2026-10-21T23:30:00Z",
+      "note": 17
+    },
+    {
+      "away": "CHI",
+      "home": "TOR",
       "tipOff": "2026-10-21T23:30:00Z"
     },
     {
