@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeClutch, parseClock, toTimeline, type Timeline } from './clutch.ts';
+import { computeClutch, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -43,4 +43,12 @@ test('the play-by-play is reduced to score changes, and a bad format fails loudl
   ] } };
   assert.deepEqual(toTimeline(pbp), [[1, 700, 2, 0]]);
   assert.throws(() => toTimeline({ game: { gameId: 'x', actions: [{ clock: 'x' }] } } as never));
+});
+
+test('lead changes and ties are counted like the box score', () => {
+  // 2-0 home, 2-2 tie, 2-4 away (a change, through the tie), 6-4 home (a change)
+  const t: Timeline = [[1, 700, 2, 0], [1, 680, 2, 2], [1, 660, 2, 4], [2, 600, 6, 4]];
+  assert.deepEqual(swings(t).map((w) => w.kind), ['tie', 'change', 'change']);
+  // Weights: two in Q1 (0.5 each), one in Q2 (0.75)
+  assert.equal(weightedSwings(t), 1.75);
 });

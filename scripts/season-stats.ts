@@ -18,7 +18,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, pause } from './nba/client.ts';
-import { computeClutch, toTimeline, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { computeClutch, swings, toTimeline, weightedSwings, SWING_WEIGHTS, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -191,9 +191,10 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
   }
 }
 
-// Step 1 with the clutch: a game is also close if it had at least a minute of clutch, or was within
+// Step 1 with the clutch: a game is also close if it had at least 3 minutes of clutch, or was within
 // 5 points with 2:00 left (whatever the final margin). Such a game starts from the full base.
-const CLUTCH_CLOSE_SECONDS = 60;
+// (60 s was tested first: it rescued blowouts with one tight minute before a team pulled away.)
+const CLUTCH_CLOSE_SECONDS = 180;
 const CLUTCH_CLOSE_MARGIN_AT_2 = 5;
 const closeByClutch = (c: Clutch) => c.seconds >= CLUTCH_CLOSE_SECONDS || c.marginAt2 <= CLUTCH_CLOSE_MARGIN_AT_2;
 
@@ -201,26 +202,49 @@ const closeByClutch = (c: Clutch) => c.seconds >= CLUTCH_CLOSE_SECONDS || c.marg
 // (full suspense points at 5 minutes of clutch, overtimes included).
 //   A: only the suspense changes.
 //   B: A, and the clutch also counts in step 1 (close game or blowout).
-function rawWithClutch(g: Game, c: Clutch, variant: 'A' | 'B'): number {
-  const share = Math.min(1, c.seconds / 300);
-  const points = competitivenessPoints(g) - competitivenessDetails(g).suspense.points
-    + SCORING.suspense.weight * share + performancePoints(g);
-  if (variant === 'B' && closeByClutch(c)) return SCORING.disputedBase + points;
+//   C: B, and the scenario counts lead changes and ties weighted by when they happened
+//      (SWING_WEIGHTS), full at scenarioFullAt (calibrated to keep today's share of games at the max).
+type Pbp = { clutch: Clutch; weighted: number; count: number };
+function rawWithClutch(g: Game, x: Pbp, variant: 'A' | 'B' | 'C', scenarioFullAt = 1): number {
+  const c = x.clutch;
+  const d = competitivenessDetails(g);
+  const suspense = SCORING.suspense.weight * Math.min(1, c.seconds / 300);
+  const scenario = variant === 'C' ? SCORING.scenario.weight * Math.min(1, x.weighted / scenarioFullAt) : d.scenario.points;
+  const points = competitivenessPoints(g) - d.suspense.points - d.scenario.points + suspense + scenario + performancePoints(g);
+  if (variant !== 'A' && closeByClutch(c)) return SCORING.disputedBase + points;
   return isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
 }
 
-function clutchReport(games: CachedGame[], clutch: Map<string, Clutch>): void {
-  const withPbp = games.filter((g) => clutch.has(g.id));
+function clutchReport(games: CachedGame[], pbp: Map<string, Pbp>): void {
+  const withPbp = games.filter((g) => pbp.has(g.id));
   title(`Clutch vs final margin (${withPbp.length} games with play-by-play)`);
   if (withPbp.length === 0) return;
+
+  // Check: lead changes + ties recounted from the play-by-play vs the box score's totals
+  const diffs = withPbp.map((g) => pbp.get(g.id)!.count - (g.leadChanges + g.timesTied));
+  const exact = diffs.filter((d) => d === 0).length;
+  const off1 = diffs.filter((d) => Math.abs(d) === 1).length;
+  console.log(`  Check, lead changes + ties from the play-by-play vs the box score: ${pct(exact, diffs.length)} identical, ${pct(off1, diffs.length)} off by 1, ${pct(diffs.length - exact - off1, diffs.length)} more.`);
+
+  // C: the weighted scenario's "full at", so that the same share of close games is at the max as today
+  const closeGames = withPbp.filter((g) => isDisputed(g));
+  const todayAtMax = closeGames.filter((g) => competitivenessDetails(g).scenario.share >= 1).length / closeGames.length;
+  const weightedClose = closeGames.map((g) => pbp.get(g.id)!.weighted).sort((x, y) => x - y);
+  const scenarioFullAt = weightedClose[Math.min(weightedClose.length - 1, Math.floor((1 - todayAtMax) * weightedClose.length))] || 1;
+  const wq = (f: number) => weightedClose[Math.min(weightedClose.length - 1, Math.floor(f * weightedClose.length))];
+  console.log(`  C — weighted swings (Q1 ×${SWING_WEIGHTS.q1}, Q2 ×${SWING_WEIGHTS.q2}, Q3 ×${SWING_WEIGHTS.q3}, Q4 ×${SWING_WEIGHTS.q4}, last 5 min / OT ×${SWING_WEIGHTS.late}):`);
+  console.log(`      close games: median ${wq(0.5)}, 75th pct ${wq(0.75)}, 90th pct ${wq(0.9)}, max ${wq(1)}. Full at ${scenarioFullAt} (${pct(todayAtMax * closeGames.length, closeGames.length)} at the max, as today).`);
+
   const rows = withPbp.map((g) => {
-    const c = clutch.get(g.id)!;
+    const x = pbp.get(g.id)!;
+    const c = x.clutch;
     const f = finalScore(g);
     return {
-      g, c, final: Math.abs(f.home - f.away),
+      g, c, x, final: Math.abs(f.home - f.away),
       now: displayScore(g),
-      a: Math.min(100, Math.round(rawWithClutch(g, c, 'A'))),
-      b: Math.min(100, Math.round(rawWithClutch(g, c, 'B'))),
+      a: Math.min(100, Math.round(rawWithClutch(g, x, 'A'))),
+      b: Math.min(100, Math.round(rawWithClutch(g, x, 'B'))),
+      cc: Math.min(100, Math.round(rawWithClutch(g, x, 'C', scenarioFullAt))),
     };
   });
 
@@ -242,22 +266,28 @@ function clutchReport(games: CachedGame[], clutch: Map<string, Clutch>): void {
   console.log(`  B — blowouts today that become close games: ${rescued.length} (${pct(rescued.length, rows.length)} of all games)`);
   console.log(`      with ≥ ${CLUTCH_CLOSE_SECONDS} s of clutch: ${bySeconds}, within ${CLUTCH_CLOSE_MARGIN_AT_2} at 2:00: ${byMargin}`);
 
-  console.log('  Ratings: now → A (suspense from clutch) → B (A + clutch in step 1):');
+  console.log('  Ratings: now → A (suspense from clutch) → B (A + clutch in step 1) → C (B + weighted scenario):');
+  type Key = 'now' | 'a' | 'b' | 'cc';
+  const keys: Key[] = ['now', 'a', 'b', 'cc'];
   const ranges = [[0, 19], [20, 34], [35, 49], [50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]];
-  const share = (key: 'now' | 'a' | 'b', lo: number, hi: number) => pct(rows.filter((r) => r[key] >= lo && r[key] <= hi).length, rows.length).padStart(6);
+  const share = (key: Key, lo: number, hi: number) => pct(rows.filter((r) => r[key] >= lo && r[key] <= hi).length, rows.length).padStart(6);
   for (const [lo, hi] of ranges) {
-    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${share('now', lo!, hi!)} → ${share('a', lo!, hi!)} → ${share('b', lo!, hi!)}`);
+    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${keys.map((k) => share(k, lo!, hi!)).join(' → ')}`);
   }
-  const count = (key: 'now' | 'a' | 'b', test: (x: number) => boolean) => rows.filter((r) => test(r[key])).length;
-  console.log(`    50 or more: ${pct(count('now', (x) => x >= 50), rows.length)} → ${pct(count('a', (x) => x >= 50), rows.length)} → ${pct(count('b', (x) => x >= 50), rows.length)}`);
-  console.log(`    100s: ${count('now', (x) => x === 100)} → ${count('a', (x) => x === 100)} → ${count('b', (x) => x === 100)}`);
+  const count = (key: Key, test: (x: number) => boolean) => rows.filter((r) => test(r[key])).length;
+  console.log(`    50 or more: ${keys.map((k) => pct(count(k, (x) => x >= 50), rows.length)).join(' → ')}`);
+  console.log(`    100s: ${keys.map((k) => count(k, (x) => x === 100)).join(' → ')}`);
 
   const line = (r: (typeof rows)[number]) =>
-    `    ${label(r.g).padEnd(22)} final ${String(r.final).padStart(2)}  at 2:00 ${String(r.c.marginAt2).padStart(2)}  clutch ${String(r.c.seconds).padStart(3)} s  late changes ${r.c.lateChanges}  last ${(r.c.lastChangeAt ?? '-').padEnd(9)} ${String(r.now).padStart(3)} → ${String(r.a).padStart(3)} → ${String(r.b).padStart(3)}`;
-  console.log('  Biggest gains with B (tight finish, bigger final margin):');
-  [...rows].sort((x, y) => (y.b - y.now) - (x.b - x.now)).slice(0, 15).forEach((r) => console.log(line(r)));
+    `    ${label(r.g).padEnd(22)} final ${String(r.final).padStart(2)}  at 2:00 ${String(r.c.marginAt2).padStart(2)}  clutch ${String(r.c.seconds).padStart(3)} s  swings ${String(r.x.count).padStart(2)} (w ${String(r.x.weighted).padStart(5)})  late ${r.c.lateChanges}  ${keys.map((k) => String(r[k]).padStart(3)).join(' → ')}`;
+  console.log('  Blowouts that become close games with B:');
+  rows.filter((r) => !isDisputed(r.g) && closeByClutch(r.c)).forEach((r) => console.log(line(r)));
   console.log('  Biggest drops (close final margin, but no real clutch):');
-  [...rows].sort((x, y) => (x.b - x.now) - (y.b - y.now)).slice(0, 12).forEach((r) => console.log(line(r)));
+  [...rows].sort((x, y) => (x.b - x.now) - (y.b - y.now)).slice(0, 10).forEach((r) => console.log(line(r)));
+  console.log('  C vs B — weighted scenario, biggest gains (late swings):');
+  [...rows].sort((x, y) => (y.cc - y.b) - (x.cc - x.b)).slice(0, 10).forEach((r) => console.log(line(r)));
+  console.log('  C vs B — weighted scenario, biggest drops (early swings):');
+  [...rows].sort((x, y) => (x.cc - x.b) - (y.cc - y.b)).slice(0, 10).forEach((r) => console.log(line(r)));
 }
 
 async function main(): Promise<void> {
@@ -282,14 +312,14 @@ async function main(): Promise<void> {
     const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
     await mkdir(pbpDir, { recursive: true });
     if (!args.includes('--offline')) await downloadPlayByPlay(games.map((g) => g.id), pbpDir);
-    const clutch = new Map<string, Clutch>();
+    const pbp = new Map<string, Pbp>();
     for (const g of games) {
       const file = path.join(pbpDir, `${g.id}.json`);
       if (!existsSync(file)) continue;
       const timeline = JSON.parse(await readFile(file, 'utf8')) as Timeline;
-      clutch.set(g.id, computeClutch(timeline, g.periods.length));
+      pbp.set(g.id, { clutch: computeClutch(timeline, g.periods.length), weighted: weightedSwings(timeline), count: swings(timeline).length });
     }
-    clutchReport(games, clutch);
+    clutchReport(games, pbp);
   }
 }
 

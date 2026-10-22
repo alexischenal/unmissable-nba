@@ -51,9 +51,44 @@ const sign = (x: number) => (x > 0 ? 1 : x < 0 ? -1 : 0);
 const label = (period: number, s: number) =>
   `${period <= 4 ? `Q${period}` : `OT${period - 4}`} ${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+export type Swing = { period: number; secondsLeft: number; kind: 'tie' | 'change' };
+
+// Lead changes and ties, counted like the NBA's box score totals: a tie whenever the score becomes
+// level (not 0-0), a lead change whenever a team leads after the other one did (even through a tie).
+export function swings(timeline: Timeline): Swing[] {
+  const out: Swing[] = [];
+  let margin = 0;
+  let lastLeader = 0;
+  for (const [period, secondsLeft, h, a] of timeline) {
+    const next = h - a;
+    if (next === 0 && margin !== 0) out.push({ period, secondsLeft, kind: 'tie' });
+    const leader = sign(next);
+    if (leader !== 0) {
+      if (lastLeader !== 0 && leader !== lastLeader) out.push({ period, secondsLeft, kind: 'change' });
+      lastLeader = leader;
+    }
+    margin = next;
+  }
+  return out;
+}
+
+// In the last 5 minutes of Q4, or in an overtime
+const isLate = (w: { period: number; secondsLeft: number }) => w.period >= 4 && w.secondsLeft <= WINDOW;
+
+// Weights by moment of the game: early swings count less, late ones more
+export const SWING_WEIGHTS = { q1: 0.5, q2: 0.75, q3: 1, q4: 1.25, late: 2 };
+
+export function weightedSwings(timeline: Timeline): number {
+  return swings(timeline).reduce((sum, w) => sum + (
+    isLate(w) ? SWING_WEIGHTS.late
+    : w.period === 1 ? SWING_WEIGHTS.q1
+    : w.period === 2 ? SWING_WEIGHTS.q2
+    : w.period === 3 ? SWING_WEIGHTS.q3
+    : SWING_WEIGHTS.q4), 0);
+}
+
 export function computeClutch(timeline: Timeline, periods: number): Clutch {
-  let seconds = 0, lateChanges = 0, marginAt2 = 0;
-  let lastChangeAt: string | null = null;
+  let seconds = 0, marginAt2 = 0;
 
   for (let p = 4; p <= periods; p++) {
     // Margin when the window opens: the last score before it
@@ -67,15 +102,19 @@ export function computeClutch(timeline: Timeline, periods: number): Clutch {
       if (period !== p || s > WINDOW) continue;
       if (p === 4 && !at2Set && s <= 120) { marginAt2 = Math.abs(margin); at2Set = true; }
       if (Math.abs(margin) <= CLUTCH_MARGIN) seconds += t - s;
-      const next = h - a;
-      if (next === 0 && margin !== 0) { lateChanges++; lastChangeAt = label(p, s); }
-      else if (next !== 0 && sign(next) !== sign(margin) && margin !== 0) { lateChanges++; lastChangeAt = label(p, s); }
-      else if (next !== 0 && margin === 0) { lastChangeAt = label(p, s); } // someone takes the lead from a tie
-      margin = next;
+      margin = h - a;
       t = s;
     }
     if (p === 4 && !at2Set) marginAt2 = Math.abs(margin);
     if (Math.abs(margin) <= CLUTCH_MARGIN) seconds += t;
   }
-  return { seconds: Math.round(seconds), lateChanges, marginAt2, lastChangeAt };
+
+  const late = swings(timeline).filter(isLate);
+  const lastChange = [...late].reverse().find((w) => w.kind === 'change');
+  return {
+    seconds: Math.round(seconds),
+    lateChanges: late.length,
+    marginAt2,
+    lastChangeAt: lastChange ? label(lastChange.period, lastChange.secondsLeft) : null,
+  };
 }
