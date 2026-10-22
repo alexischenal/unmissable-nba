@@ -9,6 +9,12 @@
       "note": 82
     },
     {
+      "away": "IND",
+      "home": "NOP",
+      "tipOff": "2026-10-22T00:00:00Z",
+      "note": 77
+    },
+    {
       "away": "CHA",
       "home": "BKN",
       "tipOff": "2026-10-21T23:30:00Z",
@@ -21,6 +27,12 @@
       "note": 59
     },
     {
+      "away": "UTA",
+      "home": "MEM",
+      "tipOff": "2026-10-22T00:00:00Z",
+      "note": 27
+    },
+    {
       "away": "MIN",
       "home": "MIA",
       "tipOff": "2026-10-21T23:30:00Z",
@@ -31,16 +43,6 @@
       "home": "TOR",
       "tipOff": "2026-10-21T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "IND",
-      "home": "NOP",
-      "tipOff": "2026-10-22T00:00:00Z"
-    },
-    {
-      "away": "UTA",
-      "home": "MEM",
-      "tipOff": "2026-10-22T00:00:00Z"
     },
     {
       "away": "DAL",
