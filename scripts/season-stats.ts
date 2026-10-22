@@ -5,6 +5,8 @@
 // Usage:
 //   npm run season-stats -- 2025-26            → downloads what's missing, then the report
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
+//   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), and a comparison:
+//                                                suspense from the final margin vs from the clutch time
 //
 // The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
 // the first run takes 10 to 15 minutes, the next ones a second. Change scoring.secret.json,
@@ -15,13 +17,14 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fetchBoxscore, pause } from './nba/client.ts';
+import { fetchBoxscore, fetchPlayByPlay, pause } from './nba/client.ts';
+import { computeClutch, toTimeline, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  competitivenessDetails, displayScore, efficiency, finalScore, loserBiggestLead, marginAfterQ3,
-  playerPoints, rawScore, regulationMargin,
+  competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore,
+  isDisputed, loserBiggestLead, marginAfterQ3, performancePoints, playerPoints, rawScore, regulationMargin,
 } from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
 
@@ -149,13 +152,101 @@ function report(games: CachedGame[]): void {
   }
 }
 
+// --- Clutch (play-by-play) --------------------------------------------------------------
+
+async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
+  const missing = ids.filter((id) => !existsSync(path.join(dir, `${id}.json`)));
+  if (missing.length === 0) return;
+  console.log(`Downloading ${missing.length} play-by-play file(s), one every ~0.5 s…`);
+  let failures = 0, done = 0;
+  for (const id of missing) {
+    try {
+      const raw = await fetchPlayByPlay(id);
+      // Only the score timeline is kept. An unexpected format stops everything at the first game,
+      // with what was found, rather than producing wrong numbers.
+      let timeline: Timeline;
+      try {
+        timeline = toTimeline(raw as RawPlayByPlay);
+      } catch (error) {
+        const game = (raw as { game?: Record<string, unknown> })?.game;
+        console.error(`Play-by-play format not as expected (${error instanceof Error ? error.message : error}).`);
+        console.error('Keys of "game":', game ? Object.keys(game).join(', ') : '(no "game")');
+        const actions = game?.actions as unknown[] | undefined;
+        if (Array.isArray(actions)) console.error('First action:', JSON.stringify(actions[1] ?? actions[0]).slice(0, 600));
+        throw new Error('Stopped: paste this message to fix the format.');
+      }
+      await writeFile(path.join(dir, `${id}.json`), JSON.stringify(timeline));
+      failures = 0;
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('Stopped')) throw error;
+      failures++;
+      console.warn(`  ${id}: ${error instanceof Error ? error.message : error}`);
+      if (failures >= 15) {
+        console.warn('15 failures in a row: stopping. Run again later; what is downloaded is kept.');
+        return;
+      }
+    }
+    if (++done % 100 === 0) console.log(`  ${done} / ${missing.length}`);
+    await pause(400);
+  }
+}
+
+// The same rating, with the suspense taken from the clutch time instead of the final margin:
+// full suspense points at 5 minutes of clutch (overtimes included).
+function rawWithClutch(g: Game, c: Clutch): number {
+  const share = Math.min(1, c.seconds / 300);
+  const points = competitivenessPoints(g) - competitivenessDetails(g).suspense.points
+    + SCORING.suspense.weight * share + performancePoints(g);
+  return isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
+}
+
+function clutchReport(games: CachedGame[], clutch: Map<string, Clutch>): void {
+  const withPbp = games.filter((g) => clutch.has(g.id));
+  title(`Clutch vs final margin (${withPbp.length} games with play-by-play)`);
+  if (withPbp.length === 0) return;
+  const rows = withPbp.map((g) => {
+    const c = clutch.get(g.id)!;
+    const now = displayScore(g);
+    const alt = Math.min(100, Math.round(rawWithClutch(g, c)));
+    const f = finalScore(g);
+    return { g, c, now, alt, final: Math.abs(f.home - f.away) };
+  });
+
+  const close = rows.filter((r) => isDisputed(r.g));
+  const buckets: [string, (s: number) => boolean][] = [
+    ['none', (s) => s === 0], ['1–60 s', (s) => s > 0 && s <= 60], ['61–180 s', (s) => s > 60 && s <= 180],
+    ['181–299 s', (s) => s > 180 && s < 300], ['5 min or more', (s) => s >= 300],
+  ];
+  console.log(`  Clutch time in close games (${close.length}):`);
+  for (const [name, test] of buckets) {
+    const k = close.filter((r) => test(r.c.seconds)).length;
+    console.log(`    ${name.padEnd(14)} ${String(k).padStart(4)}  ${pct(k, close.length).padStart(6)}`);
+  }
+
+  console.log('  Ratings, now → with clutch:');
+  const ranges = [[0, 19], [20, 34], [35, 49], [50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]];
+  for (const [lo, hi] of ranges) {
+    const a = rows.filter((r) => r.now >= lo! && r.now <= hi!).length;
+    const b = rows.filter((r) => r.alt >= lo! && r.alt <= hi!).length;
+    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${pct(a, rows.length).padStart(6)} → ${pct(b, rows.length).padStart(6)}`);
+  }
+  console.log(`    100s: ${rows.filter((r) => r.now === 100).length} → ${rows.filter((r) => r.alt === 100).length}`);
+
+  const line = (r: (typeof rows)[number]) =>
+    `    ${label(r.g).padEnd(22)} final ${String(r.final).padStart(2)}  at 2:00 ${String(r.c.marginAt2).padStart(2)}  clutch ${String(r.c.seconds).padStart(3)} s  late changes ${r.c.lateChanges}  last ${r.c.lastChangeAt ?? '-'}  ${r.now} → ${r.alt}`;
+  console.log('  Biggest gains (tight finish, bigger final margin):');
+  [...rows].sort((a, b) => (b.alt - b.now) - (a.alt - a.now)).slice(0, 12).forEach((r) => console.log(line(r)));
+  console.log('  Biggest drops (close final margin, but no real clutch):');
+  [...rows].sort((a, b) => (a.alt - a.now) - (b.alt - b.now)).slice(0, 12).forEach((r) => console.log(line(r)));
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('season-stats prints the details of the settings: never on GitHub Actions (public logs).');
   }
   const args = process.argv.slice(2);
   const season = args.find((a) => /^\d{4}-\d{2}$/.test(a));
-  if (!season) throw new Error('Usage: npm run season-stats -- 2025-26 [--offline]');
+  if (!season) throw new Error('Usage: npm run season-stats -- 2025-26 [--offline] [--clutch]');
   loadScoring();
 
   const dir = path.join(ROOT, '.cache', 'boxscores', season);
@@ -166,6 +257,20 @@ async function main(): Promise<void> {
   const games = await Promise.all(files.map(async (f) => JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame));
   if (games.length === 0) throw new Error(`No box score in ${dir}.`);
   report(games.sort((a, b) => a.id.localeCompare(b.id)));
+
+  if (args.includes('--clutch')) {
+    const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
+    await mkdir(pbpDir, { recursive: true });
+    if (!args.includes('--offline')) await downloadPlayByPlay(games.map((g) => g.id), pbpDir);
+    const clutch = new Map<string, Clutch>();
+    for (const g of games) {
+      const file = path.join(pbpDir, `${g.id}.json`);
+      if (!existsSync(file)) continue;
+      const timeline = JSON.parse(await readFile(file, 'utf8')) as Timeline;
+      clutch.set(g.id, computeClutch(timeline, g.periods.length));
+    }
+    clutchReport(games, clutch);
+  }
 }
 
 main().catch((error: unknown) => {
