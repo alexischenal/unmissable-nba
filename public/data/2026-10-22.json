@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "date": "2026-10-22",
+  "games": [
+    {
+      "away": "CLE",
+      "home": "PHI",
+      "tipOff": "2026-10-22T23:00:00Z"
+    },
+    {
+      "away": "DEN",
+      "home": "OKC",
+      "tipOff": "2026-10-23T01:30:00Z"
+    }
+  ]
+}
