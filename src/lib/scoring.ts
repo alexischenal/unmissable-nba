@@ -35,10 +35,16 @@ export const efficiency = (p: PlayerLine) =>
 
 // --- Step 1: competitive game or blowout? --------------------------------------
 
+// v2: a tight finish, seen in the play-by-play, whatever the final margin
+export const closeByClutch = (g: Game) =>
+  g.late !== undefined
+  && (g.late.clutchSeconds >= SCORING.clutch.closeSeconds || g.late.marginAt2 <= SCORING.clutch.closeMarginAt2);
+
 // Close at the end, or a big comeback: the game stayed alive until the end.
 const closeToTheEnd = (g: Game) => {
   const c = SCORING.disputed;
-  return regulationMargin(g) <= c.maxRegulationMargin || loserBiggestLead(g) >= c.minLoserBiggestLead;
+  return regulationMargin(g) <= c.maxRegulationMargin || loserBiggestLead(g) >= c.minLoserBiggestLead
+    || closeByClutch(g);
 };
 
 export const isDisputed = (g: Game) =>
@@ -58,9 +64,16 @@ export const pointsPer48 = (g: Game) => {
 // Each ingredient: its share (0 to 1) and its points. Detailed for scripts/explain.ts.
 export const competitivenessDetails = (g: Game) => {
   const { suspense, scenario, comeback, offense } = SCORING;
+  const { clutch, swings } = SCORING;
   const share = {
-    suspense: clamp01((suspense.zeroAt - regulationMargin(g)) / (suspense.zeroAt - suspense.fullAt)),
-    scenario: clamp01((g.leadChanges + g.timesTied) / scenario.fullAt),
+    // v2: time spent within 5 points at the end, instead of the final margin (often inflated by late free throws)
+    suspense: g.late
+      ? clamp01(g.late.clutchSeconds / clutch.fullAt)
+      : clamp01((suspense.zeroAt - regulationMargin(g)) / (suspense.zeroAt - suspense.fullAt)),
+    // v2: late lead changes count more than early ones
+    scenario: g.late
+      ? clamp01(g.late.weightedSwings / swings.fullAt)
+      : clamp01((g.leadChanges + g.timesTied) / scenario.fullAt),
     comeback: clamp01(loserBiggestLead(g) / comeback.fullAt),
     offense: clamp01((pointsPer48(g) - offense.zeroAt) / (offense.fullAt - offense.zeroAt)),
   };

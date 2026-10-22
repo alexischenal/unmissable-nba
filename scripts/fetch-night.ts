@@ -16,13 +16,14 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fetchBoxscore, fetchSchedule, pause } from './nba/client.ts';
+import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
+import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, nextNightWithGames, toGame } from './nba/adapter.ts';
 import { loadSchedule } from './nba/schedule-cache.ts';
 import { orderGames, type Entry } from './nba/order.ts';
 import { nextDay, planRun, type Published } from './nba/plan.ts';
 import {
-  competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
+  competitivenessPoints, displayScore, finalScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
 import { loadScoring } from './load-scoring.ts';
 import type { Game } from '../src/types/game.ts';
@@ -51,7 +52,7 @@ function logRated(game: Game): void {
   // The logs of a public repo are public: on GitHub, only the displayed rating.
   // The details (they say a lot about the settings) only show on a local run.
   if (process.env.GITHUB_ACTIONS === 'true') {
-    console.log(`  ${game.away}@${game.home} → ${displayScore(game)}`);
+    console.log(`  ${game.away}@${game.home} → ${displayScore(game)} (${game.late ? 'v2' : 'v1'})`);
     return;
   }
   console.log(
@@ -121,6 +122,25 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
       continue;
     }
     const game = toGame(box!);
+
+    // Rating v2: the play-by-play (clutch, weighted lead changes). It must be complete: its last score
+    // is the final score. Not yet: try again at the next run, up to 4 hours after tip-off (a game lasts
+    // about 2 h 15). Still missing after that: rated with v1, so a play-by-play problem never blocks a night.
+    try {
+      const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
+      await pause(500);
+      const f = finalScore(game);
+      if (!timelineMatches(timeline, f.home, f.away)) throw new Error('play-by-play not complete yet');
+      game.late = lateFrom(timeline, game.periods.length);
+    } catch (error) {
+      const waitUntil = base.tipOff ? Date.parse(base.tipOff) + 4 * 60 * 60 * 1000 : 0;
+      if (now < waitUntil && !nightIsOver) {
+        console.log(`${label}: over, waiting for its play-by-play (${error instanceof Error ? error.message : error}).`);
+        entries.push(base);
+        continue;
+      }
+      console.warn(`${label}: no complete play-by-play, rated with v1.`);
+    }
     logRated(game);
     entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)) });
   }

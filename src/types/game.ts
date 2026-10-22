@@ -27,4 +27,10 @@ export type Game = {
   timesTied: number;
   biggestLead: { home: number; away: number };
   players: PlayerLine[];
+  // From the play-by-play, when available (rating v2). Without it, the rating falls back to v1.
+  late?: {
+    clutchSeconds: number;  // within 5 points in the last 5 minutes of Q4 and of every overtime
+    marginAt2: number;      // margin with 2:00 left in the 4th quarter
+    weightedSwings: number; // lead changes + ties, weighted by when they happened
+  };
 };

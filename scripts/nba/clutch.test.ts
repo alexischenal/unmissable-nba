@@ -49,6 +49,6 @@ test('lead changes and ties are counted like the box score', () => {
   // 2-0 home, 2-2 tie, 2-4 away (a change, through the tie), 6-4 home (a change)
   const t: Timeline = [[1, 700, 2, 0], [1, 680, 2, 2], [1, 660, 2, 4], [2, 600, 6, 4]];
   assert.deepEqual(swings(t).map((w) => w.kind), ['tie', 'change', 'change']);
-  // Weights: two in Q1 (0.5 each), one in Q2 (0.75)
-  assert.equal(weightedSwings(t), 1.75);
+  // Weights: two in Q1, one in Q2
+  assert.equal(weightedSwings(t, { fullAt: 1, q1: 0.5, q2: 0.75, q3: 1, q4: 1.25, late: 2 }), 1.75);
 });
