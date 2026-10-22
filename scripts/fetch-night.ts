@@ -100,7 +100,14 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     try {
       box = await fetchBoxscore(g.gameId);
     } catch (error) {
-      if (g.gameStatus !== 1) throw error;
+      if (g.gameStatus !== 1) {
+        // Started, but no box score yet (the NBA publishes it a few seconds to minutes after tip-off),
+        // or nba.com hiccuped: this game waits for the next run, the others carry on.
+        console.warn(`${label}: no box score yet (${error instanceof Error ? error.message : error}), next run.`);
+        entries.push(base);
+        await pause(500);
+        continue;
+      }
       box = null; // no box score yet: the game hasn't started
     }
     await pause(500);
