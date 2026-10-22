@@ -29,5 +29,9 @@ export const fetchSchedule = () => getJson<RawSchedule>(SCHEDULE_URL);
 
 export const fetchBoxscore = (gameId: string) => getJson<RawBoxscore>(boxscoreUrl(gameId));
 
+// Every action of a game, with the clock and the score (only used by season-stats for now)
+export const fetchPlayByPlay = (gameId: string) =>
+  getJson<unknown>(`https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_${gameId}.json`);
+
 // A short pause between two calls, to be polite to the server.
 export const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
