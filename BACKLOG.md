@@ -125,6 +125,21 @@ Not decided. Possible changes, and what each one does.
      `lang="en"`, every card described ("1. Boston Celtics at Detroit Pistons, rated 76 out of 100").
    - False positive to ignore: the big watermark abbreviations (decorative, `aria-hidden`), flagged by axe anyway.
 
+8. **High priority — count historic defensive nights in the performance points.** A great defensive night is
+   worth watching, and the efficiency we use only sees blocks and steals. Real defensive data, game by game:
+   - **Matchups** (camera tracking): per defender, the points scored by the players he guarded, their shots
+     and their shooting. The only real defensive data per game.
+   - **Hustle stats**: deflections, contested shots, charges drawn, loose balls (counted by hand, less reliable).
+   - **The blocker: both live on `stats.nba.com`, not on the CDN we use.** That API is known for not answering
+     requests from cloud servers (GitHub Actions), not verified for us. First step: a one-off workflow, run by
+     hand, that asks for one past game's matchups and only logs whether it answers, how fast, and how many
+     players. Touches neither the site nor the data; delete it afterwards. Run it a few times: if it fails, drop
+     the matchups.
+   - **Fallback on the CDN**: the play-by-play we already fetch has a few defensive actions the efficiency
+     doesn't count (charges and offensive fouls drawn). Much poorer, but no new source.
+   - Then: a defensive bonus next to the efficiency, same principle (only what happened on the court, the same
+     scale for every player), tested on the past season before going to production.
+
 ---
 
 Ideas parked for later. Nothing below is needed for v1.
