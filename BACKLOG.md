@@ -1,5 +1,25 @@
 # Backlog
 
+## Under consideration — the rating scale
+
+Not decided. Possible changes, and what each one does.
+
+- **Give games close only until the end of Q3 the same base as the other close games** (the Q3 rule then
+  does nothing: drop it). One setting, no code.
+  - Every game under 50 is then a blowout.
+  - 45–49 only holds blowouts lifted by one player's historic night: a blowout gets almost no spectacle
+    points, so only a huge performance takes it that high.
+  - Those Q3 games, decided in the fourth, move into the 50s: the top half no longer only holds games
+    worth watching to the end.
+  - A lower base than the other close games isn't enough: a Q3 game with little spectacle stays in 45–49.
+- **Recommend games from 60 up** (explanation page only, no change to the rating).
+  - With the change above, Q3 games mostly stay under the recommendation.
+  - Without it, nothing changes in the rating; only the advice does.
+  - 50 reads by itself ("the good half"), 60 needs the explanation page.
+- **To measure before deciding:** run `season-stats` with the new base and compare the CSV with the current
+  one (games leaving 45–49, games left in it, games passing 60). Published ratings stay as they are;
+  going back is the same one-setting change.
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
@@ -105,6 +125,21 @@
      `lang="en"`, every card described ("1. Boston Celtics at Detroit Pistons, rated 76 out of 100").
    - False positive to ignore: the big watermark abbreviations (decorative, `aria-hidden`), flagged by axe anyway.
 
+8. **High priority — count historic defensive nights in the performance points.** A great defensive night is
+   worth watching, and the efficiency we use only sees blocks and steals. Real defensive data, game by game:
+   - **Matchups** (camera tracking): per defender, the points scored by the players he guarded, their shots
+     and their shooting. The only real defensive data per game.
+   - **Hustle stats**: deflections, contested shots, charges drawn, loose balls (counted by hand, less reliable).
+   - **The blocker: both live on `stats.nba.com`, not on the CDN we use.** That API is known for not answering
+     requests from cloud servers (GitHub Actions), not verified for us. First step: a one-off workflow, run by
+     hand, that asks for one past game's matchups and only logs whether it answers, how fast, and how many
+     players. Touches neither the site nor the data; delete it afterwards. Run it a few times: if it fails, drop
+     the matchups.
+   - **Fallback on the CDN**: the play-by-play we already fetch has a few defensive actions the efficiency
+     doesn't count (charges and offensive fouls drawn). Much poorer, but no new source.
+   - Then: a defensive bonus next to the efficiency, same principle (only what happened on the court, the same
+     scale for every player), tested on the past season before going to production.
+
 ---
 
 Ideas parked for later. Nothing below is needed for v1.
@@ -118,6 +153,8 @@ Pick one at random among several so returning visitors don't always see the same
 - **No more games** — shown when the home page night is over 24 hours old and no new night has started
   (day off, All-Star break, off-season), until the next night's first tip-off. Also for an old link to an empty
   night. Same GIF rotation.
+  **With a "Next night · February 18–19" button** (from `next.json`, same style as the menu link), so a break
+  says when the games come back. No button when the schedule has no night left (off-season).
 - **No games last night** (All-Star break, off days)
   - **Nick Young celebrating a three that misses.** The user opened the site sure there'd be a game… and there isn't.
     Copy idea: *"You were so sure. No games last night."* Favourite: basketball, and original.
@@ -312,6 +349,8 @@ games played in Europe…) should be rated right away, not the next morning.
   "Postponed"): to confirm on a real case. In v1 they're already skipped, but only once the night is surely over.
 - **All-Star break — dedicated screen.** Nobody cares about the games that weekend (All-Star Game, Rising Stars…):
   nothing ranked, a specific screen instead of the usual no-games one. Dates to define later (they change every season).
+  Same "Next night · …" button as the "No more games" screen: the first night after the break (`next.json` already
+  skips the All-Star games, gameId prefix `003`).
 - **New team (expansion)**: a team missing from `src/config/teams.ts` shows in default grey. Nothing breaks;
   add its colors when it happens.
 - **Off-season (June → October) — priority: very low.** A dedicated screen ("Season's over. See you in October.")
