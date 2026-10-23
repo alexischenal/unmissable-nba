@@ -1,5 +1,59 @@
 # Backlog
 
+## Under consideration — the rating scale
+
+Not decided. Nothing to change in the rating until it is: it works, and it does what it should.
+
+### Where it comes from
+
+Feedback from friends. The game the French media followed was sold as one player's incredible night. On
+the site, it has a low rating. Reading it, the first reflex isn't "the media got it wrong", it's "the site
+is broken". Meanwhile, an equivalent night in a real game is in the best-rated games of the season: the
+site doesn't miss performances, it refuses to let one performance alone turn a blowout into a good game.
+That stays. What's missing is a way to say it.
+
+### The idea: a band just under 50 for "bad game, historic night"
+
+- A blowout gets almost no spectacle points (no clutch, the comeback stays small, or the game would be
+  close). Only a huge individual night can lift it to the top of the blowout range, up to the cap at 49.
+  So a blowout rated 45 or more always has a historic performance behind it.
+- The reverse isn't true today: the 45–49 band also holds games close only until the end of Q3, then
+  decided in the fourth. Their base is lower on purpose, and many of them have no big performance.
+- Give those games the same base as the other close games (the Q3 rule then does nothing: drop it) and,
+  by construction, every game under 50 is a blowout, and 45–49 only holds blowouts with a historic night.
+  A lower base than that isn't enough: a Q3 game with little spectacle would stay in the band.
+
+### The scale it gives, for the explanation page
+
+- Under 45: skip it.
+- 45–49: a lopsided game, lifted by one player's historic night. Watch the highlights, not the game.
+- 50–59: a decent game, no more.
+- 60 and up: watch it. The site's recommendation.
+
+### Opinion, and the condition
+
+- For it, **only if the recommendation becomes 60 and up**. The lower Q3 base was there so that a game
+  decided in the fourth wouldn't pass "50 = a real game". With the recommendation at 60, those games land
+  in the 50s, under it: the patch protects nothing any more, and it muddies the 45–49 band.
+- What it brings: a scale that tells itself in one line per band; one rule less in the algorithm and in
+  its explanation; an answer to the feedback, without touching the principle (only what happened on the
+  court counts).
+- The risk: a Q3 game with a lot of spectacle could reach 60. Not shocking (36 intense minutes), but count
+  how often.
+- If the site keeps "50 and up — a real game", keep the lower Q3 base.
+
+### Order
+
+1. Decide whether the recommendation becomes 60 and up (the season visual, the pitch and the explanation
+   page say 50 today).
+2. Measure on the past season: run `season-stats` with the new base, compare the CSV with the current one
+   (how many games leave 45–49, how many are left, how many pass 60). Optionally, add the game type and
+   the performance points to the CSV export (local tool only, no effect on the site).
+3. Only then, change the setting (local file and GitHub secret, no code). Published ratings stay as they
+   are; going back is the same one-setting change.
+4. Without the change, the explanation page can still say, truthfully: "Just under 50: usually a blowout
+   lifted by one player's huge night, or a game that was close for three quarters. Watch the highlights."
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
@@ -242,14 +296,6 @@ Ideas to think over, not tasks.
     brand goes from 24 to 20px: a bit quieter than today.
   - **Two steps**: 20px up to 389px, 25px above (capitals 20px, burger 2px bars, 7px gaps). Bigger on big
     phones, a bit more CSS.
-- **A band just under 50 for "bad game, historic performance".** A blowout gets almost no spectacle points,
-  so only a huge individual night can lift it near the cap. Today that band also holds games close only
-  until the end of Q3 (their lower base). Lift those out (same base as other close games, or drop the Q3
-  rule) and the band only holds blowouts with a historic performance: "watch the highlights, not the game".
-  Goes with recommending games from 60 up rather than 50. Before deciding: add the game type and the
-  performance points to the `season-stats` CSV, compare both bases, check what is left in the band.
-  Also answers feedback from friends: a game the media sold on one player's night gets a low rating, and
-  reads as a bug.
 
 ## Updates during the day — rate each game as soon as it ends
 
