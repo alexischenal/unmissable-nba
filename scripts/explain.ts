@@ -9,8 +9,13 @@
 //   npm run explain -- --fixture    → the fixtures of April 4, 2026, no network
 //   npm run explain -- 2026-10-21 --v1     → the box score only (rating v1), no play-by-play
 
+import { existsSync } from 'node:fs';
+import { readdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
+import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -81,6 +86,33 @@ function explain(g: Game): void {
   console.log(`Rating: ${base} = ${n1(raw)} → ${displayScore(g)}`);
 }
 
+// A night of a past season, from the box scores (and play-by-play) cached by season-stats.
+// Returns false when nothing is cached for that date.
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+async function explainFromCache(date: string, v1Only: boolean): Promise<boolean> {
+  const boxDir = path.join(ROOT, '.cache', 'boxscores');
+  if (!existsSync(boxDir)) return false;
+  const found: { game: Game & { id: string; date?: string }; season: string }[] = [];
+  for (const season of await readdir(boxDir)) {
+    for (const f of await readdir(path.join(boxDir, season))) {
+      const game = JSON.parse(await readFile(path.join(boxDir, season, f), 'utf8')) as Game & { id: string; date?: string };
+      if (game.date === date) found.push({ game, season });
+    }
+  }
+  if (found.length === 0) return false;
+  console.log(`${date}: ${found.length} game(s), from the season-stats cache`);
+  for (const { game, season } of found) {
+    const pbp = path.join(ROOT, '.cache', 'playbyplay', season, `${game.id}.json`);
+    if (!v1Only && existsSync(pbp)) {
+      const timeline = JSON.parse(await readFile(pbp, 'utf8')) as Timeline;
+      const f = finalScore(game);
+      if (timelineMatches(timeline, f.home, f.away)) game.late = lateFrom(timeline, game.periods.length);
+    }
+    explain(game);
+  }
+  return true;
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('explain prints the details of the settings: never on GitHub Actions (public logs).');
@@ -104,6 +136,8 @@ async function main(): Promise<void> {
   const v1Only = args.includes('--v1');
 
   const scheduled = gamesOnDate(await fetchSchedule(), date);
+  // Not in this season's schedule: a past season, from season-stats' cache
+  if (scheduled.length === 0 && await explainFromCache(date, v1Only)) return;
   console.log(`${date}: ${scheduled.length} game(s)`);
   for (const g of scheduled) {
     const label = `${g.awayTeam.teamTricode}@${g.homeTeam.teamTricode}`;
