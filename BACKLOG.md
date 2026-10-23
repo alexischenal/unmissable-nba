@@ -2,59 +2,23 @@
 
 ## Under consideration — the rating scale
 
-Not decided. Nothing to change in the rating until it is: it works, and it does what it should.
+Not decided. Possible changes, and what each one does.
 
-### Where it comes from
-
-Feedback from friends who know the game. The game the French media followed was the most promising on
-paper. It was over early, and the headline became one player's incredible night: "the game lasted ten
-minutes" doesn't sell. On the site, that game has a low rating, and next to the headline, it reads as a
-mistake. The rating is right: an equivalent night in a real game is among the best-rated games of the
-season. The site doesn't miss performances, it refuses to let one performance alone turn a blowout into
-a good game. That stays. The question is only whether, and how, to tell readers who come with the
-headline in mind.
-
-### The idea: a band just under 50 for "bad game, historic night"
-
-- A blowout gets almost no spectacle points (no clutch, the comeback stays small, or the game would be
-  close). Only a huge individual night can lift it to the top of the blowout range, up to the cap at 49.
-  So a blowout rated 45 or more always has a historic performance behind it.
-- The reverse isn't true today: the 45–49 band also holds games close only until the end of Q3, then
-  decided in the fourth. Their base is lower on purpose, and many of them have no big performance.
-- Give those games the same base as the other close games (the Q3 rule then does nothing: drop it) and,
-  by construction, every game under 50 is a blowout, and 45–49 only holds blowouts with a historic night.
-  A lower base than that isn't enough: a Q3 game with little spectacle would stay in the band.
-
-### The scale it gives, for the explanation page
-
-- Under 45: skip it.
-- 45–49: a lopsided game, lifted by one player's historic night. Watch the highlights, not the game.
-- 50–59: a decent game, no more.
-- 60 and up: watch it. The site's recommendation.
-
-### Opinion, and the condition
-
-- For it, **only if the recommendation becomes 60 and up**. The lower Q3 base was there so that a game
-  decided in the fourth wouldn't pass "50 = a real game". With the recommendation at 60, those games land
-  in the 50s, under it: the patch protects nothing any more, and it muddies the 45–49 band.
-- What it brings: a scale that tells itself in one line per band; one rule less in the algorithm and in
-  its explanation; an answer to the feedback, without touching the principle (only what happened on the
-  court counts).
-- The risk: a Q3 game with a lot of spectacle could reach 60. Not shocking (36 intense minutes), but count
-  how often.
-- If the site keeps "50 and up — a real game", keep the lower Q3 base.
-
-### Order
-
-1. Decide whether the recommendation becomes 60 and up (the season visual, the pitch and the explanation
-   page say 50 today).
-2. Measure on the past season: run `season-stats` with the new base, compare the CSV with the current one
-   (how many games leave 45–49, how many are left, how many pass 60). Optionally, add the game type and
-   the performance points to the CSV export (local tool only, no effect on the site).
-3. Only then, change the setting (local file and GitHub secret, no code). Published ratings stay as they
-   are; going back is the same one-setting change.
-4. Without the change, the explanation page can still say, truthfully: "Just under 50: usually a blowout
-   lifted by one player's huge night, or a game that was close for three quarters. Watch the highlights."
+- **Give games close only until the end of Q3 the same base as the other close games** (the Q3 rule then
+  does nothing: drop it). One setting, no code.
+  - Every game under 50 is then a blowout.
+  - 45–49 only holds blowouts lifted by one player's historic night: a blowout gets almost no spectacle
+    points, so only a huge performance takes it that high.
+  - Those Q3 games, decided in the fourth, move into the 50s: the top half no longer only holds games
+    worth watching to the end.
+  - A lower base than the other close games isn't enough: a Q3 game with little spectacle stays in 45–49.
+- **Recommend games from 60 up** (explanation page only, no change to the rating).
+  - With the change above, Q3 games mostly stay under the recommendation.
+  - Without it, nothing changes in the rating; only the advice does.
+  - 50 reads by itself ("the good half"), 60 needs the explanation page.
+- **To measure before deciding:** run `season-stats` with the new base and compare the CSV with the current
+  one (games leaving 45–49, games left in it, games passing 60). Published ratings stay as they are;
+  going back is the same one-setting change.
 
 ## Next up — Monday
 
