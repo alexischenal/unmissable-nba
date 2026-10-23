@@ -80,7 +80,10 @@ export const competitivenessDetails = (g: Game) => {
   return {
     suspense: { share: share.suspense, points: suspense.weight * share.suspense },
     scenario: { share: share.scenario, points: scenario.weight * share.scenario },
-    comeback: { share: share.comeback, points: comeback.weight * share.comeback },
+    comeback: {
+      share: share.comeback,
+      points: comeback.weight * share.comeback + comeback.bonusPerPoint * Math.max(0, loserBiggestLead(g) - comeback.fullAt),
+    },
     offense: { share: share.offense, points: offense.weight * share.offense },
   };
 };

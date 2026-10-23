@@ -62,7 +62,9 @@ function explain(g: Game): void {
     : `${g.leadChanges} lead changes + ${g.timesTied} ties (full at ${s.scenario.fullAt})`;
   console.log(`  suspense  ${pct(compet.suspense.share)}  ${n1(compet.suspense.points).padStart(5)} / ${s.suspense.weight}   ${suspenseWhy}`);
   console.log(`  scenario  ${pct(compet.scenario.share)}  ${n1(compet.scenario.points).padStart(5)} / ${s.scenario.weight}    ${scenarioWhy}`);
-  console.log(`  comeback  ${pct(compet.comeback.share)}  ${n1(compet.comeback.points).padStart(5)} / ${s.comeback.weight}    loser led by ${loserBiggestLead(g)} (full at ${s.comeback.fullAt})`);
+  const extra = Math.max(0, loserBiggestLead(g) - s.comeback.fullAt);
+  const bonus = extra > 0 && s.comeback.bonusPerPoint > 0 ? `, + ${n1(extra * s.comeback.bonusPerPoint)} bonus for ${extra} pts beyond` : '';
+  console.log(`  comeback  ${pct(compet.comeback.share)}  ${n1(compet.comeback.points).padStart(5)} / ${s.comeback.weight}    loser led by ${loserBiggestLead(g)} (full at ${s.comeback.fullAt}${bonus})`);
   console.log(`  offense   ${pct(compet.offense.share)}  ${n1(compet.offense.points).padStart(5)} / ${s.offense.weight}    ${n1(pointsPer48(g))} pts per 48 min (zero at ${s.offense.zeroAt}, full at ${s.offense.fullAt})`);
   console.log(`  total            ${n1(competitivenessPoints(g)).padStart(5)}`);
 

@@ -249,6 +249,29 @@ function clutchReport(games: CachedGame[], pbp: Map<string, Pbp>): void {
   [...rows].sort((a, b) => (a.v2 - a.v1) - (b.v2 - b.v1)).slice(0, 10).forEach((r) => console.log(line(r)));
 }
 
+// Comeback bonus: every point of the loser's lead beyond comeback.fullAt adds bonusPerPoint.
+// Compares a few values on the season (v2 rating when the play-by-play is there).
+function comebackBonusReport(games: CachedGame[], late: Map<string, NonNullable<Game['late']>>): void {
+  const c = SCORING.comeback;
+  title(`Comeback bonus beyond ${c.fullAt} (now: ${c.bonusPerPoint} per point)`);
+  const withLate = (g: CachedGame) => (late.has(g.id) ? { ...g, late: late.get(g.id)! } : g);
+  const big = games.filter((g) => loserBiggestLead(g) > c.fullAt).sort((a, b) => loserBiggestLead(b) - loserBiggestLead(a));
+  console.log(`  ${big.length} games where the loser led by more than ${c.fullAt} (${pct(big.length, games.length)}).`);
+  const values = [0, 0.5, 1, 1.5];
+  const saved = c.bonusPerPoint;
+  const ratings = values.map((b) => {
+    c.bonusPerPoint = b;
+    return new Map(games.map((g) => [g.id, displayScore(withLate(g))]));
+  });
+  c.bonusPerPoint = saved;
+  console.log(`  100s:        ${values.map((b, k) => `${b} → ${[...ratings[k]!.values()].filter((x) => x === 100).length}`).join('   ')}`);
+  console.log(`  50 or more:  ${values.map((b, k) => `${b} → ${pct([...ratings[k]!.values()].filter((x) => x >= 50).length, games.length)}`).join('   ')}`);
+  console.log(`  Biggest comebacks (rating with a bonus of ${values.join(' / ')} per point):`);
+  for (const g of big.slice(0, 15)) {
+    console.log(`    ${label(g).padEnd(22)} loser led by ${String(loserBiggestLead(g)).padStart(2)}   ${values.map((_, k) => String(ratings[k]!.get(g.id)).padStart(3)).join(' / ')}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('season-stats prints the details of the settings: never on GitHub Actions (public logs).');
@@ -283,6 +306,7 @@ async function main(): Promise<void> {
       });
     }
     clutchReport(games, pbp);
+    comebackBonusReport(games, new Map([...pbp].map(([id, x]) => [id, x.late])));
 
     // Every game's rating (v2 when the play-by-play is there), for charts. Teams, date and rating only:
     // no score, no settings.
