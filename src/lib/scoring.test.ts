@@ -8,7 +8,8 @@ import { detAtPhi } from '../../fixtures/2026-04-04-det-phi.ts';
 
 test('v1: without play-by-play, nothing changes', () => {
   assert.equal(sasAtDen.late, undefined);
-  assert.equal(Math.round(rawScore(sasAtDen) * 10) / 10, 122.2);
+  // 122.2 before the comeback bonus, + 0.8 (the loser led by 13, 1 point beyond the example's 12)
+  assert.equal(Math.round(rawScore(sasAtDen) * 10) / 10, 123);
 });
 
 test('v2: the suspense comes from the clutch time, the scenario from the weighted swings', () => {
@@ -28,4 +29,12 @@ test('v2: a blowout by the final margin, but tight at the end, is a close game f
   assert.equal(disputedBaseFor(tightEnd), 50);
   const stillBlowout = { ...detAtPhi, late: { clutchSeconds: 60, marginAt2: 12, weightedSwings: 0 } };
   assert.equal(isDisputed(stillBlowout), false);
+});
+
+test('comeback: linear up to fullAt, then a bonus per extra point, uncapped', () => {
+  const lead = (n: number) => ({ ...sasAtDen, biggestLead: { home: 0, away: n } }); // SAS lost: its lead counts
+  const pts = (n: number) => competitivenessDetails(lead(n)).comeback.points;
+  assert.equal(pts(6), 3);                            // example: weight 6, full at 12
+  assert.equal(pts(12), 6);
+  assert.equal(Math.round(pts(29) * 10) / 10, 19.6); // 6 + 17 × 0.8
 });

@@ -24,7 +24,9 @@ export type ScoringConfig = {
   // Step 2: competitiveness and entertainment
   suspense: { weight: number; fullAt: number; zeroAt: number }; // margin at the end of regulation
   scenario: { weight: number; fullAt: number };                 // lead changes + times tied
-  comeback: { weight: number; fullAt: number };                 // biggest lead of the loser
+  // Biggest lead of the loser. Beyond fullAt, every extra point of lead brings bonusPerPoint, uncapped:
+  // a historic comeback (29 points, CLE@PHI, October 22) must stand out from an ordinary big one.
+  comeback: { weight: number; fullAt: number; bonusPerPoint: number };
   offense: { weight: number; zeroAt: number; fullAt: number };  // total points per 48 minutes
   // Step 2: individual performances (uncapped)
   performance: {
@@ -49,7 +51,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   blowoutMax: 49,
   suspense: { weight: 10, fullAt: 2, zeroAt: 16 },
   scenario: { weight: 8, fullAt: 18 },
-  comeback: { weight: 6, fullAt: 12 },
+  comeback: { weight: 6, fullAt: 12, bonusPerPoint: 0.8 },
   offense: { weight: 6, zeroAt: 200, fullAt: 250 },
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
