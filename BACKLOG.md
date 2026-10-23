@@ -242,6 +242,14 @@ Ideas to think over, not tasks.
     brand goes from 24 to 20px: a bit quieter than today.
   - **Two steps**: 20px up to 389px, 25px above (capitals 20px, burger 2px bars, 7px gaps). Bigger on big
     phones, a bit more CSS.
+- **A band just under 50 for "bad game, historic performance".** A blowout gets almost no spectacle points,
+  so only a huge individual night can lift it near the cap. Today that band also holds games close only
+  until the end of Q3 (their lower base). Lift those out (same base as other close games, or drop the Q3
+  rule) and the band only holds blowouts with a historic performance: "watch the highlights, not the game".
+  Goes with recommending games from 60 up rather than 50. Before deciding: add the game type and the
+  performance points to the `season-stats` CSV, compare both bases, check what is left in the band.
+  Also answers feedback from friends: a game the media sold on one player's night gets a low rating, and
+  reads as a bug.
 
 ## Updates during the day — rate each game as soon as it ends
 
