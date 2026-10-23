@@ -157,6 +157,18 @@ Not decided. Possible changes, and what each one does.
      check to keep running while the tab is hidden: a small JSON every 5 minutes, browsers throttle
      background timers anyway.
    - Card states (upcoming → live → rated) are recomputed on each update, not only at load.
+   - **To think over: a "last updated" in the header again.**
+     - Without the auto update, it's needed: the only way to know the page is stale ("Updated 9 h ago" → F5).
+     - With it, the page is never stale when looked at. It would only reassure, or explain a gap ("Last rating
+       1 h ago": no game ended since), and the "In progress" cards already say that. Its one real use left:
+       the network or the script fails and the page silently stops updating. Option: show something only then
+       ("Couldn't check for new ratings").
+     - Only the time of the last new data is known (the last run that wrote something). The time of the last
+       check would mean writing the JSON on every run, so a commit and a deploy every 5 minutes: exactly what
+       the lighter runs removed. Hence a label like "Last rating 12 min ago", not "Updated".
+     - Relative time (see the rule in "Product"), recomputed on each update. Room at 320px: a small grey
+       line, or in the burger menu.
+     - To decide: what should the visitor understand, "the page is fresh" or "nothing happened since"?
 
 ---
 
