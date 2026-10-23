@@ -5,8 +5,9 @@
 // Usage:
 //   npm run season-stats -- 2025-26            → downloads what's missing, then the report
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
-//   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), and the
-//                                                comparison v1 (box score) vs v2 (with the play-by-play)
+//   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), the
+//                                                comparison v1 (box score) vs v2 (with the play-by-play),
+//                                                and .cache/ratings-2025-26.csv (every game's rating)
 //
 // The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
 // the first run takes 10 to 15 minutes, the next ones a second. Change scoring.secret.json,
@@ -282,6 +283,16 @@ async function main(): Promise<void> {
       });
     }
     clutchReport(games, pbp);
+
+    // Every game's rating (v2 when the play-by-play is there), for charts. Teams, date and rating only:
+    // no score, no settings.
+    const csv = ['date,away,home,rating', ...games.map((g) => {
+      const x = pbp.get(g.id);
+      return `${g.date ?? ''},${g.away},${g.home},${displayScore(x ? { ...g, late: x.late } : g)}`;
+    })].join('\n') + '\n';
+    const out = path.join(ROOT, '.cache', `ratings-${season}.csv`);
+    await writeFile(out, csv);
+    console.log(`\nEvery game's rating: ${path.relative(ROOT, out)}`);
   }
 }
 
