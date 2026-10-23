@@ -6,11 +6,13 @@ Not decided. Nothing to change in the rating until it is: it works, and it does 
 
 ### Where it comes from
 
-Feedback from friends. The game the French media followed was sold as one player's incredible night. On
-the site, it has a low rating. Reading it, the first reflex isn't "the media got it wrong", it's "the site
-is broken". Meanwhile, an equivalent night in a real game is in the best-rated games of the season: the
-site doesn't miss performances, it refuses to let one performance alone turn a blowout into a good game.
-That stays. What's missing is a way to say it.
+Feedback from friends who know the game. The game the French media followed was the most promising on
+paper. It was over early, and the headline became one player's incredible night: "the game lasted ten
+minutes" doesn't sell. On the site, that game has a low rating, and next to the headline, it reads as a
+mistake. The rating is right: an equivalent night in a real game is among the best-rated games of the
+season. The site doesn't miss performances, it refuses to let one performance alone turn a blowout into
+a good game. That stays. The question is only whether, and how, to tell readers who come with the
+headline in mind.
 
 ### The idea: a band just under 50 for "bad game, historic night"
 
