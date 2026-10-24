@@ -9,6 +9,12 @@
       "note": 80
     },
     {
+      "away": "NYK",
+      "home": "BOS",
+      "tipOff": "2026-10-23T23:00:00Z",
+      "note": 72
+    },
+    {
       "away": "TOR",
       "home": "WAS",
       "tipOff": "2026-10-23T23:00:00Z",
@@ -29,11 +35,6 @@
     {
       "away": "DAL",
       "home": "IND",
-      "tipOff": "2026-10-23T23:00:00Z"
-    },
-    {
-      "away": "NYK",
-      "home": "BOS",
       "tipOff": "2026-10-23T23:00:00Z"
     },
     {
