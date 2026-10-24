@@ -15,13 +15,14 @@
       "note": 2
     },
     {
-      "away": "DAL",
-      "home": "IND",
-      "tipOff": "2026-10-23T23:00:00Z"
-    },
-    {
       "away": "MIN",
       "home": "ORL",
+      "tipOff": "2026-10-23T23:00:00Z",
+      "note": 1
+    },
+    {
+      "away": "DAL",
+      "home": "IND",
       "tipOff": "2026-10-23T23:00:00Z"
     },
     {
