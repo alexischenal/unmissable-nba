@@ -21,6 +21,12 @@
       "note": 71
     },
     {
+      "away": "HOU",
+      "home": "SAS",
+      "tipOff": "2026-10-24T01:30:00Z",
+      "note": 70
+    },
+    {
       "away": "TOR",
       "home": "WAS",
       "tipOff": "2026-10-23T23:00:00Z",
@@ -49,11 +55,6 @@
       "home": "ORL",
       "tipOff": "2026-10-23T23:00:00Z",
       "note": 1
-    },
-    {
-      "away": "HOU",
-      "home": "SAS",
-      "tipOff": "2026-10-24T01:30:00Z"
     },
     {
       "away": "LAC",
