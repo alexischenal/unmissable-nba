@@ -58,3 +58,19 @@ test('buzzer: the last action time, or null when the play-by-play has none', () 
   assert.equal(buzzerAt({ game: { gameId: 'x', actions: [action('2026-10-24T01:00:00Z'), action('2026-10-24T02:58:30.4Z')] } }), Date.parse('2026-10-24T02:58:30.4Z'));
   assert.equal(buzzerAt({ game: { gameId: 'x', actions: [action()] } }), null);
 });
+
+test('a correction added after the game, at the end of the list, is left out', () => {
+  // Like MEM@GSW (October 23): the last action is a Q2 play, with its score of the time
+  const act = (period: number, clock: string, home: number, away: number, timeActual: string) =>
+    ({ period, clock, scoreHome: String(home), scoreAway: String(away), timeActual });
+  const pbp = { game: { gameId: 'x', actions: [
+    act(1, 'PT11M40.00S', 2, 0, '2026-10-24T02:10:00Z'),
+    act(2, 'PT05M00.00S', 34, 33, '2026-10-24T02:50:00Z'),
+    act(4, 'PT00M01.20S', 108, 109, '2026-10-24T04:45:00Z'),
+    act(4, 'PT00M00.00S', 108, 111, '2026-10-24T04:46:00Z'),
+    act(2, 'PT04M58.00S', 33, 34, '2026-10-24T05:02:00Z'),
+  ] } };
+  const timeline = toTimeline(pbp);
+  assert.deepEqual(timeline[timeline.length - 1], [4, 0, 108, 111]);
+  assert.equal(buzzerAt(pbp), Date.parse('2026-10-24T04:46:00Z'));
+});
