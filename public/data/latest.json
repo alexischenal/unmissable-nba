@@ -21,6 +21,12 @@
       "note": 62
     },
     {
+      "away": "HOU",
+      "home": "ATL",
+      "tipOff": "2026-10-25T00:30:00Z",
+      "note": 62
+    },
+    {
       "away": "BKN",
       "home": "CLE",
       "tipOff": "2026-10-24T23:30:00Z",
@@ -31,11 +37,6 @@
       "home": "DAL",
       "tipOff": "2026-10-25T00:00:00Z",
       "note": 49
-    },
-    {
-      "away": "HOU",
-      "home": "ATL",
-      "tipOff": "2026-10-25T00:30:00Z"
     },
     {
       "away": "NOP",
