@@ -122,6 +122,20 @@ export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game[
   return { clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline) };
 }
 
+// The biggest deficit a team came back from, to within `within` points (one possession: 3),
+// whoever won in the end. 0 if no team ever got back within that margin after trailing.
+export function erasedDeficit(timeline: Timeline, within = 3): number {
+  let worstHome = 0, worstAway = 0; // biggest deficit so far, for each team
+  let erased = 0;
+  for (const [, , h, a] of timeline) {
+    worstHome = Math.max(worstHome, a - h);
+    worstAway = Math.max(worstAway, h - a);
+    if (a - h <= within) erased = Math.max(erased, worstHome);
+    if (h - a <= within) erased = Math.max(erased, worstAway);
+  }
+  return erased;
+}
+
 // The play-by-play is complete when its last score is the box score's final score
 export function timelineMatches(timeline: Timeline, home: number, away: number): boolean {
   const last = timeline[timeline.length - 1];
