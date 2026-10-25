@@ -20,6 +20,22 @@ Not decided. Possible changes, and what each one does.
   one (games leaving 45–49, games left in it, games passing 60). Published ratings stay as they are;
   going back is the same one-setting change.
 
+### Checked and dropped: the comeback "back within one possession", whoever won (October 25)
+
+- **The worry**: the comeback counts the loser's biggest lead, so only comebacks that went all the way. A
+  high rating and a big early lead would then tell who wins.
+- **The idea**: count the biggest deficit a team came back from to within one possession (3 points), whoever
+  won, in the rating and in the step 1 test.
+- **Measured on 2025-26** (local simulation, removed since): in games where a team led big, the share where
+  that team lost.
+  - Today: about 1 in 2 from 70 up (53%, 45% from 85 up, small samples). A coin flip: the rating says
+    something will happen, not who wins. No real leak.
+  - With the idea: about 30%. The viewer could bet on the leading team holding on, and be right 7 times
+    out of 10: a leak the other way.
+  - And it inflated the whole scale: 61% of ratings changed, 50+ from 54% to 61%, 100s from 15 to 24, 72
+    blowouts turned into close games (some from 4 to 72). Any small early deficit erased now counted.
+- **Kept as it is.** To check again later, the leak is the number to watch.
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
