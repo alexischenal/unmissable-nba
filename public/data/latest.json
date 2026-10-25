@@ -17,7 +17,8 @@
     {
       "away": "BKN",
       "home": "CLE",
-      "tipOff": "2026-10-24T23:30:00Z"
+      "tipOff": "2026-10-24T23:30:00Z",
+      "note": 60
     },
     {
       "away": "SAS",
