@@ -31,16 +31,37 @@ export function parseClock(clock: string): number {
   return Number(m[1]) * 60 + Number(m[2]);
 }
 
-// The play-by-play reduced to its score changes. Fails loudly on an unexpected format.
+type Action = RawPlayByPlay['game']['actions'][number];
+
+// The actions in game order. The NBA can add a correction after the game, at the end of the list,
+// with the score of the moment the play happened (seen on MEM@GSW, October 23: a last score of 33-34
+// after a 111-108 final). Read in list order, it looked like the end of the game. Any action that goes
+// back in the game (an earlier period, or more time left than the action before) is left out.
+// A 1-second tolerance: actions logged on the same play can differ by a fraction of a second.
+function inGameOrder(actions: Action[]): Action[] {
+  const out: Action[] = [];
+  let period = 0, left = Infinity;
+  for (const a of actions) {
+    if (typeof a.period !== 'number' || a.scoreHome === undefined || a.scoreAway === undefined) {
+      throw new Error(`Unexpected play-by-play action: ${JSON.stringify(a).slice(0, 300)}`);
+    }
+    const s = parseClock(a.clock);
+    if (a.period < period || (a.period === period && s > left + 1)) continue;
+    if (a.period > period) left = Infinity;
+    period = a.period;
+    left = Math.min(left, s);
+    out.push(a);
+  }
+  return out;
+}
+
+// The play-by-play reduced to its score changes, in game order. Fails loudly on an unexpected format.
 export function toTimeline(pbp: RawPlayByPlay): Timeline {
   const actions = pbp?.game?.actions;
   if (!Array.isArray(actions) || actions.length === 0) throw new Error('Unexpected play-by-play: no game.actions');
   const out: Timeline = [];
   let home = 0, away = 0;
-  for (const a of actions) {
-    if (typeof a.period !== 'number' || a.scoreHome === undefined || a.scoreAway === undefined) {
-      throw new Error(`Unexpected play-by-play action: ${JSON.stringify(a).slice(0, 300)}`);
-    }
+  for (const a of inGameOrder(actions)) {
     const h = Number(a.scoreHome), w = Number(a.scoreAway);
     if (h !== home || w !== away) {
       home = h; away = w;
@@ -122,11 +143,13 @@ export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game[
   return { clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline) };
 }
 
-// When the game really ended (wall clock, ms): the last action's time, the final buzzer.
+// When the game really ended (wall clock, ms): the last action's time in game order, the final buzzer.
 // null when the play-by-play doesn't carry it: the delay is then just not shown.
 export function buzzerAt(pbp: RawPlayByPlay): number | null {
   const actions = pbp?.game?.actions;
-  const last = Array.isArray(actions) ? actions[actions.length - 1]?.timeActual : undefined;
+  if (!Array.isArray(actions) || actions.length === 0) return null;
+  const ordered = inGameOrder(actions);
+  const last = ordered[ordered.length - 1]?.timeActual;
   const t = last ? Date.parse(last) : NaN;
   return Number.isFinite(t) ? t : null;
 }
