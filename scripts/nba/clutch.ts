@@ -11,7 +11,7 @@ export type ScoreEvent = [number, number, number, number];
 export type Timeline = ScoreEvent[];
 
 export type RawPlayByPlay = {
-  game: { gameId: string; actions: { period: number; clock: string; scoreHome: string; scoreAway: string }[] };
+  game: { gameId: string; actions: { period: number; clock: string; scoreHome: string; scoreAway: string; timeActual?: string }[] };
 };
 
 export type Clutch = {
@@ -120,6 +120,15 @@ export function computeClutch(timeline: Timeline, periods: number): Clutch {
 export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
   const c = computeClutch(timeline, periods);
   return { clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline) };
+}
+
+// When the game really ended (wall clock, ms): the last action's time, the final buzzer.
+// null when the play-by-play doesn't carry it: the delay is then just not shown.
+export function buzzerAt(pbp: RawPlayByPlay): number | null {
+  const actions = pbp?.game?.actions;
+  const last = Array.isArray(actions) ? actions[actions.length - 1]?.timeActual : undefined;
+  const t = last ? Date.parse(last) : NaN;
+  return Number.isFinite(t) ? t : null;
 }
 
 // The play-by-play is complete when its last score is the box score's final score

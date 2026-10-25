@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeClutch, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { buzzerAt, computeClutch, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -51,4 +51,10 @@ test('lead changes and ties are counted like the box score', () => {
   assert.deepEqual(swings(t).map((w) => w.kind), ['tie', 'change', 'change']);
   // Weights: two in Q1, one in Q2
   assert.equal(weightedSwings(t, { fullAt: 1, q1: 0.5, q2: 0.75, q3: 1, q4: 1.25, late: 2 }), 1.75);
+});
+
+test('buzzer: the last action time, or null when the play-by-play has none', () => {
+  const action = (timeActual?: string) => ({ period: 4, clock: 'PT00M00.00S', scoreHome: '100', scoreAway: '98', ...(timeActual ? { timeActual } : {}) });
+  assert.equal(buzzerAt({ game: { gameId: 'x', actions: [action('2026-10-24T01:00:00Z'), action('2026-10-24T02:58:30.4Z')] } }), Date.parse('2026-10-24T02:58:30.4Z'));
+  assert.equal(buzzerAt({ game: { gameId: 'x', actions: [action()] } }), null);
 });
