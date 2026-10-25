@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeClutch, erasedDeficit, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { computeClutch, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -51,16 +51,4 @@ test('lead changes and ties are counted like the box score', () => {
   assert.deepEqual(swings(t).map((w) => w.kind), ['tie', 'change', 'change']);
   // Weights: two in Q1, one in Q2
   assert.equal(weightedSwings(t, { fullAt: 1, q1: 0.5, q2: 0.75, q3: 1, q4: 1.25, late: 2 }), 1.75);
-});
-
-test('comeback within one possession: counted whoever won', () => {
-  // Away down 20, back to 2, then loses by 10: the 20 counts
-  const held: Timeline = [[1, 600, 20, 0], [3, 300, 60, 58], [4, 0, 100, 90]];
-  assert.equal(erasedDeficit(held), 20);
-  // Away down 20, never back within 3: nothing
-  const never: Timeline = [[1, 600, 20, 0], [3, 300, 60, 54], [4, 0, 100, 80]];
-  assert.equal(erasedDeficit(never), 0);
-  // Home down 15, comes back and wins: the 15 counts
-  const won: Timeline = [[1, 600, 0, 15], [4, 60, 90, 90], [4, 0, 95, 90]];
-  assert.equal(erasedDeficit(won), 15);
 });

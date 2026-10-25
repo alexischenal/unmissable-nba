@@ -7,7 +7,6 @@
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
 //   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), the
 //                                                comparison v1 (box score) vs v2 (with the play-by-play),
-//                                                the comeback "back within one possession" (simulation),
 //                                                and .cache/ratings-2025-26.csv (every game's rating)
 //
 // The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
@@ -20,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, pause } from './nba/client.ts';
-import { computeClutch, erasedDeficit, lateFrom, swings, timelineMatches, toTimeline, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { computeClutch, lateFrom, swings, timelineMatches, toTimeline, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -193,7 +192,7 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
   }
 }
 
-type Pbp = { clutch: Clutch; late: NonNullable<Game['late']>; count: number; complete: boolean; erased: number };
+type Pbp = { clutch: Clutch; late: NonNullable<Game['late']>; count: number; complete: boolean };
 
 // v1 (box score only) vs v2 (with the play-by-play), both with the settings in use
 function clutchReport(games: CachedGame[], pbp: Map<string, Pbp>): void {
@@ -273,55 +272,6 @@ function comebackBonusReport(games: CachedGame[], late: Map<string, NonNullable<
   }
 }
 
-// Comeback measured whoever won: the biggest deficit a team came back from, to within one possession.
-// Today it's the loser's biggest lead, which only counts comebacks that went all the way: a high rating
-// and a big early lead then hint at who wins. Simulated here by giving that value to the loser's biggest
-// lead, the only input the comeback and the step 1 test read. Nothing changes in production.
-function possessionComebackReport(games: CachedGame[], pbp: Map<string, Pbp>): void {
-  title('Comeback "back within one possession", whoever won');
-  const rows = games.filter((g) => pbp.has(g.id)).map((g) => {
-    const x = pbp.get(g.id)!;
-    const now = { ...g, late: x.late };
-    const f = finalScore(g);
-    const loser = f.home > f.away ? 'away' : 'home';
-    const alt = { ...now, biggestLead: { ...g.biggestLead, [loser]: Math.max(loserBiggestLead(g), x.erased) } };
-    // The team that led by the most: did it lose?
-    const leader = g.biggestLead.home >= g.biggestLead.away ? 'home' : 'away';
-    return {
-      g, erased: x.erased, loserLead: loserBiggestLead(g), maxLead: Math.max(g.biggestLead.home, g.biggestLead.away),
-      leaderLost: leader === loser, before: displayScore(now), after: displayScore(alt),
-      closeBefore: isDisputed(now), closeAfter: isDisputed(alt),
-    };
-  });
-  const n = rows.length;
-  const changed = rows.filter((r) => r.after !== r.before);
-  console.log(`  ${n} games with play-by-play. Comeback bigger than the loser's lead: ${rows.filter((r) => r.erased > r.loserLead).length}. Rating changed: ${changed.length} (${pct(changed.length, n)}).`);
-  const gains = changed.map((r) => r.after - r.before).sort((a, b) => a - b);
-  if (gains.length) console.log(`  Change: min ${gains[0]}, median ${gains[Math.floor(gains.length / 2)]}, max ${gains[gains.length - 1]}.`);
-  console.log(`  50 or more: ${pct(rows.filter((r) => r.before >= 50).length, n)} → ${pct(rows.filter((r) => r.after >= 50).length, n)}`);
-  console.log(`  100s: ${rows.filter((r) => r.before === 100).length} → ${rows.filter((r) => r.after === 100).length}`);
-  const flips = rows.filter((r) => !r.closeBefore && r.closeAfter);
-  console.log(`  Blowouts that become close games (step 1): ${flips.length}`);
-  const line = (r: (typeof rows)[number]) =>
-    `    ${label(r.g).padEnd(22)} biggest lead ${String(r.maxLead).padStart(2)}  loser led by ${String(r.loserLead).padStart(2)}  came back from ${String(r.erased).padStart(2)}  ${String(r.before).padStart(3)} → ${String(r.after).padStart(3)}`;
-  flips.forEach((r) => console.log(line(r)));
-  console.log('  Biggest gains:');
-  [...changed].sort((a, b) => (b.after - b.before) - (a.after - a.before)).slice(0, 15).forEach((r) => console.log(line(r)));
-
-  // The leak: in games with a big lead and a high rating, how often did the team that led by the most lose?
-  const big = SCORING.comeback.fullAt;
-  console.log(`  The leak — games where a team led by ${big} or more: share where that team lost`);
-  console.log('    rating     now                       comeback within one possession');
-  for (const t of [50, 70, 85, 100]) {
-    const cell = (k: 'before' | 'after') => {
-      const set = rows.filter((r) => r.maxLead >= big && r[k] >= t);
-      const lost = set.filter((r) => r.leaderLost).length;
-      return `${pct(lost, set.length).padStart(6)} (${lost}/${set.length})`.padEnd(26);
-    };
-    console.log(`    ≥ ${String(t).padStart(3)}      ${cell('before')}${cell('after')}`);
-  }
-}
-
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('season-stats prints the details of the settings: never on GitHub Actions (public logs).');
@@ -353,12 +303,10 @@ async function main(): Promise<void> {
       pbp.set(g.id, {
         clutch: computeClutch(timeline, g.periods.length), late: lateFrom(timeline, g.periods.length),
         count: swings(timeline).length, complete: timelineMatches(timeline, f.home, f.away),
-        erased: erasedDeficit(timeline),
       });
     }
     clutchReport(games, pbp);
     comebackBonusReport(games, new Map([...pbp].map(([id, x]) => [id, x.late])));
-    possessionComebackReport(games, pbp);
 
     // Every game's rating (v2 when the play-by-play is there), for charts. Teams, date and rating only:
     // no score, no settings.
