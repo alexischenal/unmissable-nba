@@ -15,7 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { buzzerAt, lateFrom, timelineMatches, toTimeline, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -30,7 +30,12 @@ const n1 = (x: number) => x.toFixed(1);
 const pct = (x: number) => `${Math.round(x * 100)}%`.padStart(4);
 const check = (ok: boolean) => (ok ? 'yes' : 'no ');
 
-function explain(g: Game): void {
+const hm = (ms: number) => { const m = Math.round(ms / 60000); return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`; };
+
+// Extra lines under the header: real duration, why the play-by-play wasn't used
+type Notes = { tipOff?: string; buzzer?: number | null; pbpProblem?: string };
+
+function explain(g: Game, notes: Notes = {}): void {
   const c = SCORING.disputed;
   const f = finalScore(g);
   const ot = overtimes(g);
@@ -41,6 +46,10 @@ function explain(g: Game): void {
 
   console.log(`\n${g.away} ${f.away} @ ${g.home} ${f.home}${ot ? ` (${ot} OT)` : ''}   ${g.late ? 'v2 (play-by-play)' : 'v1 (box score only)'}`);
   console.log('-'.repeat(60));
+  if (notes.tipOff && notes.buzzer) {
+    console.log(`Real time: ${hm(notes.buzzer - Date.parse(notes.tipOff))} from tip-off to the final buzzer (${new Date(notes.buzzer).toISOString().slice(11, 16)} UTC)`);
+  }
+  if (notes.pbpProblem) console.log(`Play-by-play not used: ${notes.pbpProblem}`);
 
   const q3Only = disputed && disputedBaseFor(g) !== SCORING.disputedBase;
   console.log(`Step 1 — close game? ${disputed ? (q3Only ? 'YES, only after Q3 (lower base)' : 'YES') : 'NO, blowout'}`);
@@ -128,7 +137,7 @@ async function main(): Promise<void> {
       import('../fixtures/2026-04-04-was-mia.ts'),
       import('../fixtures/2026-04-04-det-phi.ts'),
     ]);
-    [sasAtDen, wasAtMia, detAtPhi].forEach(explain);
+    [sasAtDen, wasAtMia, detAtPhi].forEach((g) => explain(g));
     return;
   }
 
@@ -156,18 +165,23 @@ async function main(): Promise<void> {
       continue;
     }
     const game = toGame(box);
+    const notes: Notes = g.gameDateTimeUTC ? { tipOff: g.gameDateTimeUTC } : {};
     // Rating v2, like the site: the play-by-play, when it's there and complete
     if (!v1Only) {
       try {
-        const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
+        const pbp = await fetchPlayByPlay(g.gameId) as RawPlayByPlay;
+        const timeline = toTimeline(pbp);
+        notes.buzzer = buzzerAt(pbp);
         const f = finalScore(game);
+        const last = timeline[timeline.length - 1];
         if (timelineMatches(timeline, f.home, f.away)) game.late = lateFrom(timeline, game.periods.length);
+        else notes.pbpProblem = `its last score (${last ? `${last[3]}-${last[2]}` : 'none'}) isn't the box score's final score (${f.away}-${f.home})`;
         await pause(500);
-      } catch {
-        // No play-by-play: v1
+      } catch (error) {
+        notes.pbpProblem = error instanceof Error ? error.message : String(error);
       }
     }
-    explain(game);
+    explain(game, notes);
   }
 }
 

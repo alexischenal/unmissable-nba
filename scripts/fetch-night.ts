@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
+import { buzzerAt, lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, nextNightWithGames, toGame } from './nba/adapter.ts';
 import { loadSchedule } from './nba/schedule-cache.ts';
 import { orderGames, type Entry } from './nba/order.ts';
@@ -48,11 +48,16 @@ function publishedState(date: string): Published {
   return nightIsComplete(night) ? 'complete' : 'partial';
 }
 
-function logRated(game: Game): void {
-  // The logs of a public repo are public: on GitHub, only the displayed rating.
+// "22 min after the buzzer": how long the site took to rate the game once it was really over.
+// Measured from the end, not the tip-off: a long game (injury, reviews, overtime) isn't a site delay.
+const afterBuzzer = (buzzer: number | null, now: number) =>
+  buzzer === null ? '' : `, ${Math.max(0, Math.round((now - buzzer) / 60000))} min after the buzzer`;
+
+function logRated(game: Game, buzzer: number | null, now: number): void {
+  // The logs of a public repo are public: on GitHub, only the displayed rating (and the delay).
   // The details (they say a lot about the settings) only show on a local run.
   if (process.env.GITHUB_ACTIONS === 'true') {
-    console.log(`  ${game.away}@${game.home} → ${displayScore(game)} (${game.late ? 'v2' : 'v1'})`);
+    console.log(`  ${game.away}@${game.home} → ${displayScore(game)} (${game.late ? 'v2' : 'v1'}${afterBuzzer(buzzer, now)})`);
     return;
   }
   console.log(
@@ -62,6 +67,7 @@ function logRated(game: Game): void {
     `perfs ${performancePoints(game).toFixed(1).padStart(5)}`,
     `raw ${rawScore(game).toFixed(1).padStart(6)}`,
     `→ ${displayScore(game)}`,
+    `(${game.late ? 'v2' : 'v1'}${afterBuzzer(buzzer, now)})`,
   );
 }
 
@@ -133,12 +139,15 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     // Rating v2: the play-by-play (clutch, weighted lead changes). It must be complete: its last score
     // is the final score. Not yet: try again at the next run, up to 4 hours after tip-off (a game lasts
     // about 2 h 15). Still missing after that: rated with v1, so a play-by-play problem never blocks a night.
+    let buzzer: number | null = null;
     try {
-      const timeline = toTimeline(await fetchPlayByPlay(g.gameId) as RawPlayByPlay);
+      const pbp = await fetchPlayByPlay(g.gameId) as RawPlayByPlay;
+      const timeline = toTimeline(pbp);
       await pause(500);
       const f = finalScore(game);
       if (!timelineMatches(timeline, f.home, f.away)) throw new Error('play-by-play not complete yet');
       game.late = lateFrom(timeline, game.periods.length);
+      buzzer = buzzerAt(pbp);
     } catch (error) {
       const waitUntil = base.tipOff ? Date.parse(base.tipOff) + 4 * 60 * 60 * 1000 : 0;
       if (now < waitUntil && !nightIsOver) {
@@ -148,7 +157,7 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
       }
       console.warn(`${label}: no complete play-by-play, rated with v1.`);
     }
-    logRated(game);
+    logRated(game, buzzer, now);
     entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)) });
   }
 
@@ -162,7 +171,7 @@ async function fixtureNight(): Promise<NightJson> {
     import('../fixtures/2026-04-04-det-phi.ts'),
   ]);
   const games = [sasAtDen, wasAtMia, detAtPhi];
-  games.forEach(logRated);
+  games.forEach((g) => logRated(g, null, Date.now()));
   const entries = games.map((g) => ({ away: g.away, home: g.home, note: displayScore(g), raw: round1(rawScore(g)) }));
   return { version: 2, date: '2026-04-04', games: orderGames([], entries) };
 }
