@@ -9,15 +9,16 @@
       "note": 100
     },
     {
+      "away": "LAC",
+      "home": "OKC",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 69
+    },
+    {
       "away": "IND",
       "home": "BKN",
       "tipOff": "2026-10-25T22:00:00Z",
       "note": 11
-    },
-    {
-      "away": "LAC",
-      "home": "OKC",
-      "tipOff": "2026-10-25T23:00:00Z"
     },
     {
       "away": "ORL",
