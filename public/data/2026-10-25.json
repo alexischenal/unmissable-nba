@@ -35,7 +35,8 @@
     {
       "away": "DET",
       "home": "PHI",
-      "tipOff": "2026-10-25T23:30:00Z"
+      "tipOff": "2026-10-25T23:30:00Z",
+      "note": 0
     },
     {
       "away": "MEM",
