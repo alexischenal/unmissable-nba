@@ -21,13 +21,14 @@
       "note": 11
     },
     {
-      "away": "ORL",
-      "home": "NYK",
-      "tipOff": "2026-10-25T23:00:00Z"
-    },
-    {
       "away": "TOR",
       "home": "MIN",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 2
+    },
+    {
+      "away": "ORL",
+      "home": "NYK",
       "tipOff": "2026-10-25T23:00:00Z"
     },
     {
