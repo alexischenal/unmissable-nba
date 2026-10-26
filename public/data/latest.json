@@ -15,6 +15,12 @@
       "note": 69
     },
     {
+      "away": "ORL",
+      "home": "NYK",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 64
+    },
+    {
       "away": "IND",
       "home": "BKN",
       "tipOff": "2026-10-25T22:00:00Z",
@@ -25,11 +31,6 @@
       "home": "MIN",
       "tipOff": "2026-10-25T23:00:00Z",
       "note": 2
-    },
-    {
-      "away": "ORL",
-      "home": "NYK",
-      "tipOff": "2026-10-25T23:00:00Z"
     },
     {
       "away": "DET",
