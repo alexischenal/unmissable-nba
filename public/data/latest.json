@@ -27,6 +27,12 @@
       "note": 11
     },
     {
+      "away": "MEM",
+      "home": "SAC",
+      "tipOff": "2026-10-26T01:00:00Z",
+      "note": 9
+    },
+    {
       "away": "TOR",
       "home": "MIN",
       "tipOff": "2026-10-25T23:00:00Z",
@@ -37,11 +43,6 @@
       "home": "PHI",
       "tipOff": "2026-10-25T23:30:00Z",
       "note": 0
-    },
-    {
-      "away": "MEM",
-      "home": "SAC",
-      "tipOff": "2026-10-26T01:00:00Z"
     }
   ]
 }
