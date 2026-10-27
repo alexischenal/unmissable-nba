@@ -27,6 +27,12 @@
       "note": 66
     },
     {
+      "away": "MEM",
+      "home": "UTA",
+      "tipOff": "2026-10-27T01:00:00Z",
+      "note": 66
+    },
+    {
       "away": "WAS",
       "home": "CHA",
       "tipOff": "2026-10-26T23:00:00Z",
@@ -43,11 +49,6 @@
       "home": "BOS",
       "tipOff": "2026-10-26T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "MEM",
-      "home": "UTA",
-      "tipOff": "2026-10-27T01:00:00Z"
     },
     {
       "away": "GSW",
