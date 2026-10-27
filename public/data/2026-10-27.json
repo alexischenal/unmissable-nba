@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "date": "2026-10-27",
+  "games": [
+    {
+      "away": "BKN",
+      "home": "BOS",
+      "tipOff": "2026-10-27T23:30:00Z"
+    },
+    {
+      "away": "DET",
+      "home": "NYK",
+      "tipOff": "2026-10-28T00:00:00Z"
+    },
+    {
+      "away": "SAC",
+      "home": "SAS",
+      "tipOff": "2026-10-28T00:00:00Z"
+    },
+    {
+      "away": "POR",
+      "home": "LAL",
+      "tipOff": "2026-10-28T03:00:00Z"
+    }
+  ]
+}
