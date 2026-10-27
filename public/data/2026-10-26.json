@@ -39,6 +39,12 @@
       "note": 60
     },
     {
+      "away": "GSW",
+      "home": "DEN",
+      "tipOff": "2026-10-27T02:00:00Z",
+      "note": 13
+    },
+    {
       "away": "PHX",
       "home": "OKC",
       "tipOff": "2026-10-27T00:00:00Z",
@@ -49,11 +55,6 @@
       "home": "BOS",
       "tipOff": "2026-10-26T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "GSW",
-      "home": "DEN",
-      "tipOff": "2026-10-27T02:00:00Z"
     }
   ]
 }
