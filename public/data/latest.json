@@ -3,6 +3,12 @@
   "date": "2026-10-26",
   "games": [
     {
+      "away": "MIN",
+      "home": "CLE",
+      "tipOff": "2026-10-26T23:00:00Z",
+      "note": 82
+    },
+    {
       "away": "DAL",
       "home": "MIA",
       "tipOff": "2026-10-26T23:30:00Z",
@@ -19,11 +25,6 @@
       "home": "BOS",
       "tipOff": "2026-10-26T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "MIN",
-      "home": "CLE",
-      "tipOff": "2026-10-26T23:00:00Z"
     },
     {
       "away": "IND",
