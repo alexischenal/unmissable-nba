@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buzzerAt, computeClutch, parseClock, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { buzzerAt, computeClutch, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -73,4 +73,19 @@ test('a correction added after the game, at the end of the list, is left out', (
   const timeline = toTimeline(pbp);
   assert.deepEqual(timeline[timeline.length - 1], [4, 0, 108, 111]);
   assert.equal(buzzerAt(pbp), Date.parse('2026-10-24T04:46:00Z'));
+});
+
+test('readPlayByPlay: the v2 data when complete, the reason when not', () => {
+  const act = (period: number, clock: string, home: number, away: number) =>
+    ({ period, clock, scoreHome: String(home), scoreAway: String(away), timeActual: '2026-10-27T02:00:00Z' });
+  const game = {
+    home: 'CLE', away: 'MIN', leadChanges: 0, timesTied: 0, biggestLead: { home: 2, away: 0 }, players: [],
+    periods: [{ home: 2, away: 0 }, { home: 0, away: 0 }, { home: 0, away: 0 }, { home: 0, away: 0 }],
+  };
+  const done = readPlayByPlay({ game: { gameId: 'x', actions: [act(1, 'PT11M00.00S', 2, 0), act(4, 'PT00M00.00S', 2, 0)] } }, game);
+  assert.ok(done.late);
+  assert.equal(done.buzzer, Date.parse('2026-10-27T02:00:00Z'));
+  const early = readPlayByPlay({ game: { gameId: 'x', actions: [act(1, 'PT11M00.00S', 0, 0)] } }, game);
+  assert.equal(early.late, undefined);
+  assert.match(early.problem ?? '', /not complete yet/);
 });

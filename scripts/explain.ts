@@ -15,7 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { buzzerAt, lateFrom, timelineMatches, toTimeline, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
+import { lateFrom, readPlayByPlay, timelineMatches, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -169,13 +169,10 @@ async function main(): Promise<void> {
     // Rating v2, like the site: the play-by-play, when it's there and complete
     if (!v1Only) {
       try {
-        const pbp = await fetchPlayByPlay(g.gameId) as RawPlayByPlay;
-        const timeline = toTimeline(pbp);
-        notes.buzzer = buzzerAt(pbp);
-        const f = finalScore(game);
-        const last = timeline[timeline.length - 1];
-        if (timelineMatches(timeline, f.home, f.away)) game.late = lateFrom(timeline, game.periods.length);
-        else notes.pbpProblem = `its last score (${last ? `${last[3]}-${last[2]}` : 'none'}) isn't the box score's final score (${f.away}-${f.home})`;
+        const read = readPlayByPlay(await fetchPlayByPlay(g.gameId) as RawPlayByPlay, game);
+        notes.buzzer = read.buzzer;
+        if (read.late) game.late = read.late;
+        else notes.pbpProblem = read.problem;
         await pause(500);
       } catch (error) {
         notes.pbpProblem = error instanceof Error ? error.message : String(error);
