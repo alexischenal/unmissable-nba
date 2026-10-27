@@ -3,13 +3,14 @@
   "date": "2026-10-26",
   "games": [
     {
-      "away": "MIN",
-      "home": "CLE",
-      "tipOff": "2026-10-26T23:00:00Z"
-    },
-    {
       "away": "WAS",
       "home": "CHA",
+      "tipOff": "2026-10-26T23:00:00Z",
+      "note": 60
+    },
+    {
+      "away": "MIN",
+      "home": "CLE",
       "tipOff": "2026-10-26T23:00:00Z"
     },
     {
