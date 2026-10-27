@@ -1,14 +1,14 @@
 How the rating works
 
-Every morning, Unmissable looks at last night's games and asks one question: was this game worth watching? It never looks at who was playing — only at what happened on the court.
+After every game, Unmissable asks one question: was this game worth watching? It never looks at who was playing, only at what happened on the court.
 
 First, was it a real game?
-A game counts as competitive if it was close at the end of regulation, if the fourth quarter was still up for grabs, or if a team came back from a big deficit. Competitive games are rated from 50 up; blowouts never go above 49. A blowout stays a blowout, even if someone scores 60.
+A game counts as competitive if it was close at the end of regulation, if the finish was tight, or if a team came back from a big deficit. Competitive games are rated from 50 up. A game that was close for three quarters, then decided in the fourth, starts a little lower. Blowouts never go above 49. A blowout stays a blowout, even if someone scores 60.
 
 Then, how good was it?
-Among competitive games, the rating goes up with:
-- suspense: how close it was at the end;
-- twists: lead changes and ties;
+The rating goes up with:
+- suspense: the time spent within one or two possessions in the last minutes (and in overtime);
+- twists: lead changes and ties, and the later they come, the more they count;
 - comebacks: how big a lead the losing team let slip;
 - offense: how many points were scored;
 - big performances: every monster stat line adds to the rating, and the bigger it is, the more it counts. Two stars going at it is the best show there is.

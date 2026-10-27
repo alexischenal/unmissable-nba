@@ -12,8 +12,8 @@ Requirements: Node 22.6 or later.
 
 ```bash
 npm install
-npm run fetch:fixture   # generates public/data/latest.json from the real games of April 4, 2026
-npm run dev             # http://localhost:5173
+npm run fetch:fixture   # a demo night from the real games of April 4, 2026 (public/data/2099-04-04.json)
+npm run dev             # http://localhost:5173/?date=2099-04-04
 ```
 
 In WebStorm: *Open* the folder; the scripts show up in the **npm** tool window.
@@ -26,14 +26,14 @@ In WebStorm: *Open* the folder; the scripts show up in the **npm** tool window.
 | `npm run fetch` | **NBA calls**: the night to publish, if any → ratings → `public/data/` |
 | `npm test` | tests of the run rules |
 | `npm run fetch -- --date=2026-10-20` | same, for a specific US date |
-| `npm run fetch:fixture` | same, with test data, no network |
+| `npm run fetch:fixture` | test data, no network: the demo night `public/data/2099-04-04.json` (ignored by Git) |
 
 The site reads `public/data/latest.json`, or a specific night with `?date=2026-04-04`.
 
 ## Architecture
 
 ```
-NBA API (cdn.nba.com)  ←  scripts/fetch-night.ts   (server side, every 15 minutes)
+NBA API (cdn.nba.com)  ←  scripts/fetch-night.ts   (server side, every 5 minutes)
                                  ↓  computes the ratings
                          public/data/YYYY-MM-DD.json   (teams + rating, NO score)
                                  ↓
@@ -88,13 +88,14 @@ them. Without either, the script runs with the examples and says so; on GitHub, 
 
 `.github/workflows/update.yml` runs on GitHub Actions:
 
-- **every 15 minutes**: `scripts/nba/plan.ts` decides whether there's anything to do. Until a night's first
+- **every 5 minutes, from cron-job.org**, which starts the workflow through the GitHub API (GitHub's own
+  schedule can start runs several minutes late; it stays as an hourly fallback). No runs between 08:00 and
+  15:00 UTC: no game is ever under way then (`npm run check-window` checks it on the season's schedule).
+  Each run, `scripts/nba/plan.ts` decides whether there's anything to do. Until a night's first
   tip-off, the site keeps showing the previous night. At the first tip-off, the night appears with every game
   unrated; then each game gets its rating as soon as it's over. A run only commits and redeploys when something
   changed. A night still incomplete the next day gets caught up. A day without games publishes nothing;
 - **on every push to `main`**: rebuilds and deploys (no fetch);
-- **every 5 minutes from cron-job.org**, which starts the same workflow through the GitHub API (GitHub's own
-  schedule can start runs several minutes late; it stays as a fallback);
 - **manually** (*Actions → Update and deploy → Run workflow*), with an optional date.
 
 Only a push, or a run that found new data, rebuilds and redeploys the site.

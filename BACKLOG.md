@@ -119,9 +119,9 @@ Not decided. Possible changes, and what each one does.
      add `.idea/` to `.gitignore`. Local files stay.
    - [ ] **Merged branches** (54): delete them, and turn on *Settings → General → Automatically delete head
      branches* so GitHub cleans up after every merge.
-   - [ ] **`how-it-works.txt` is out of date**: says competitive games start at 50 (games close only after Q3
-     now start lower), and opens with "Every morning" (the US use cases aren't mornings). Rewrite it when the
-     presentation page is built. Ingredients only, never the settings.
+   - [x] **`how-it-works.txt` brought up to date** (October 27): rating v2 (clutch, late lead changes), the
+     lower start of games close only after Q3, no "Every morning". Polish it when the presentation page is
+     built. Ingredients only, never the settings.
    - [ ] **"Contributors: Claude"** shows on the repo page (from the `Co-Authored-By` lines). Decide whether
      that's fine for the portfolio. Removing it from past commits means rewriting the whole history (heavy,
      risky): the realistic option is only to stop adding the line from now on.
