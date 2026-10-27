@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "date": "2026-10-25",
+  "games": [
+    {
+      "away": "LAL",
+      "home": "UTA",
+      "tipOff": "2026-10-25T21:00:00Z",
+      "note": 100
+    },
+    {
+      "away": "LAC",
+      "home": "OKC",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 69
+    },
+    {
+      "away": "ORL",
+      "home": "NYK",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 64
+    },
+    {
+      "away": "IND",
+      "home": "BKN",
+      "tipOff": "2026-10-25T22:00:00Z",
+      "note": 11
+    },
+    {
+      "away": "MEM",
+      "home": "SAC",
+      "tipOff": "2026-10-26T01:00:00Z",
+      "note": 9
+    },
+    {
+      "away": "TOR",
+      "home": "MIN",
+      "tipOff": "2026-10-25T23:00:00Z",
+      "note": 2
+    },
+    {
+      "away": "DET",
+      "home": "PHI",
+      "tipOff": "2026-10-25T23:30:00Z",
+      "note": 0
+    }
+  ]
+}

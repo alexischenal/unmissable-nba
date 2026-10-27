@@ -1,5 +1,6 @@
 // scripts/fetch-night.ts
-// The server script, run every 15 minutes by GitHub Actions:
+// The server script, run by GitHub Actions every 5 minutes (started by cron-job.org), except between
+// 08:00 and 15:00 UTC, when no game is under way:
 //   1. decides which nights need work (scripts/nba/plan.ts) — most runs stop here;
 //   2. puts the night on the site at its first tip-off, every game without a rating;
 //   3. rates each game as soon as it's over (box score from nba.com → algorithm);
@@ -9,7 +10,8 @@
 // Usage:
 //   npm run fetch                      → whatever the current time calls for
 //   npm run fetch -- --date=2026-10-20 → a specific date
-//   npm run fetch:fixture              → the real games of April 4, 2026, no network
+//   npm run fetch:fixture              → the real games of April 4, 2026, no network, written as the demo
+//                                        night public/data/2099-04-04.json (ignored by Git, never latest.json)
 
 import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -17,13 +19,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
-import { buzzerAt, lateFrom, timelineMatches, toTimeline, type RawPlayByPlay } from './nba/clutch.ts';
+import { readPlayByPlay, type RawPlayByPlay } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, nextNightWithGames, toGame } from './nba/adapter.ts';
 import { loadSchedule } from './nba/schedule-cache.ts';
 import { orderGames, type Entry } from './nba/order.ts';
 import { nextDay, planRun, type Published } from './nba/plan.ts';
 import {
-  competitivenessPoints, displayScore, finalScore, isDisputed, performancePoints, rawScore,
+  competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
 import { loadScoring } from './load-scoring.ts';
 import type { Game } from '../src/types/game.ts';
@@ -34,6 +36,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(ROOT, 'public', 'data');
 const round1 = (x: number) => Math.round(x * 10) / 10;
 const fileFor = (date: string) => path.join(OUT_DIR, `${date}.json`);
+const DEMO_DATE = '2099-04-04';
 
 async function readNight(file: string): Promise<NightJson | null> {
   if (!existsSync(file)) return null;
@@ -141,13 +144,11 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     // about 2 h 15). Still missing after that: rated with v1, so a play-by-play problem never blocks a night.
     let buzzer: number | null = null;
     try {
-      const pbp = await fetchPlayByPlay(g.gameId) as RawPlayByPlay;
-      const timeline = toTimeline(pbp);
+      const read = readPlayByPlay(await fetchPlayByPlay(g.gameId) as RawPlayByPlay, game);
       await pause(500);
-      const f = finalScore(game);
-      if (!timelineMatches(timeline, f.home, f.away)) throw new Error('play-by-play not complete yet');
-      game.late = lateFrom(timeline, game.periods.length);
-      buzzer = buzzerAt(pbp);
+      if (read.problem !== undefined) throw new Error(read.problem);
+      game.late = read.late;
+      buzzer = read.buzzer;
     } catch (error) {
       const waitUntil = base.tipOff ? Date.parse(base.tipOff) + 4 * 60 * 60 * 1000 : 0;
       if (now < waitUntil && !nightIsOver) {
@@ -178,7 +179,7 @@ async function fixtureNight(): Promise<NightJson> {
 
 // Writes the night if it changed. latest.json only ever moves forward: catching up on an
 // older night (or a manual --date) must not replace a more recent one.
-async function save(night: NightJson, { forceLatest = false } = {}): Promise<void> {
+async function save(night: NightJson, { latest: updateLatest = true } = {}): Promise<void> {
   const json = JSON.stringify(night, null, 2) + '\n';
   await mkdir(OUT_DIR, { recursive: true });
 
@@ -191,9 +192,10 @@ async function save(night: NightJson, { forceLatest = false } = {}): Promise<voi
     console.log(`${night.date}: no change.`);
   }
 
+  if (!updateLatest) return;
   const latestPath = path.join(OUT_DIR, 'latest.json');
   const latest = await readNight(latestPath);
-  if (forceLatest || !latest || night.date >= latest.date) {
+  if (!latest || night.date >= latest.date) {
     if ((existsSync(latestPath) ? await readFile(latestPath, 'utf8') : null) !== json) {
       await writeFile(latestPath, json);
       console.log('Written: public/data/latest.json');
@@ -227,8 +229,11 @@ async function main(): Promise<void> {
   const dateArg = args.find((a) => a.startsWith('--date='))?.slice('--date='.length);
   if (dateArg && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) throw new Error(`Invalid date: ${dateArg}`);
 
+  // The fixture never touches the real data: a demo night, ignored by Git (public/data/2099-*.json),
+  // shown with ?date=2099-04-04.
   if (useFixture) {
-    await save(await fixtureNight(), { forceLatest: true });
+    await save({ ...await fixtureNight(), date: DEMO_DATE }, { latest: false });
+    console.log(`Open the site with ?date=${DEMO_DATE}`);
     return;
   }
 

@@ -39,10 +39,10 @@ jobs:
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # The script only uses Node's built-ins: no npm install needed, so idle runs stay short.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
 
@@ -54,7 +54,7 @@ jobs:
 
       - name: Restore the night's schedule
         id: schedule
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .cache/schedule.json
           key: schedule-${{ steps.night.outputs.night }}
@@ -72,7 +72,7 @@ jobs:
       # succeeded: the copy it wrote is then the fresh one.
       - name: Keep the night's schedule
         if: steps.schedule.outputs.cache-hit != 'true' && hashFiles('.cache/schedule.json') != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .cache/schedule.json
           key: schedule-${{ steps.night.outputs.night }}
@@ -113,11 +113,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       # The branch tip, so the data just committed by "update" is included.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.ref }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -126,11 +126,11 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

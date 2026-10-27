@@ -1,7 +1,8 @@
 // scripts/nba/plan.ts
 // Decides what a scheduled run should do. Pure functions: no network, no files, easy to test.
 //
-// The workflow wakes up every 15 minutes, all day. A night appears on the site at its first
+// The workflow wakes up every 5 minutes (cron-job.org), except between 08:00 and 15:00 UTC, when no game
+// is under way (checked by npm run check-window). A night appears on the site at its first
 // tip-off (until then, the site keeps the previous night), then each game gets its rating as
 // soon as it's over. Most runs have nothing to do and stop right away.
 

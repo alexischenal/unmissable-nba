@@ -1,5 +1,6 @@
 // scripts/nba/clutch.ts
 import { SCORING } from '../../src/config/scoring.ts';
+import { finalScore } from '../../src/lib/scoring.ts';
 import type { Game } from '../../src/types/game.ts';
 
 // "Clutch", the NBA's own definition: the last 5 minutes of the 4th quarter or of an overtime,
@@ -158,4 +159,22 @@ export function buzzerAt(pbp: RawPlayByPlay): number | null {
 export function timelineMatches(timeline: Timeline, home: number, away: number): boolean {
   const last = timeline[timeline.length - 1];
   return last !== undefined && last[2] === home && last[3] === away;
+}
+
+// Everything the rating needs from a play-by-play, in one place (fetch-night and explain):
+// the v2 data when it's complete, otherwise why not. The buzzer comes either way, when known.
+export type PlayByPlayRead =
+  | { late: NonNullable<Game['late']>; buzzer: number | null; problem?: undefined }
+  | { late?: undefined; buzzer: number | null; problem: string };
+
+export function readPlayByPlay(pbp: RawPlayByPlay, game: Game): PlayByPlayRead {
+  const timeline = toTimeline(pbp); // throws on an unexpected format
+  const buzzer = buzzerAt(pbp);
+  const f = finalScore(game);
+  if (!timelineMatches(timeline, f.home, f.away)) {
+    const last = timeline[timeline.length - 1];
+    const seen = last ? `${last[3]}-${last[2]}` : 'none';
+    return { buzzer, problem: `not complete yet: last score ${seen}, final ${f.away}-${f.home}` };
+  }
+  return { buzzer, late: lateFrom(timeline, game.periods.length) };
 }

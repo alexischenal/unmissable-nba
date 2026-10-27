@@ -1,0 +1,60 @@
+{
+  "version": 2,
+  "date": "2026-10-26",
+  "games": [
+    {
+      "away": "MIN",
+      "home": "CLE",
+      "tipOff": "2026-10-26T23:00:00Z",
+      "note": 82
+    },
+    {
+      "away": "DAL",
+      "home": "MIA",
+      "tipOff": "2026-10-26T23:30:00Z",
+      "note": 75
+    },
+    {
+      "away": "ATL",
+      "home": "HOU",
+      "tipOff": "2026-10-27T00:30:00Z",
+      "note": 68
+    },
+    {
+      "away": "IND",
+      "home": "MIL",
+      "tipOff": "2026-10-27T00:00:00Z",
+      "note": 66
+    },
+    {
+      "away": "MEM",
+      "home": "UTA",
+      "tipOff": "2026-10-27T01:00:00Z",
+      "note": 66
+    },
+    {
+      "away": "WAS",
+      "home": "CHA",
+      "tipOff": "2026-10-26T23:00:00Z",
+      "note": 60
+    },
+    {
+      "away": "GSW",
+      "home": "DEN",
+      "tipOff": "2026-10-27T02:00:00Z",
+      "note": 13
+    },
+    {
+      "away": "PHX",
+      "home": "OKC",
+      "tipOff": "2026-10-27T00:00:00Z",
+      "note": 5
+    },
+    {
+      "away": "CHI",
+      "home": "BOS",
+      "tipOff": "2026-10-26T23:30:00Z",
+      "note": 3
+    }
+  ]
+}
