@@ -8,3 +8,6 @@ public/data/2099-*.json
 scoring.secret.json
 # Box scores downloaded by npm run season-stats
 .cache/
+# Local reports (season-stats, explain…): they print the real settings
+rapport*.txt
+report*.txt
