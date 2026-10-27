@@ -15,6 +15,12 @@
       "note": 75
     },
     {
+      "away": "ATL",
+      "home": "HOU",
+      "tipOff": "2026-10-27T00:30:00Z",
+      "note": 68
+    },
+    {
       "away": "IND",
       "home": "MIL",
       "tipOff": "2026-10-27T00:00:00Z",
@@ -37,11 +43,6 @@
       "home": "BOS",
       "tipOff": "2026-10-26T23:30:00Z",
       "note": 3
-    },
-    {
-      "away": "ATL",
-      "home": "HOU",
-      "tipOff": "2026-10-27T00:30:00Z"
     },
     {
       "away": "MEM",
