@@ -3,15 +3,16 @@
   "date": "2026-10-27",
   "games": [
     {
+      "away": "BKN",
+      "home": "BOS",
+      "tipOff": "2026-10-27T23:30:00Z",
+      "note": 80
+    },
+    {
       "away": "SAC",
       "home": "SAS",
       "tipOff": "2026-10-28T00:00:00Z",
       "note": 11
-    },
-    {
-      "away": "BKN",
-      "home": "BOS",
-      "tipOff": "2026-10-27T23:30:00Z"
     },
     {
       "away": "DET",
