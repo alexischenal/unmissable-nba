@@ -9,15 +9,16 @@
       "note": 80
     },
     {
+      "away": "DET",
+      "home": "NYK",
+      "tipOff": "2026-10-28T00:00:00Z",
+      "note": 60
+    },
+    {
       "away": "SAC",
       "home": "SAS",
       "tipOff": "2026-10-28T00:00:00Z",
       "note": 11
-    },
-    {
-      "away": "DET",
-      "home": "NYK",
-      "tipOff": "2026-10-28T00:00:00Z"
     },
     {
       "away": "POR",
