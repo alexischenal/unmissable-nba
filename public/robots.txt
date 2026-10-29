@@ -1,4 +1,4 @@
-# Pre-launch: the site is not meant to be indexed yet.
-# At launch, replace "Disallow: /" with "Allow: /" and remove the noindex meta in index.html.
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://unmissable.watch/sitemap.xml
