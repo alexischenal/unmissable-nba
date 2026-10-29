@@ -20,7 +20,7 @@ export function About() {
 
       <h2 className="article__subtitle">Step two: the story of the game</h2>
       <p className="article__text">
-        A huge comeback? Five minutes of crazy clutch time? Lead changes all night long? A shootout? Each one
+        A huge comeback? Five minutes of crazy clutch time? Lead changes all game long? A shootout? Each one
         adds points.
       </p>
 
