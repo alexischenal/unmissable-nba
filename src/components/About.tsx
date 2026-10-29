@@ -4,7 +4,7 @@
 export function About() {
   return (
     <article className="article">
-      <h1 className="article__title">Percentages on my NBA?</h1>
+      <h1 className="article__title">Percentages, on my NBA?</h1>
 
       <p className="article__text">
         Where do these percentages come from? As soon as a game ends, Unmissable.watch politely asks the NBA
@@ -23,11 +23,14 @@ export function About() {
         A huge comeback? Five minutes of crazy clutch time? Lead changes all night long? Each one adds points.
       </p>
 
-      <h2 className="article__subtitle">And then, the pièce de résistance: individual performances</h2>
+      <h2 className="article__subtitle">And then, step three: individual performances</h2>
       <p className="article__text">A good night barely counts. A huge one sends the rating flying.</p>
       <p className="article__text">
         In short: a monster performance in a real game is unmissable, and you won't miss it if you check here
         before picking a replay.
+      </p>
+      <p className="article__text">
+        The final rating is capped at 100. It's not a grade, it's a percentage of how unmissable the game is.
       </p>
       <p className="article__text article__promise">You'll know what to watch. You'll never know who won.</p>
 
