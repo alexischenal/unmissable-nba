@@ -51,6 +51,7 @@ function NextNightName({ date }: { date: string }) {
 }
 
 const ABOUT_ITEM: MenuItem = { key: 'about', href: ABOUT_URL, label: 'How it works' };
+const LEGAL_ITEM: MenuItem = { key: 'legal', href: LEGAL_URL, label: 'Legal notice' };
 
 export function App() {
   const home = useNight();
@@ -80,11 +81,12 @@ export function App() {
     else if (!nextNight) status = 'No games on the next night.';
   }
 
-  // The menu: the other nights first, then How it works
+  // The menu: the other nights first, then the text pages (never the page you're on)
   const menuItems: MenuItem[] = [];
   if (PAGE !== 'home' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
   if (PAGE !== 'next' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: <NextNightName date={nextNight.date} /> });
   if (PAGE !== 'about') menuItems.push(ABOUT_ITEM);
+  if (PAGE !== 'legal') menuItems.push(LEGAL_ITEM);
 
   // One <h1> per page: the brand on the night pages, the page title on the text pages
   const Brand = SECTION ? 'p' : 'h1';
