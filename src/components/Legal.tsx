@@ -31,6 +31,11 @@ export function Legal() {
 
       <h2 className="article__subtitle">Personal data</h2>
       <p className="article__text">No account, no cookies: the site doesn't collect any personal data.</p>
+      <p className="article__text">
+        Visits are counted with <a className="article__link" href="https://www.goatcounter.com">GoatCounter</a>:
+        anonymous statistics only (pages viewed, referring site, country, browser, screen size), without cookies
+        and without tracking you across sites.
+      </p>
     </article>
   );
 }
