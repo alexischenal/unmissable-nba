@@ -27,7 +27,7 @@ export function About() {
       <h2 className="article__subtitle">And then, step three: individual performances</h2>
       <p className="article__text">A good night barely counts. A huge one sends the rating flying.</p>
       <p className="article__text">
-        In short: a monster performance in a real game is unmissable, and you won't miss it if you check here
+        Long story short: a monster performance in a real game is unmissable, and you won't miss it if you check here
         before picking a replay.
       </p>
       <p className="article__text">
