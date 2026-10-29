@@ -143,11 +143,10 @@ export function App() {
         })}
       </main>
 
-      {PAGE !== 'about' && (
-        <footer className="footer">
-          <a className="footer__link" href={ABOUT_URL}>How it works</a>
-        </footer>
-      )}
+      {/* On every page, How it works included (marked as the current page there) */}
+      <footer className="footer">
+        <a className="footer__link" href={ABOUT_URL} aria-current={PAGE === 'about' ? 'page' : undefined}>How it works</a>
+      </footer>
     </>
   );
 }
