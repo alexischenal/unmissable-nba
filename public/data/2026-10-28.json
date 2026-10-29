@@ -63,15 +63,16 @@
       "note": 5
     },
     {
+      "away": "LAL",
+      "home": "LAC",
+      "tipOff": "2026-10-29T02:30:00Z",
+      "note": 4
+    },
+    {
       "away": "DEN",
       "home": "NOP",
       "tipOff": "2026-10-29T00:00:00Z",
       "note": 0
-    },
-    {
-      "away": "LAL",
-      "home": "LAC",
-      "tipOff": "2026-10-29T02:30:00Z"
     }
   ]
 }
