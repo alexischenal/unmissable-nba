@@ -21,6 +21,12 @@
       "note": 65
     },
     {
+      "away": "GSW",
+      "home": "MIN",
+      "tipOff": "2026-10-29T00:00:00Z",
+      "note": 65
+    },
+    {
       "away": "CHA",
       "home": "DET",
       "tipOff": "2026-10-28T23:00:00Z",
@@ -49,11 +55,6 @@
       "home": "NOP",
       "tipOff": "2026-10-29T00:00:00Z",
       "note": 0
-    },
-    {
-      "away": "GSW",
-      "home": "MIN",
-      "tipOff": "2026-10-29T00:00:00Z"
     },
     {
       "away": "SAS",
