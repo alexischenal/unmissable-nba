@@ -521,6 +521,7 @@ because of their Paris tip-off times. Same night, two days. Unmissable groups by
 
 ## Launch
 
-- Remove the `noindex` meta in `index.html` and allow crawling in `public/robots.txt`.
+- [x] Open to search engines (October 29): no `noindex`, `robots.txt` allows crawling, `sitemap.xml` with the four pages.
+  Next: a title and description per page, written at build time; How it works pre-rendered in the HTML.
 - README for the portfolio: screenshot, the zero-spoiler architecture, the adapter, the two-step algorithm,
   and how it differs from Thuuz (2014 app that rated game excitement live; Unmissable is for the morning after).
