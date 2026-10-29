@@ -36,6 +36,29 @@ Not decided. Possible changes, and what each one does.
     blowouts turned into close games (some from 4 to 72). Any small early deficit erased now counted.
 - **Kept as it is.** To check again later, the leak is the number to watch.
 
+## Algorithm evolutions
+
+New ingredients, from the play-by-play, only what happened on the court. Changing the algorithm during
+the season is fine: nights aren't compared across a season, and published ratings stay as they are.
+Same method for each: simulate on the past season (`season-stats`), look at which games move, then decide.
+
+1. **A game decided in the last seconds** (to try first). Today a lead change with 4:30 left weighs the
+   same as a game-winner at the buzzer: both are in the last-5-minutes window. Measure it from the last lead
+   change or tie in the final 24 seconds, or a one-possession margin on the last possession. Says the
+   ending was wild, not who won: no leak.
+2. **Several overtimes.** Suspense is capped by the clutch time, so a double or triple overtime earns about
+   as much as a single one. A small bonus from the second overtime on.
+3. **When the comeback happened.** Erasing a big deficit in the fourth is worth more than in the second;
+   today only the size of the loser's biggest lead counts. Weight it by moment, like lead changes.
+4. **Scoring runs.** An 18-0 that turns a close game around is partly covered by comeback and lead
+   changes, but not when the game stays close.
+5. **Shooting rather than points.** Offense counts points, not quality: a slow, well-played game gets
+   nothing, a high-scoring game full of bricks gets the full share. Both teams' shooting (true shooting,
+   from the box score) would measure "nobody could score" whatever the pace.
+
+Left out: dunks and highlight plays (they follow the teams' style and measure clips, not games), records
+and milestones (context, not play), fights and ejections.
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
