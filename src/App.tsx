@@ -93,16 +93,18 @@ export function App() {
             <Menu items={menuItems} />
             <Brand className="header__brand">
               <a className="header__home" href={HOME_URL}>Unmissable</a>
+              {/* The About page says where you are next to the brand, not on the right */}
+              {PAGE === 'about' && <span className="header__section">How it works</span>}
             </Brand>
           </div>
           {/* Where you are, in plain text. The other pages are in the menu. */}
-          <p className="header__night header__current">
-            {PAGE === 'about'
-              ? 'How it works'
-              : PAGE === 'next'
+          {PAGE !== 'about' && (
+            <p className="header__night header__current">
+              {PAGE === 'next'
                 ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
                 : homeNight ? <NightName date={homeNight.date} /> : ' '}
-          </p>
+            </p>
+          )}
         </header>
 
         {PAGE === 'about' && <About />}
