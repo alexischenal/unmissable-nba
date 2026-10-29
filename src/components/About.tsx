@@ -14,7 +14,9 @@ export function About() {
       <h2 className="article__subtitle">Step one: blowout or real game?</h2>
       <p className="article__text">
         Blowouts start at 0% and can never go above 49%. Scoring 80 in a blowout is still a blowout, so it
-        stays there. Competitive games start at 50%.
+        stays there.
+        <br />
+        Competitive games start at 50%.
       </p>
 
       <h2 className="article__subtitle">Step two: the story of the game</h2>
@@ -25,8 +27,10 @@ export function About() {
 
       <h2 className="article__subtitle">And then, step three: individual performances</h2>
       <p className="article__text">
-        A good night barely counts. A huge one sends the rating flying. Long story short: monster performances in real games are unmissable. You won't miss those if you
-        check here before picking a replay.
+        A good night barely counts. A huge one sends the rating flying.
+        <br />
+        Long story short: monster performances in real games are unmissable. You won't miss those if you check
+        here before picking a replay.
       </p>
       <p className="article__text">
         The math has no ceiling: a crazy night keeps adding points, because nobody should put a limit on
