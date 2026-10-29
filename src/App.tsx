@@ -2,20 +2,24 @@
 // Three pages, same app:
 //   - home: the night on screen (best games first), from latest.json;
 //   - next (/next): the next calendar night's games, with their tip-off times, from next.json;
-//   - about (/how-it-works): where the percentages come from.
+//   - about (/how-it-works): where the percentages come from;
+//   - legal (/legal): the legal notice.
 // The header says where you are; the other pages are in the burger menu.
 
 import { About } from './components/About.tsx';
+import { Legal } from './components/Legal.tsx';
 import { MatchCard } from './components/MatchCard.tsx';
 import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
-import { ABOUT_URL, HOME_URL, NEXT_URL, PAGE, nightDates, nightLabel } from './lib/night.ts';
+import { ABOUT_URL, HOME_URL, LEGAL_URL, NEXT_URL, PAGE, nightDates, nightLabel } from './lib/night.ts';
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
 const LOADED_AT = Date.now();
 
-if (PAGE === 'about') document.title = 'How it works — Unmissable';
+// The text pages: their name next to the brand, and in the browser tab
+const SECTION = PAGE === 'about' ? 'How it works' : PAGE === 'legal' ? 'Legal notice' : null;
+if (SECTION) document.title = `${SECTION} — Unmissable`;
 
 // The three groups, in display order. Rated games come first, without a heading;
 // the next groups get an <h2> to separate them.
@@ -54,7 +58,7 @@ export function App() {
 
   const homeNight = home.status === 'ready' ? home.night : null;
   const nextNight = next.status === 'ready' ? next.night : null;
-  // The night on screen (none on the About page)
+  // The night on screen (none on the text pages)
   const night: NightJson | null = PAGE === 'next' ? nextNight : PAGE === 'home' ? homeNight : null;
   const complete = night !== null && nightIsComplete(night);
 
@@ -82,8 +86,8 @@ export function App() {
   if (PAGE !== 'next' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: <NextNightName date={nextNight.date} /> });
   if (PAGE !== 'about') menuItems.push(ABOUT_ITEM);
 
-  // One <h1> per page: the brand on the night pages, the page title on the About page
-  const Brand = PAGE === 'about' ? 'p' : 'h1';
+  // One <h1> per page: the brand on the night pages, the page title on the text pages
+  const Brand = SECTION ? 'p' : 'h1';
 
   return (
     <>
@@ -93,12 +97,12 @@ export function App() {
             <Menu items={menuItems} />
             <Brand className="header__brand">
               <a className="header__home" href={HOME_URL}>Unmissable</a>
-              {/* The About page says where you are next to the brand, not on the right */}
-              {PAGE === 'about' && <span className="header__section">How it works</span>}
+              {/* The text pages say where you are next to the brand, not on the right */}
+              {SECTION && <span className="header__section">{SECTION}</span>}
             </Brand>
           </div>
           {/* Where you are, in plain text. The other pages are in the menu. */}
-          {PAGE !== 'about' && (
+          {!SECTION && (
             <p className="header__night header__current">
               {PAGE === 'next'
                 ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
@@ -108,6 +112,7 @@ export function App() {
         </header>
 
         {PAGE === 'about' && <About />}
+        {PAGE === 'legal' && <Legal />}
 
         <p className="page__status" role="status" hidden={status === null}>{status}</p>
 
@@ -145,9 +150,10 @@ export function App() {
         })}
       </main>
 
-      {/* On every page, How it works included (marked as the current page there) */}
+      {/* On every page, the text pages included (the current one is marked) */}
       <footer className="footer">
         <a className="footer__link" href={ABOUT_URL} aria-current={PAGE === 'about' ? 'page' : undefined}>How it works</a>
+        <a className="footer__link" href={LEGAL_URL} aria-current={PAGE === 'legal' ? 'page' : undefined}>Legal notice</a>
       </footer>
     </>
   );

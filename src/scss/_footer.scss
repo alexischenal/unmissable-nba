@@ -2,6 +2,9 @@
 @use "mixins" as *;
 
 .footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
   padding: 40px var(--stripe) 48px;
 
   .footer__link {

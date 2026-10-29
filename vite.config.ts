@@ -3,9 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages only serves files that exist: /next and /how-it-works need their own index.html.
+// GitHub Pages only serves files that exist: /next, /how-it-works and /legal need their own index.html.
 // Same page as the home page; the app reads the URL to know which one it is.
-const PAGES = ['next', 'how-it-works'];
+const PAGES = ['next', 'how-it-works', 'legal'];
 
 function otherPages(): Plugin {
   return {
