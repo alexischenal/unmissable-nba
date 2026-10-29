@@ -3,6 +3,12 @@
   "date": "2026-10-28",
   "games": [
     {
+      "away": "SAS",
+      "home": "UTA",
+      "tipOff": "2026-10-29T01:00:00Z",
+      "note": 90
+    },
+    {
       "away": "NYK",
       "home": "CHI",
       "tipOff": "2026-10-29T00:00:00Z",
@@ -55,11 +61,6 @@
       "home": "NOP",
       "tipOff": "2026-10-29T00:00:00Z",
       "note": 0
-    },
-    {
-      "away": "SAS",
-      "home": "UTA",
-      "tipOff": "2026-10-29T01:00:00Z"
     },
     {
       "away": "OKC",
