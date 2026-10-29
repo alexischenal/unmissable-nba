@@ -1,0 +1,15 @@
+@use "variables" as *;
+@use "mixins" as *;
+
+.footer {
+  padding: 40px var(--stripe) 48px;
+
+  .footer__link {
+    @include underline-link;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: $ink;
+  }
+}
