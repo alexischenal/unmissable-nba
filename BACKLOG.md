@@ -127,9 +127,8 @@ Not decided. Possible changes, and what each one does.
      risky): the realistic option is only to stop adding the line from now on.
    - The "main branch isn't protected" banner: harmless for a personal project, dismiss it.
 7. **High priority — accessibility (audit of October 21: axe-core, keyboard, structure).**
-   - [ ] **Header label contrast**: "Night of…" / "Next night" is `$muted` (`#5c5a55`) on black: **3.04:1**, 4.5 needed
-     at 13px. Use a lighter grey in the header only (`$muted` stays right on the light page): `#7a776f` (4.7:1,
-     closest to today) or `#86837b` (5.55:1, more comfortable). To pick.
+   - [x] **Header label contrast**: "Night of…" / "Next night" was `$muted` (`#5c5a55`) on black, 3.04:1. Now white
+     (October 29): 21:1.
    - [ ] **City name on some reds: 4.34:1** (4.5 needed, small text): white on ATL/POR `#E03A3E`, and on the Sixers'
      red when they switch colors (PHI@NYK). Team names (large text) pass. Fixing means darkening those reds very
      slightly, away from the official colors: decide whether the 0.16 gap is worth it.

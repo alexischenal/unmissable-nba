@@ -132,6 +132,15 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
+  .header__section {
+    margin-left: 0.5em;
+    font-size: 0.5em;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 0.6em;
+    }
+  }
+
   .header__home {
     color: inherit;
     text-decoration: none;
@@ -143,7 +152,7 @@ $burger-gap: $gap-ratio * 1em;
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: $muted;
+    color: $white;
   }
 
   @media (max-width: $breakpoint-mobile) {
