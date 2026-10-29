@@ -3,6 +3,12 @@
   "date": "2026-10-28",
   "games": [
     {
+      "away": "PHI",
+      "home": "IND",
+      "tipOff": "2026-10-28T23:00:00Z",
+      "note": 74
+    },
+    {
       "away": "WAS",
       "home": "CLE",
       "tipOff": "2026-10-28T23:00:00Z",
@@ -19,11 +25,6 @@
       "home": "ATL",
       "tipOff": "2026-10-28T23:00:00Z",
       "note": 9
-    },
-    {
-      "away": "PHI",
-      "home": "IND",
-      "tipOff": "2026-10-28T23:00:00Z"
     },
     {
       "away": "ORL",
