@@ -4,7 +4,7 @@
 export function About() {
   return (
     <article className="article">
-      <h1 className="article__title">Percentages, on my NBA?</h1>
+      <h1 className="article__title">Another percentage, on my NBA?</h1>
 
       <p className="article__text">
         Where do these percentages come from? As soon as a game ends, Unmissable.watch politely asks the NBA
