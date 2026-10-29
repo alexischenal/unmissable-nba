@@ -11,12 +11,12 @@ export function About() {
         for its box score and play-by-play. Then the algorithm gets to work.
       </p>
 
-      <h2 className="article__subtitle">Step one: blowout or real game?</h2>
+      <h2 className="article__subtitle">Step one: blowout or close game?</h2>
       <p className="article__text">
         Blowouts start at 0% and can never go above 49%. Scoring 80 in a blowout is still a blowout, so it
         stays there.
         <br />
-        Competitive games start at 50%.
+        Close games start at 50%.
       </p>
 
       <h2 className="article__subtitle">Step two: the story of the game</h2>
@@ -29,7 +29,7 @@ export function About() {
       <p className="article__text">
         A good night barely counts. A huge one sends the rating flying.
         <br />
-        Long story short: monster performances in real games are unmissable. You won't miss those if you check
+        Long story short: monster performances in close games are unmissable. You won't miss those if you check
         here before picking a replay.
       </p>
       <p className="article__text">
