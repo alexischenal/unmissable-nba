@@ -3,6 +3,12 @@
   "date": "2026-10-28",
   "games": [
     {
+      "away": "NYK",
+      "home": "CHI",
+      "tipOff": "2026-10-29T00:00:00Z",
+      "note": 77
+    },
+    {
       "away": "PHI",
       "home": "IND",
       "tipOff": "2026-10-28T23:00:00Z",
@@ -47,11 +53,6 @@
     {
       "away": "GSW",
       "home": "MIN",
-      "tipOff": "2026-10-29T00:00:00Z"
-    },
-    {
-      "away": "NYK",
-      "home": "CHI",
       "tipOff": "2026-10-29T00:00:00Z"
     },
     {
