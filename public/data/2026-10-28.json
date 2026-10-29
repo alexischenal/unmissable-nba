@@ -35,7 +35,8 @@
     {
       "away": "DEN",
       "home": "NOP",
-      "tipOff": "2026-10-29T00:00:00Z"
+      "tipOff": "2026-10-29T00:00:00Z",
+      "note": 0
     },
     {
       "away": "GSW",
