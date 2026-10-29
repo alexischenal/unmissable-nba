@@ -1,17 +1,17 @@
 @use "variables" as *;
 @use "mixins" as *;
 
-.about {
+.article {
   max-width: calc(800px + 2 * var(--stripe));
   padding: 0 var(--stripe) 56px;
 
-  .about__title {
+  .article__title {
     @include section-heading;
     padding-left: 0;
     padding-right: 0;
   }
 
-  .about__subtitle {
+  .article__subtitle {
     margin: 36px 0 10px;
     font-family: $font-text;
     font-weight: 600;
@@ -21,7 +21,7 @@
     text-transform: uppercase;
   }
 
-  .about__text {
+  .article__text {
     margin: 0 0 14px;
     font-family: $font-body;
     font-size: 18px;
@@ -32,16 +32,21 @@
     }
   }
 
-  .about__promise {
+  .article__link {
+    color: inherit;
+    text-underline-offset: 0.15em;
+  }
+
+  .article__promise {
     margin-top: 28px;
     font-weight: 600;
   }
 
-  .about__figure {
+  .article__figure {
     margin: 24px 0 0;
   }
 
-  .about__image {
+  .article__image {
     display: block;
     width: 100%;
     max-width: 800px;
