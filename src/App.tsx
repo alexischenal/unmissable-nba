@@ -83,7 +83,8 @@ export function App() {
 
   // The menu: the other nights first, then the text pages (never the page you're on)
   const menuItems: MenuItem[] = [];
-  if (PAGE !== 'home' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
+  // The home night only from the Next page: on the text pages, the brand leads home
+  if (PAGE === 'next' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
   if (PAGE !== 'next' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: <NextNightName date={nextNight.date} /> });
   if (PAGE !== 'about') menuItems.push(ABOUT_ITEM);
   if (PAGE !== 'legal') menuItems.push(LEGAL_ITEM);
