@@ -3,20 +3,24 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages only serves files that exist: /next needs its own next/index.html.
+// GitHub Pages only serves files that exist: /next and /how-it-works need their own index.html.
 // Same page as the home page; the app reads the URL to know which one it is.
-function nextPage(): Plugin {
+const PAGES = ['next', 'how-it-works'];
+
+function otherPages(): Plugin {
   return {
-    name: 'next-page',
+    name: 'other-pages',
     apply: 'build',
     closeBundle() {
       const dist = (p: string) => fileURLToPath(new URL(`./dist/${p}`, import.meta.url));
-      mkdirSync(dist('next'), { recursive: true });
-      copyFileSync(dist('index.html'), dist('next/index.html'));
+      for (const page of PAGES) {
+        mkdirSync(dist(page), { recursive: true });
+        copyFileSync(dist('index.html'), dist(`${page}/index.html`));
+      }
     },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), nextPage()],
+  plugins: [react(), otherPages()],
 });

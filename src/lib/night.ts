@@ -28,12 +28,15 @@ export function nightDates(isoDate: string, { short = false } = {}): string {
 export const nightLabel = (isoDate: string, options: { short?: boolean } = {}): string =>
   `Night of ${nightDates(isoDate, options)}`;
 
-// The two pages. GitHub Pages serves /next from dist/next/index.html (copied at build time, see
-// vite.config.ts): same app, it only reads the URL to know which page it is.
-export type Page = 'home' | 'next';
-export const PAGE: Page = window.location.pathname.replace(/\/+$/, '') === '/next' ? 'next' : 'home';
+// The pages. GitHub Pages serves /next and /how-it-works from their own index.html (copied at build
+// time, see vite.config.ts): same app, it only reads the URL to know which page it is.
+export type Page = 'home' | 'next' | 'about';
+const PATH = window.location.pathname.replace(/\/+$/, '');
+export const PAGE: Page = PATH === '/next' ? 'next' : PATH === '/how-it-works' ? 'about' : 'home';
 export const HOME_URL = '/';
-export const NEXT_URL = '/next/'; // with the slash: GitHub Pages would redirect /next to /next/
+// With the slash: GitHub Pages would redirect /next to /next/
+export const NEXT_URL = '/next/';
+export const ABOUT_URL = '/how-it-works/';
 
 async function loadFile(file: string, signal?: AbortSignal): Promise<NightJson | null> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/${file}`, { cache: 'no-cache', signal });

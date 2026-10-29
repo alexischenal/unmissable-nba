@@ -1,0 +1,44 @@
+@use "variables" as *;
+
+@mixin section-heading {
+  margin: 0;
+  padding: 28px var(--stripe) 12px;
+  font-family: $font-display;
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $ink;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 36px var(--stripe) 16px;
+  }
+}
+
+@mixin underline-link {
+  position: relative;
+  text-decoration: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0.18em;
+    bottom: -4px;
+    height: 1px;
+    background-color: currentColor;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+  }
+
+  &:hover::after {
+    transform: scaleX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      transition: none;
+    }
+  }
+}
