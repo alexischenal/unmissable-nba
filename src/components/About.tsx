@@ -32,6 +32,8 @@ export function About() {
         Long story short: monster performances in close games are unmissable. You won't miss those if you check
         here before picking a replay.
       </p>
+
+      <h2 className="article__subtitle">Good to know</h2>
       <p className="article__text">
         The math has no ceiling: a crazy night keeps adding points, because nobody should put a limit on
         what players can do. The display stops at 100%, which simply means unmissable.
