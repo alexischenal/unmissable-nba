@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "date": "2026-10-29",
+  "games": [
+    {
+      "away": "CLE",
+      "home": "ATL",
+      "tipOff": "2026-10-30T00:00:00Z"
+    },
+    {
+      "away": "SAC",
+      "home": "NOP",
+      "tipOff": "2026-10-30T00:00:00Z"
+    },
+    {
+      "away": "MEM",
+      "home": "POR",
+      "tipOff": "2026-10-30T02:00:00Z"
+    }
+  ]
+}
