@@ -3,15 +3,16 @@
   "date": "2026-10-29",
   "games": [
     {
+      "away": "CLE",
+      "home": "ATL",
+      "tipOff": "2026-10-30T00:00:00Z",
+      "note": 67
+    },
+    {
       "away": "SAC",
       "home": "NOP",
       "tipOff": "2026-10-30T00:00:00Z",
       "note": 17
-    },
-    {
-      "away": "CLE",
-      "home": "ATL",
-      "tipOff": "2026-10-30T00:00:00Z"
     },
     {
       "away": "MEM",
