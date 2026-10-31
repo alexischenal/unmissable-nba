@@ -38,6 +38,9 @@ export function About() {
         The math has no ceiling: a crazy night keeps adding points, because nobody should put a limit on
         what players can do. The display stops at 100%, which simply means unmissable.
       </p>
+      <p className="article__text">
+        A flame next to a percentage means somebody had a big night. Tap it to see how big.
+      </p>
       <p className="article__text article__promise">You'll know what to watch. You'll never know who won.</p>
 
       <p className="article__text">To show what it looks like, here's every game of last season, rated.</p>

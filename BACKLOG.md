@@ -73,7 +73,9 @@ and milestones (context, not play), fights and ejections.
     changes) would tell the whole story, a bigger spoiler than "a big night". The rating already says it. The
     "?" now only shows on games with a performance. Nights rated earlier keep a `scenario` key in their JSON:
     ignored by the cards. The secret's `why.scenarioPoints` and `why.scenarioSwings` are no longer read.
-  - To do maybe: one line in How it works ("Tap the ? next to a percentage…").
+  - **A flame instead of the "?"** (October 31). The button now only means "a big night", so it says so; a bigger
+    pastille at every size. The same flame for Big, Huge and Crazy: the level only shows once opened. One line in Good
+    to know (How it works) explains it.
 
 ## Next up — Monday
 

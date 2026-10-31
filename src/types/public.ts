@@ -8,7 +8,7 @@ export type PublicGame = {
   tipOff?: string; // ISO time in UTC (version 2). Missing in version 1 files.
   note?: number; // displayed rating, 0 to 100 — only once the game is over
   // No raw rating here (some files from October 20, 2026 had one): see scripts/nba/order.ts.
-  why?: Why; // where the rating comes from, shown under the "?" of a rated card
+  why?: Why; // where the rating comes from, shown under the flame of a rated card
 };
 
 // Never a name, a team or a number: only how many players had a big night.

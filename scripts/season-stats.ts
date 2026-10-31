@@ -7,7 +7,7 @@
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
 //   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), the
 //                                                comparison v1 (box score) vs v2 (with the play-by-play),
-//                                                the "?" on the cards (how often, and why),
+//                                                the flame on the cards (how often, and why),
 //                                                and .cache/ratings-2025-26.csv (every game's rating)
 //
 // The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
@@ -274,10 +274,10 @@ function comebackBonusReport(games: CachedGame[], late: Map<string, NonNullable<
   }
 }
 
-// The "?" on the cards (src/lib/why.ts), with the settings in use: how often, and why.
+// The flame on the cards (src/lib/why.ts), with the settings in use: how often, and why.
 function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late']>>): void {
   const w = SCORING.why;
-  title(`Why — the "?" on the cards (big ${w.bigNight}, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
+  title(`Why — the flame on the cards (big ${w.bigNight}, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
   const rows = games.map((g0) => {
     const g = late.has(g0.id) ? { ...g0, late: late.get(g0.id)! } : g0;
     return { note: displayScore(g), why: whyOf(g) };
@@ -288,13 +288,13 @@ function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late
   const line = (name: string, count: number, of = n) =>
     console.log(`  ${name.padEnd(34)} ${String(count).padStart(5)}  ${pct(count, of).padStart(6)}  ≈ ${n1(count / nights).padStart(4)} per night`);
 
-  line('games with a "?"', k((r) => r.why !== undefined));
+  line('games with a flame', k((r) => r.why !== undefined));
   line('  with a big performance', k((r) => (r.why?.big ?? 0) > 0));
   line('  with a huge performance', k((r) => (r.why?.huge ?? 0) > 0));
   line('  with a crazy performance', k((r) => (r.why?.crazy ?? 0) > 0));
   const high = rows.filter((r) => r.note >= 50);
   const low = rows.filter((r) => r.note < 50);
-  console.log(`  "?" at 50% or more: ${pct(high.filter((r) => r.why).length, high.length)}  ·  under 50%: ${pct(low.filter((r) => r.why).length, low.length)}`);
+  console.log(`  flame at 50% or more: ${pct(high.filter((r) => r.why).length, high.length)}  ·  under 50%: ${pct(low.filter((r) => r.why).length, low.length)}`);
 
   // Players per tier (each in one tier only)
   const players = (tier: 'big' | 'huge' | 'crazy') => rows.reduce((s, r) => s + (r.why?.[tier] ?? 0), 0);

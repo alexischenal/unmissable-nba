@@ -2,7 +2,7 @@
 // One game: away team on the left, home team on the right, and in the middle:
 //   - upcoming → the tip-off time, in the visitor's own time zone and format;
 //   - live     → nothing in the middle;
-//   - rated    → the rating, and a "?" when there's something to say about it (src/lib/why.ts).
+//   - rated    → the rating, and a flame when a player had a big night (src/lib/why.ts).
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type Ref } from 'react';
 import { TEAMS, type Team } from '../config/teams.ts';
@@ -61,7 +61,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Several strips can be open at once, to compare. One folds back:
-  //   - with its "?", or a click on its own card or strip;
+  //   - with its flame, or a click on its own card or strip;
   //   - with a click outside every card (the other cards and their strips leave it open);
   //   - with Escape.
   // On the full click, not on pointerdown like the menu: folding the strip moves the cards below,
@@ -86,7 +86,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [whyOpen]);
-  // A click on the opened card (or its strip) folds it back; the "?" handles its own clicks.
+  // A click on the opened card (or its strip) folds it back; the flame handles its own clicks.
   const foldOnClick = (event: ReactMouseEvent) => {
     if (whyOpen && !buttonRef.current?.contains(event.target as Node)) setWhyOpen(false);
   };
@@ -133,7 +133,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
             aria-label={`Why ${game.note}%?`}
             onClick={() => setWhyOpen((o) => !o)}
           >
-            ?
+            <svg className="card__why-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
           </button>
         )}
       </article>
