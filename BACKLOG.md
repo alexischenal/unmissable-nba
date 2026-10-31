@@ -62,10 +62,11 @@ and milestones (context, not play), fights and ejections.
 ## Evolutions
 
 - [x] **A "why" button on rated cards** (October 31). A small circled "?" at the top right of the percentage,
-  only on games with something to say; it opens a strip under the card (never a pop-up).
+  only on games with something to say; it opens a strip under the card (never a pop-up), folded back by a
+  click anywhere else or Escape.
   - **Scenario**, by rules: a tight finish or a big comeback ALWAYS get it (the same tests as step 1, checked
     by a test); lead changes or spectacle points above a threshold add the other intense games.
-  - **Big / Huge / Crazy night**, counted (×2), never named. The chips are on fire, lightly to fully: only
+  - **Big / Huge / Crazy performance**, counted (×2), never named. The chips are on fire, lightly to fully: only
     who opened the strip sees it. The "?" itself stays plain.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret

@@ -37,15 +37,15 @@ export function whyOf(g: Game): Why | undefined {
 
 export type WhyChip = { label: string; heat?: 'big' | 'huge' | 'crazy' };
 
-// The chips, in display order: "Scenario", "Crazy night", "Huge night ×2", "Big night".
-// The nights carry a heat level: the card shows them on fire, lightly to fully.
+// The chips, in display order: "Scenario", "Crazy performance", "Huge performance ×2", "Big performance".
+// The performances carry a heat level: the card shows them on fire, lightly to fully.
 export function whyChips(why: Why): WhyChip[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [
     ...(why.scenario ? [{ label: 'Scenario' }] : []),
-    ...(why.crazy ? [{ label: `Crazy night${times(why.crazy)}`, heat: 'crazy' as const }] : []),
-    ...(why.huge ? [{ label: `Huge night${times(why.huge)}`, heat: 'huge' as const }] : []),
-    ...(why.big ? [{ label: `Big night${times(why.big)}`, heat: 'big' as const }] : []),
+    ...(why.crazy ? [{ label: `Crazy performance${times(why.crazy)}`, heat: 'crazy' as const }] : []),
+    ...(why.huge ? [{ label: `Huge performance${times(why.huge)}`, heat: 'huge' as const }] : []),
+    ...(why.big ? [{ label: `Big performance${times(why.big)}`, heat: 'big' as const }] : []),
   ];
 }
 
