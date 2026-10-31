@@ -175,29 +175,27 @@
   }
 
   .card__why-button {
+    --why-size: max(16px, calc(var(--note-w) * 0.19));
     position: absolute;
     left: calc(50% + var(--note-w) / 2);
     top: calc(50% - var(--note-h) / 2);
-    translate: -50% -50%;
+    translate: -78% -22%;
     z-index: 1;
-    width: 20px;
-    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--why-size);
+    height: var(--why-size);
     padding: 0;
     border: 1.5px solid $bg;
     border-radius: 50%;
     background: $ink;
     color: $bg;
-    font-family: $font-text;
-    font-weight: 600;
-    font-size: 12px;
+    font-family: $font-display;
+    font-weight: 900;
+    font-size: calc(var(--why-size) * 0.62);
     line-height: 1;
     cursor: pointer;
-
-    @media (max-width: $breakpoint-mobile) {
-      width: 16px;
-      height: 16px;
-      font-size: 10px;
-    }
   }
 
   .card__why-button::before {
