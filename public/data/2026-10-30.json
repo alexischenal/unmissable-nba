@@ -3,6 +3,12 @@
   "date": "2026-10-30",
   "games": [
     {
+      "away": "HOU",
+      "home": "DAL",
+      "tipOff": "2026-10-31T00:00:00Z",
+      "note": 82
+    },
+    {
       "away": "NYK",
       "home": "PHI",
       "tipOff": "2026-10-30T23:30:00Z",
@@ -43,11 +49,6 @@
       "home": "MIN",
       "tipOff": "2026-10-31T00:00:00Z",
       "note": 6
-    },
-    {
-      "away": "HOU",
-      "home": "DAL",
-      "tipOff": "2026-10-31T00:00:00Z"
     },
     {
       "away": "DEN",
