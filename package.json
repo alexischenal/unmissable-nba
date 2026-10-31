@@ -15,6 +15,7 @@
     "fetch": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts",
     "season-stats": "node --experimental-strip-types --no-warnings scripts/season-stats.ts",
     "check-window": "node --experimental-strip-types --no-warnings scripts/check-window.ts",
+    "flame-study": "node --experimental-strip-types --no-warnings scripts/flame-study.ts",
     "explain": "node --experimental-strip-types --no-warnings scripts/explain.ts",
     "fetch:fixture": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts --fixture",
     "test": "node --experimental-strip-types --no-warnings --test scripts/nba/plan.test.ts scripts/nba/order.test.ts scripts/nba/schedule-cache.test.ts scripts/nba/adapter.test.ts scripts/nba/clutch.test.ts src/lib/scoring.test.ts src/lib/colors.test.ts src/lib/why.test.ts"
