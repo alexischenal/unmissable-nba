@@ -25,11 +25,11 @@ import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  closeByClutch, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore,
+  competitivenessDetails, disputedBaseFor, displayScore, efficiency, finalScore,
   isDisputed, loserBiggestLead, marginAfterQ3, performancePoints, playerPoints, rawScore, regulationMargin,
 } from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
-import { hasScenario, whyOf } from '../src/lib/why.ts';
+import { whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
@@ -280,7 +280,7 @@ function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late
   title(`Why — the "?" on the cards (big ${w.bigNight}, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
   const rows = games.map((g0) => {
     const g = late.has(g0.id) ? { ...g0, late: late.get(g0.id)! } : g0;
-    return { g, note: displayScore(g), why: whyOf(g), tight: closeByClutch(g) };
+    return { note: displayScore(g), why: whyOf(g) };
   });
   const n = rows.length;
   const nights = new Set(games.map((g) => g.date).filter(Boolean)).size || 165;
@@ -289,23 +289,12 @@ function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late
     console.log(`  ${name.padEnd(34)} ${String(count).padStart(5)}  ${pct(count, of).padStart(6)}  ≈ ${n1(count / nights).padStart(4)} per night`);
 
   line('games with a "?"', k((r) => r.why !== undefined));
-  line('  with Scenario', k((r) => r.why?.scenario === true));
   line('  with a big performance', k((r) => (r.why?.big ?? 0) > 0));
   line('  with a huge performance', k((r) => (r.why?.huge ?? 0) > 0));
   line('  with a crazy performance', k((r) => (r.why?.crazy ?? 0) > 0));
   const high = rows.filter((r) => r.note >= 50);
   const low = rows.filter((r) => r.note < 50);
   console.log(`  "?" at 50% or more: ${pct(high.filter((r) => r.why).length, high.length)}  ·  under 50%: ${pct(low.filter((r) => r.why).length, low.length)}`);
-
-  // Why Scenario, rule by rule (a game can match several)
-  const scen = rows.filter((r) => hasScenario(r.g));
-  const swingsOk = (r: (typeof rows)[number]) => r.g.late !== undefined && r.g.late.weightedSwings >= w.scenarioSwings;
-  console.log(`  Scenario (${scen.length} games), by rule:`);
-  console.log(`    tight finish ${scen.filter((r) => r.tight).length} · big comeback ${scen.filter((r) => loserBiggestLead(r.g) >= SCORING.disputed.minLoserBiggestLead).length} · lead changes ${scen.filter(swingsOk).length} · spectacle points ${scen.filter((r) => competitivenessPoints(r.g) >= w.scenarioPoints).length}`);
-
-  // Check: a tight finish always gets Scenario
-  const missed = rows.filter((r) => r.tight && !r.why?.scenario);
-  console.log(`  Check, tight finishes without Scenario: ${missed.length} (must be 0)`);
 
   // Players per tier (each in one tier only)
   const players = (tier: 'big' | 'huge' | 'crazy') => rows.reduce((s, r) => s + (r.why?.[tier] ?? 0), 0);
