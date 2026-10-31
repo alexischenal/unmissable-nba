@@ -4,7 +4,7 @@
 //   - live     → nothing in the middle;
 //   - rated    → the rating, and a "?" when there's something to say about it (src/lib/why.ts).
 
-import { useEffect, useId, useRef, useState, type CSSProperties, type Ref } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type Ref } from 'react';
 import { TEAMS, type Team } from '../config/teams.ts';
 import { cardColors, type Colors } from '../lib/colors.ts';
 import { whyChips, type WhyChip } from '../lib/why.ts';
@@ -60,19 +60,24 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // A click or a tap anywhere else (another card's "?" included), or Escape, folds it back.
+  // Several strips can be open at once, to compare. One folds back:
+  //   - with its "?", or a click on its own card or strip;
+  //   - with a click outside every card (the other cards and their strips leave it open);
+  //   - with Escape.
   // On the full click, not on pointerdown like the menu: folding the strip moves the cards below,
-  // and the release of a click on another "?" would then land beside it.
+  // and the release of a click would then land somewhere else.
   useEffect(() => {
     if (!whyOpen) return;
     const onClick = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (!cardRef.current?.contains(target) && !stripRef.current?.contains(target)) setWhyOpen(false);
+      const target = event.target as Element;
+      if (target.closest?.('.card, .card__why')) return;
+      setWhyOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      const focused = document.activeElement;
       setWhyOpen(false);
-      buttonRef.current?.focus();
+      if (cardRef.current?.contains(focused) || stripRef.current?.contains(focused)) buttonRef.current?.focus();
     };
     document.addEventListener('click', onClick);
     document.addEventListener('keydown', onKeyDown);
@@ -81,13 +86,17 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [whyOpen]);
+  // A click on the opened card (or its strip) folds it back; the "?" handles its own clicks.
+  const foldOnClick = (event: ReactMouseEvent) => {
+    if (whyOpen && !buttonRef.current?.contains(event.target as Node)) setWhyOpen(false);
+  };
   const why = state === 'rated' && game.why ? whyChips(game.why) : [];
   const away = teamFor(game.away);
   const home = teamFor(game.home);
   // Two teams with the same color (PHI and NYK): one switches, so the diagonal stays visible
   const colors = cardColors(away, home);
 
-  const classes = ['card', featured && 'card--featured', state !== 'rated' && `card--${state}`];
+  const classes = ['card', featured && 'card--featured', state !== 'rated' && `card--${state}`, whyOpen && 'card--why-open'];
   const teams = `${away.location} ${away.name} at ${home.location} ${home.name}`;
   const label =
     state === 'rated' ? `${rank}. ${teams}, rated ${game.note} out of 100`
@@ -98,7 +107,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   // whatever the result (otherwise the layout would spoil the winner).
   return (
     <>
-      <article ref={cardRef} className={classes.filter(Boolean).join(' ')} aria-label={label}>
+      <article ref={cardRef} className={classes.filter(Boolean).join(' ')} aria-label={label} onClick={foldOnClick}>
         <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
         <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
         {/* In progress: no block in the middle at all */}
@@ -128,18 +137,25 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
           </button>
         )}
       </article>
-      {why.length > 0 && <WhyStrip ref={stripRef} id={whyId} open={whyOpen} note={game.note} chips={why} />}
+      {why.length > 0 && <WhyStrip ref={stripRef} id={whyId} open={whyOpen} note={game.note} chips={why} onClick={foldOnClick} />}
     </>
   );
 }
 
 // The strip under an opened card. The individual nights are on fire: lightly, more, fully.
 // Only who opened the card sees it.
-type WhyStripProps = { ref: Ref<HTMLDivElement>; id: string; open: boolean; note?: number; chips: WhyChip[] };
+type WhyStripProps = {
+  ref: Ref<HTMLDivElement>;
+  id: string;
+  open: boolean;
+  note?: number;
+  chips: WhyChip[];
+  onClick: (event: ReactMouseEvent) => void;
+};
 
-function WhyStrip({ ref, id, open, note, chips }: WhyStripProps) {
+function WhyStrip({ ref, id, open, note, chips, onClick }: WhyStripProps) {
   return (
-    <div ref={ref} id={id} className="card__why" hidden={!open}>
+    <div ref={ref} id={id} className="card__why" hidden={!open} onClick={onClick}>
       <span className="card__why-lead" aria-hidden="true">Why</span>
       <ul className="card__why-list" aria-label={`Why ${note}%`}>
         {chips.map(({ label, heat }) => (

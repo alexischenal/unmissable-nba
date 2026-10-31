@@ -353,6 +353,11 @@
   display: none;
 }
 
+.card--why-open,
+.card--why-open + .card__why {
+  cursor: pointer;
+}
+
 .card--featured {
   --card-h: 350px;
   --note-w: 144px;
