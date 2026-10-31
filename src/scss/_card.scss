@@ -179,7 +179,7 @@
     position: absolute;
     left: calc(50% + var(--note-w) / 2);
     top: calc(50% - var(--note-h) / 2);
-    translate: -78% -22%;
+    translate: -50% -50%;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -191,9 +191,9 @@
     border-radius: 50%;
     background: $ink;
     color: $bg;
-    font-family: $font-display;
-    font-weight: 900;
-    font-size: calc(var(--why-size) * 0.62);
+    font-family: $font-text;
+    font-weight: 600;
+    font-size: calc(var(--why-size) * 0.6);
     line-height: 1;
     cursor: pointer;
   }
