@@ -9,6 +9,12 @@
       "note": 82
     },
     {
+      "away": "DEN",
+      "home": "PHX",
+      "tipOff": "2026-10-31T02:00:00Z",
+      "note": 65
+    },
+    {
       "away": "NYK",
       "home": "PHI",
       "tipOff": "2026-10-30T23:30:00Z",
@@ -49,11 +55,6 @@
       "home": "MIN",
       "tipOff": "2026-10-31T00:00:00Z",
       "note": 6
-    },
-    {
-      "away": "DEN",
-      "home": "PHX",
-      "tipOff": "2026-10-31T02:00:00Z"
     },
     {
       "away": "LAL",
