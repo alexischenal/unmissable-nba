@@ -3,6 +3,18 @@
   "date": "2026-10-30",
   "games": [
     {
+      "away": "NYK",
+      "home": "PHI",
+      "tipOff": "2026-10-30T23:30:00Z",
+      "note": 64
+    },
+    {
+      "away": "ORL",
+      "home": "TOR",
+      "tipOff": "2026-10-30T23:30:00Z",
+      "note": 61
+    },
+    {
       "away": "CHA",
       "home": "WAS",
       "tipOff": "2026-10-30T23:00:00Z",
@@ -17,17 +29,8 @@
     {
       "away": "CHI",
       "home": "BOS",
-      "tipOff": "2026-10-30T23:30:00Z"
-    },
-    {
-      "away": "NYK",
-      "home": "PHI",
-      "tipOff": "2026-10-30T23:30:00Z"
-    },
-    {
-      "away": "ORL",
-      "home": "TOR",
-      "tipOff": "2026-10-30T23:30:00Z"
+      "tipOff": "2026-10-30T23:30:00Z",
+      "note": 6
     },
     {
       "away": "HOU",
