@@ -64,8 +64,9 @@ and milestones (context, not play), fights and ejections.
 - [x] **A "why" button on rated cards** (October 31). A small circled "?" at the top right of the percentage,
   only on games with something to say; it opens a strip under the card (never a pop-up), folded back by a
   click anywhere else or Escape.
-  - **Big / Huge / Crazy performance**, counted (×2), never named. The chips are on fire, lightly to fully: only
-    who opened the strip sees it. The "?" itself stays plain.
+  - **Big / Huge / Crazy performance**, counted (×2), never named. The chips glow, lightly to fully, without
+    moving (blinking was too much with several strips open): only who opened the strip sees the level. Only the
+    flame button moves.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
     config (`why.*`). Ratings published before October 31 have no "?".
