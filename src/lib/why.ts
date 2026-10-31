@@ -10,11 +10,12 @@ import { efficiency } from './scoring.ts';
 
 export function whyOf(g: Game): Why | undefined {
   const w = SCORING.why;
-  const effs = g.players.map(efficiency);
-  // Three tiers, each player in one only
-  const crazy = effs.filter((e) => e >= w.crazyNight).length;
-  const huge = effs.filter((e) => e >= w.hugeNight && e < w.crazyNight).length;
-  const big = effs.filter((e) => e >= w.bigNight && e < w.hugeNight).length;
+  const lines = g.players.map((p) => ({ eff: efficiency(p), pts: p.pts }));
+  // Three tiers, each player in one only. Huge and crazy by efficiency; big also by points: a scorer who had
+  // to take every shot still had a big night, even if his misses pull his efficiency down.
+  const crazy = lines.filter(({ eff }) => eff >= w.crazyNight).length;
+  const huge = lines.filter(({ eff }) => eff >= w.hugeNight && eff < w.crazyNight).length;
+  const big = lines.filter(({ eff, pts }) => eff < w.hugeNight && (eff >= w.bigNight || pts >= w.bigPoints)).length;
   const why: Why = {
     ...(crazy ? { crazy } : {}),
     ...(huge ? { huge } : {}),
