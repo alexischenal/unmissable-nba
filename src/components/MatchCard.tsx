@@ -92,7 +92,8 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
       {why.length > 0 && (
         <button
           type="button"
-          className="card__why-button"
+          // A crazy night: the "?" catches fire (rare: about one night in ten)
+          className={game.why?.crazy ? 'card__why-button card__why-button--hot' : 'card__why-button'}
           aria-expanded={whyOpen}
           aria-controls={whyId}
           aria-label={`Why ${game.note}%?`}

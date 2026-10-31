@@ -22,21 +22,25 @@ export function hasScenario(g: Game): boolean {
 export function whyOf(g: Game): Why | undefined {
   const w = SCORING.why;
   const effs = g.players.map(efficiency);
-  const huge = effs.filter((e) => e >= w.hugeNight).length;
+  // Three tiers, each player in one only
+  const crazy = effs.filter((e) => e >= w.crazyNight).length;
+  const huge = effs.filter((e) => e >= w.hugeNight && e < w.crazyNight).length;
   const big = effs.filter((e) => e >= w.bigNight && e < w.hugeNight).length;
   const why: Why = {
     ...(hasScenario(g) ? { scenario: true as const } : {}),
+    ...(crazy ? { crazy } : {}),
     ...(huge ? { huge } : {}),
     ...(big ? { big } : {}),
   };
   return Object.keys(why).length ? why : undefined;
 }
 
-// The chips, in display order: "Scenario", "Huge night ×2", "Big night"
+// The chips, in display order: "Scenario", "Crazy night", "Huge night ×2", "Big night"
 export function whyLabels(why: Why): string[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [
     ...(why.scenario ? ['Scenario'] : []),
+    ...(why.crazy ? [`Crazy night${times(why.crazy)}`] : []),
     ...(why.huge ? [`Huge night${times(why.huge)}`] : []),
     ...(why.big ? [`Big night${times(why.big)}`] : []),
   ];

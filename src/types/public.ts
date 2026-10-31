@@ -14,7 +14,8 @@ export type PublicGame = {
 // Never a name, a team, a number or how the game ends: only what kind of game it was.
 export type Why = {
   scenario?: true; // the story of the game: a tight finish, a big comeback, lead changes…
-  huge?: number;   // players with a huge night
+  crazy?: number;  // players with a crazy night
+  huge?: number;   // players with a huge night (not crazy)
   big?: number;    // players with a big night (not huge)
 };
 

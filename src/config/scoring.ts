@@ -48,6 +48,7 @@ export type ScoringConfig = {
     scenarioSwings: number; // weighted lead changes + ties for "Scenario"
     bigNight: number;       // efficiency for a "big night"
     hugeNight: number;      // efficiency for a "huge night"
+    crazyNight: number;     // efficiency for a "crazy night" (the button gets a flame)
   };
 };
 
@@ -64,7 +65,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
-  why: { scenarioPoints: 16, scenarioSwings: 16, bigNight: 37, hugeNight: 46 },
+  why: { scenarioPoints: 16, scenarioSwings: 16, bigNight: 37, hugeNight: 46, crazyNight: 56 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.

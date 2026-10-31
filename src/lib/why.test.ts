@@ -36,8 +36,8 @@ test('why: a big comeback gets Scenario, so do lead changes all game long', () =
 });
 
 test('why: big and huge nights are counted, never named', () => {
-  const why = whyOf({ ...flat, players: [player(50), player(48), player(40), player(30)] }); // example: 37 / 46
-  assert.deepEqual(why, { huge: 2, big: 1 });
-  assert.deepEqual(whyLabels(why!), ['Huge night ×2', 'Big night']);
+  const why = whyOf({ ...flat, players: [player(60), player(50), player(48), player(40), player(30)] }); // example: 37 / 46 / 56
+  assert.deepEqual(why, { crazy: 1, huge: 2, big: 1 });
+  assert.deepEqual(whyLabels(why!), ['Crazy night', 'Huge night ×2', 'Big night']);
   assert.deepEqual(whyLabels({ scenario: true, big: 2 }), ['Scenario', 'Big night ×2']);
 });
