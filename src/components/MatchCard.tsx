@@ -7,7 +7,7 @@
 import { useId, useState, type CSSProperties } from 'react';
 import { TEAMS, type Team } from '../config/teams.ts';
 import { cardColors, type Colors } from '../lib/colors.ts';
-import { whyChips } from '../lib/why.ts';
+import { whyChips, type WhyChip } from '../lib/why.ts';
 import type { GameState, PublicGame } from '../types/public.ts';
 
 const FALLBACK_TEAM: Team = { location: '', name: '?', primary: '#5C5A55', secondary: '#141414' };
@@ -73,46 +73,51 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   // whatever the result (otherwise the layout would spoil the winner).
   return (
     <>
-    <article className={classes.filter(Boolean).join(' ')} aria-label={label}>
-      <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
-      <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
-      {/* In progress: no block in the middle at all */}
-      {state !== 'live' && (
-        <div className="card__note" aria-hidden="true">
-          {state === 'rated' && (
-            <span className="card__note-value">
-              {game.note}
-              <span className="card__note-unit">%</span>
-            </span>
-          )}
-          {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
-        </div>
-      )}
-      {/* Only on the games with something to say: the card opens downwards, never a pop-up */}
-      {why.length > 0 && (
-        <button
-          type="button"
-          className="card__why-button"
-          aria-expanded={whyOpen}
-          aria-controls={whyId}
-          aria-label={`Why ${game.note}%?`}
-          onClick={() => setWhyOpen((o) => !o)}
-        >
-          ?
-        </button>
-      )}
-    </article>
-    {why.length > 0 && (
-      <div id={whyId} className="card__why" hidden={!whyOpen}>
-        <span className="card__why-lead" aria-hidden="true">Why</span>
-        <ul className="card__why-list" aria-label={`Why ${game.note}%`}>
-          {/* The individual nights are on fire: lightly, more, fully. Only for who opened the card. */}
-          {why.map(({ label, heat }) => (
-            <li className={heat ? `card__why-chip card__why-chip--${heat}` : 'card__why-chip'} key={label}>{label}</li>
-          ))}
-        </ul>
-      </div>
-    )}
+      <article className={classes.filter(Boolean).join(' ')} aria-label={label}>
+        <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
+        <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
+        {/* In progress: no block in the middle at all */}
+        {state !== 'live' && (
+          <div className="card__note" aria-hidden="true">
+            {state === 'rated' && (
+              <span className="card__note-value">
+                {game.note}
+                <span className="card__note-unit">%</span>
+              </span>
+            )}
+            {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
+          </div>
+        )}
+        {/* Only on the games with something to say: the card opens downwards, never a pop-up */}
+        {why.length > 0 && (
+          <button
+            type="button"
+            className="card__why-button"
+            aria-expanded={whyOpen}
+            aria-controls={whyId}
+            aria-label={`Why ${game.note}%?`}
+            onClick={() => setWhyOpen((o) => !o)}
+          >
+            ?
+          </button>
+        )}
+      </article>
+      {why.length > 0 && <WhyStrip id={whyId} open={whyOpen} note={game.note} chips={why} />}
     </>
+  );
+}
+
+// The strip under an opened card. The individual nights are on fire: lightly, more, fully.
+// Only who opened the card sees it.
+function WhyStrip({ id, open, note, chips }: { id: string; open: boolean; note?: number; chips: WhyChip[] }) {
+  return (
+    <div id={id} className="card__why" hidden={!open}>
+      <span className="card__why-lead" aria-hidden="true">Why</span>
+      <ul className="card__why-list" aria-label={`Why ${note}%`}>
+        {chips.map(({ label, heat }) => (
+          <li className={heat ? `card__why-chip card__why-chip--${heat}` : 'card__why-chip'} key={label}>{label}</li>
+        ))}
+      </ul>
+    </div>
   );
 }

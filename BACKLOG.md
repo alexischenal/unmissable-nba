@@ -59,6 +59,20 @@ Same method for each: simulate on the past season (`season-stats`), look at whic
 Left out: dunks and highlight plays (they follow the teams' style and measure clips, not games), records
 and milestones (context, not play), fights and ejections.
 
+## Evolutions
+
+- [x] **A "why" button on rated cards** (October 31). A small circled "?" at the top right of the percentage,
+  only on games with something to say; it opens a strip under the card (never a pop-up).
+  - **Scenario**, by rules: a tight finish or a big comeback ALWAYS get it (the same tests as step 1, checked
+    by a test); lead changes or spectacle points above a threshold add the other intense games.
+  - **Big / Huge / Crazy night**, counted (×2), never named. The chips are on fire, lightly to fully: only
+    who opened the strip sees it. The "?" itself stays plain.
+  - Never a name, a team, a number, or how the game ends (no "Overtime").
+  - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
+    config (`why.*`). Ratings published before October 31 have no "?".
+  - Known trade-off: Scenario reuses step 1's tests, so the public play-by-play could hint at those settings.
+  - To do maybe: one line in How it works ("Tap the ? next to a percentage…").
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
