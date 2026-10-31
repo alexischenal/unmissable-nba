@@ -197,15 +197,30 @@
     line-height: 1;
     cursor: pointer;
     transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    animation: why-ember 2.6s ease-in-out infinite alternate;
 
     @media (prefers-reduced-motion: reduce) {
       transition: none;
+      animation: none;
+      box-shadow: 0 0 6px 1px rgba(255, 140, 26, 0.5);
     }
   }
 
   .card__why-icon {
     width: 72%;
     height: 72%;
+    color: #ffb45c;
+    transform-origin: 50% 90%;
+    animation: why-flicker 1.3s ease-in-out infinite alternate;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .card__why-button[aria-expanded="true"] .card__why-icon,
+  .card__why-button:hover .card__why-icon {
+    color: #ff7a1a;
   }
 
   .card__why-button::before {
@@ -223,6 +238,38 @@
   .card__why-button:focus-visible {
     outline: 2px solid $white;
     outline-offset: 2px;
+  }
+}
+
+@keyframes why-ember {
+  from {
+    box-shadow: 0 0 4px 0 rgba(255, 140, 26, 0.35);
+  }
+
+  to {
+    box-shadow: 0 0 10px 2px rgba(255, 150, 40, 0.65), 0 -3px 8px 0 rgba(255, 80, 20, 0.35);
+  }
+}
+
+@keyframes why-flicker {
+  0% {
+    scale: 1 1;
+    filter: brightness(1);
+  }
+
+  40% {
+    scale: 0.96 1.06;
+    filter: brightness(1.2);
+  }
+
+  70% {
+    scale: 1.02 0.97;
+    filter: brightness(0.92);
+  }
+
+  100% {
+    scale: 0.98 1.04;
+    filter: brightness(1.12);
   }
 }
 
