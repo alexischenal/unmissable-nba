@@ -203,6 +203,11 @@
     }
   }
 
+  .card__why-icon {
+    width: 72%;
+    height: 72%;
+  }
+
   .card__why-button::before {
     content: "";
     position: absolute;

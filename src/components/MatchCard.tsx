@@ -133,7 +133,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
             aria-label={`Why ${game.note}%?`}
             onClick={() => setWhyOpen((o) => !o)}
           >
-            ?
+            <svg className="card__why-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
           </button>
         )}
       </article>
