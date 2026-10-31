@@ -29,6 +29,15 @@ test('why: a "scenario" key from an older night is ignored', () => {
   assert.deepEqual(whyLabels({ scenario: true, big: 2 }), ['Big performance ×2']);
 });
 
+test('why: a big scoring night is a big night, even with a low efficiency', () => {
+  // 44 points on 16/40 with 6 turnovers: efficiency well under the example big night (37), 44 ≥ 41 points
+  const scorer: PlayerLine = { ...player(0), pts: 44, fgm: 16, fga: 40, ftm: 8, fta: 8, tov: 6 };
+  assert.deepEqual(whyOf({ ...flat, players: [scorer] }), { big: 1 });
+  // Never above big on points alone, never counted twice
+  assert.deepEqual(whyOf({ ...flat, players: [{ ...player(60), pts: 60 }] }), { crazy: 1 });
+  assert.equal(whyOf({ ...flat, players: [{ ...scorer, pts: 40 }] }), undefined);
+});
+
 test('why: big and huge nights are counted, never named', () => {
   const why = whyOf({ ...flat, players: [player(60), player(50), player(48), player(40), player(30)] }); // example: 37 / 46 / 56
   assert.deepEqual(why, { crazy: 1, huge: 2, big: 1 });

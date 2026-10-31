@@ -24,7 +24,11 @@ import type { Game, PlayerLine } from '../src/types/game.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
-type Row = { g: CachedGame; note: number; effs: number[]; best: number };
+type Row = { g: CachedGame; note: number; effs: number[]; best: number; maxPts: number };
+
+// The flame at an efficiency threshold, with the points rule of the big nights (src/lib/why.ts)
+const litLine = (p: PlayerLine, at: number) => efficiency(p) >= at || p.pts >= SCORING.why.bigPoints;
+const litGame = (r: Row, at: number) => r.best >= at || r.maxPts >= SCORING.why.bigPoints;
 
 const THRESHOLDS = [32, 34, 36, 38, 40, 42, 45, 50];
 
@@ -46,12 +50,12 @@ function thresholdTable(rows: Row[], nights: Map<string, Row[]>): void {
   const hundred = rows.filter((r) => r.note >= 100);
   const tops = [...nights.values()].map((games) => [...games].sort((a, b) => b.note - a.note)[0]!);
   for (const t of THRESHOLDS) {
-    const lit = (r: Row) => r.best >= t;
+    const lit = (r: Row) => litGame(r, t);
     const empty = [...nights.values()].filter((games) => !games.some(lit)).length;
     const perNight = rows.filter(lit).length / nights.size;
     console.log(
       `  ${String(t).padStart(5)}   ${pct(rows.filter(lit).length, rows.length).padStart(5)}   ${n1(perNight).padStart(9)}   ` +
-      `${pct(empty, nights.size).padStart(10)}   ${pct(rows.filter((r) => r.effs.filter((e) => e >= t).length >= 2).length, rows.length).padStart(9)}   ` +
+      `${pct(empty, nights.size).padStart(10)}   ${pct(rows.filter((r) => r.g.players.filter((p) => litLine(p, t)).length >= 2).length, rows.length).padStart(9)}   ` +
       `${pct(high.filter(lit).length, high.length).padStart(7)}   ${pct(low.filter(lit).length, low.length).padStart(9)}   ` +
       `${pct(hundred.filter(lit).length, hundred.length).padStart(7)}   ${pct(tops.filter(lit).length, tops.length).padStart(17)}`,
     );
@@ -64,7 +68,7 @@ function nightsReport(nights: Map<string, Row[]>, at: number): void {
   const counts = new Map<number, number>();
   const shares: number[] = [];
   for (const games of nights.values()) {
-    const lit = games.filter((r) => r.best >= at).length;
+    const lit = games.filter((r) => litGame(r, at)).length;
     counts.set(Math.min(lit, 5), (counts.get(Math.min(lit, 5)) ?? 0) + 1);
     if (games.length >= 5) shares.push(lit / games.length);
   }
@@ -95,18 +99,18 @@ function concentration(rows: Row[], at: number): void {
     for (const abbr of [r.g.home, r.g.away]) {
       const t = teams.get(abbr) ?? { lit: 0, games: 0 };
       t.games++;
-      if (r.g.players.some((p) => teamOf(r.g, p) === abbr && efficiency(p) >= at)) t.lit++;
+      if (r.g.players.some((p) => teamOf(r.g, p) === abbr && litLine(p, at))) t.lit++;
       teams.set(abbr, t);
     }
     for (const p of r.g.players) {
       if (!p.name) continue;
       const x = players.get(p.name) ?? { team: teamOf(r.g, p), lit: 0, games: 0 };
       x.games++;
-      if (efficiency(p) >= at) x.lit++;
+      if (litLine(p, at)) x.lit++;
       players.set(p.name, x);
     }
   }
-  const litLines = rows.reduce((s, r) => s + r.effs.filter((e) => e >= at).length, 0);
+  const litLines = rows.reduce((s, r) => s + r.g.players.filter((p) => litLine(p, at)).length, 0);
   const top = [...players.entries()].filter(([, x]) => x.lit > 0).sort((a, b) => b[1].lit - a[1].lit);
   console.log(`  ${top.length} different players, ${litLines} lines. Top 12:`);
   let cumul = 0;
@@ -141,14 +145,14 @@ function borderline(rows: Row[], at: number): void {
 
 // The big scoring nights the efficiency leaves out: a player who had to shoot a lot to carry his team
 function scoringNights(rows: Row[], at: number): void {
-  title(`Big scoring nights and the flame at ${at}+`);
+  title(`Big scoring nights and the efficiency at ${at}+ alone (without the ${SCORING.why.bigPoints}-point rule)`);
   const lines = rows.flatMap((r) => r.g.players.map((p) => ({ r, p, e: efficiency(p) })));
   for (const min of [35, 40, 45, 50]) {
     const x = lines.filter((l) => l.p.pts >= min);
     console.log(`  ${min}+ points: ${String(x.length).padStart(3)} lines, ${pct(x.filter((l) => l.e >= at).length, x.length).padStart(4)} with the flame`);
   }
   const missed = lines.filter((l) => l.p.pts >= 40 && l.e < at).sort((a, b) => b.p.pts - a.p.pts);
-  console.log(`  40+ points without the flame (${missed.length}):`);
+  console.log(`  40+ points under ${at} of efficiency (${missed.length}):`);
   for (const l of missed.slice(0, 25)) {
     console.log(`    ${(l.p.name ?? '?').padEnd(24)} eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
   }
@@ -161,9 +165,9 @@ function playerNights(rows: Row[], name: string, at: number): void {
     console.log('  no game found under this name (check the spelling, accents included)');
     return;
   }
-  console.log(`  ${lines.length} games, ${lines.filter((l) => l.e >= at).length} with the flame at ${at}+`);
+  console.log(`  ${lines.length} games, ${lines.filter((l) => litLine(l.p, at)).length} with the flame at ${at}+`);
   for (const l of [...lines].sort((a, b) => b.p.pts - a.p.pts).slice(0, 12)) {
-    console.log(`    ${l.e >= at ? 'flame' : '     '}  eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
+    console.log(`    ${litLine(l.p, at) ? 'flame' : '     '}  eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
   }
 }
 
@@ -195,12 +199,13 @@ async function main(): Promise<void> {
       v2++;
     }
     const effs = g.players.map(efficiency);
-    rows.push({ g, note: displayScore(g), effs, best: Math.max(0, ...effs) });
+    rows.push({ g, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)) });
   }
   const nights = new Map<string, Row[]>();
   for (const r of rows) nights.set(r.g.date ?? '?', [...(nights.get(r.g.date ?? '?') ?? []), r]);
 
   console.log(`Flame study, ${season}: ${rows.length} games (${v2} rated with the play-by-play), focus on ${at}+`);
+  console.log(`The flame: efficiency at the threshold, or ${SCORING.why.bigPoints}+ points (setting why.bigPoints).`);
   distribution(rows);
   thresholdTable(rows, nights);
   nightsReport(nights, at);

@@ -55,6 +55,10 @@ Same method for each: simulate on the past season (`season-stats`), look at whic
 5. **Shooting rather than points.** Offense counts points, not quality: a slow, well-played game gets
    nothing, a high-scoring game full of bricks gets the full share. Both teams' shooting (true shooting,
    from the box score) would measure "nobody could score" whatever the pace.
+6. **A big night relative to the player.** Efficiency treats every player the same, so a regular night of
+   the best all-around players crosses the flame's threshold (last season: Jokić lit it in half his games,
+   Denver in 61% of theirs). A threshold relative to the player's own season would fix it, but needs each
+   player's history, and would touch the rating too.
 
 Left out: dunks and highlight plays (they follow the teams' style and measure clips, not games), records
 and milestones (context, not play), fights and ejections.
@@ -67,6 +71,10 @@ and milestones (context, not play), fights and ejections.
   - **Big / Huge / Crazy performance**, counted (×2), never named. The chips glow, lightly to fully, without
     moving (blinking was too much with several strips open): only who opened the strip sees the level. Only the
     flame button moves.
+  - **40 points is a big night** (October 31), whatever the efficiency (setting `why.bigPoints`): a scorer who
+    had to take every shot still had a big night. Big tier only, and the flame only: the rating doesn't change.
+    Last season, efficiency alone missed 36 nights of 40 to 44 points (45+ were all lit); Curry's four 42+
+    nights all had the flame.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
     config (`why.*`). Ratings published before October 31 have no "?".

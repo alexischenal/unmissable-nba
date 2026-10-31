@@ -277,7 +277,7 @@ function comebackBonusReport(games: CachedGame[], late: Map<string, NonNullable<
 // The flame on the cards (src/lib/why.ts), with the settings in use: how often, and why.
 function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late']>>): void {
   const w = SCORING.why;
-  title(`Why — the flame on the cards (big ${w.bigNight}, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
+  title(`Why — the flame on the cards (big ${w.bigNight} or ${w.bigPoints} pts, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
   const rows = games.map((g0) => {
     const g = late.has(g0.id) ? { ...g0, late: late.get(g0.id)! } : g0;
     return { note: displayScore(g), why: whyOf(g) };

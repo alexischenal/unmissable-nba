@@ -44,6 +44,7 @@ export type ScoringConfig = {
   // The "why" indicators on the cards (src/lib/why.ts): the individual nights, by efficiency
   why: {
     bigNight: number;       // efficiency for a "big night"
+    bigPoints: number;      // …or this many points, whatever the efficiency (a scorer carrying his team)
     hugeNight: number;      // efficiency for a "huge night"
     crazyNight: number;     // efficiency for a "crazy night" (the button gets a flame)
   };
@@ -62,7 +63,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
-  why: { bigNight: 37, hugeNight: 46, crazyNight: 56 },
+  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.
