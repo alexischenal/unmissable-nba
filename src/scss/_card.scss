@@ -196,6 +196,11 @@
     font-size: calc(var(--why-size) * 0.6);
     line-height: 1;
     cursor: pointer;
+    transition: background-color 0.15s ease-out, color 0.15s ease-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   .card__why-button::before {
@@ -204,9 +209,15 @@
     inset: -12px;
   }
 
-  .card__why-button[aria-expanded="true"] {
+  .card__why-button[aria-expanded="true"],
+  .card__why-button:hover {
     background: $bg;
     color: $ink;
+  }
+
+  .card__why-button:focus-visible {
+    outline: 2px solid $bg;
+    outline-offset: 2px;
   }
 }
 
