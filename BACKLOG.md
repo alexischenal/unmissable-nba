@@ -75,7 +75,7 @@ and milestones (context, not play), fights and ejections.
     ignored by the cards. The secret's `why.scenarioPoints` and `why.scenarioSwings` are no longer read.
   - **A flame instead of the "?"** (October 31). The button now only means "a big night", so it says so; a bigger
     pastille at every size. The pastille is on fire like the Crazy chip (gradient and glow, the flame itself stays still), the same
-    for Big, Huge and Crazy: the level only shows once opened. One line in Good
+    for Big, Huge and Crazy: the level only shows once opened. No hover effect: the fire stays as it is. One line in Good
     to know (How it works) explains it.
 
 ## Next up — Monday
