@@ -11,9 +11,9 @@ export type PublicGame = {
   why?: Why; // where the rating comes from, shown under the "?" of a rated card
 };
 
-// Never a name, a team, a number or how the game ends: only what kind of game it was.
+// Never a name, a team or a number: only how many players had a big night.
 export type Why = {
-  scenario?: true; // the story of the game: a tight finish, a big comeback, lead changes…
+  scenario?: true; // no longer written (nights rated before November 1), ignored by the cards
   crazy?: number;  // players with a crazy night
   huge?: number;   // players with a huge night (not crazy)
   big?: number;    // players with a big night (not huge)

@@ -242,7 +242,7 @@ async function main(): Promise<void> {
     // Demo only: the best game shows every "why" chip at once (the three performance flames),
     // whatever the settings. Never on a real night.
     const [first, ...rest] = night.games;
-    const games = first ? [{ ...first, why: { scenario: true as const, crazy: 1, huge: 1, big: 1 } }, ...rest] : rest;
+    const games = first ? [{ ...first, why: { crazy: 1, huge: 1, big: 1 } }, ...rest] : rest;
     await save({ ...night, date: DEMO_DATE, games }, { latest: false });
     console.log(`Open the site with ?date=${DEMO_DATE}`);
     return;
