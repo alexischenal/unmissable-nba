@@ -35,13 +35,18 @@ export function whyOf(g: Game): Why | undefined {
   return Object.keys(why).length ? why : undefined;
 }
 
-// The chips, in display order: "Scenario", "Crazy night", "Huge night ×2", "Big night"
-export function whyLabels(why: Why): string[] {
+export type WhyChip = { label: string; heat?: 'big' | 'huge' | 'crazy' };
+
+// The chips, in display order: "Scenario", "Crazy night", "Huge night ×2", "Big night".
+// The nights carry a heat level: the card shows them on fire, lightly to fully.
+export function whyChips(why: Why): WhyChip[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [
-    ...(why.scenario ? ['Scenario'] : []),
-    ...(why.crazy ? [`Crazy night${times(why.crazy)}`] : []),
-    ...(why.huge ? [`Huge night${times(why.huge)}`] : []),
-    ...(why.big ? [`Big night${times(why.big)}`] : []),
+    ...(why.scenario ? [{ label: 'Scenario' }] : []),
+    ...(why.crazy ? [{ label: `Crazy night${times(why.crazy)}`, heat: 'crazy' as const }] : []),
+    ...(why.huge ? [{ label: `Huge night${times(why.huge)}`, heat: 'huge' as const }] : []),
+    ...(why.big ? [{ label: `Big night${times(why.big)}`, heat: 'big' as const }] : []),
   ];
 }
+
+export const whyLabels = (why: Why): string[] => whyChips(why).map((c) => c.label);
