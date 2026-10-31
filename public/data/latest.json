@@ -9,13 +9,14 @@
       "note": 6
     },
     {
-      "away": "CHI",
-      "home": "BOS",
-      "tipOff": "2026-10-30T23:30:00Z"
-    },
-    {
       "away": "DET",
       "home": "BKN",
+      "tipOff": "2026-10-30T23:30:00Z",
+      "note": 6
+    },
+    {
+      "away": "CHI",
+      "home": "BOS",
       "tipOff": "2026-10-30T23:30:00Z"
     },
     {
