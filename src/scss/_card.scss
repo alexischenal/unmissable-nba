@@ -280,6 +280,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px var(--stripe);
   background: $ink;
@@ -297,13 +298,10 @@
     letter-spacing: 0.1em;
   }
 
-  .card__why-lead {
-    color: $muted-on-dark;
-  }
-
   .card__why-list {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: inherit;
     margin: 0;
     padding: 0;

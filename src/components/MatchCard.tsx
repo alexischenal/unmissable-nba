@@ -156,7 +156,6 @@ type WhyStripProps = {
 function WhyStrip({ ref, id, open, note, chips, onClick }: WhyStripProps) {
   return (
     <div ref={ref} id={id} className="card__why" hidden={!open} onClick={onClick}>
-      <span className="card__why-lead" aria-hidden="true">Why</span>
       <ul className="card__why-list" aria-label={`Why ${note}%`}>
         {chips.map(({ label, heat }) => (
           <li className={heat ? `card__why-chip card__why-chip--${heat}` : 'card__why-chip'} key={label}>{label}</li>
