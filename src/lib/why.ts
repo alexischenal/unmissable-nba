@@ -1,5 +1,5 @@
 // src/lib/why.ts
-// The "why" indicators of a rated game: shown under the "?" next to its percentage.
+// The "why" indicators of a rated game: shown under the flame next to its percentage.
 // Only the individual nights, never a name, a team or a number. Nothing about the story of the game
 // (comeback, close finish, lead changes…): knowing which one counted would tell the whole story.
 
@@ -27,7 +27,7 @@ export type WhyChip = { label: string; heat?: 'big' | 'huge' | 'crazy' };
 
 // The chips, in display order: "Crazy performance", "Huge performance ×2", "Big performance".
 // Each carries a heat level: the card shows them on fire, lightly to fully. A "scenario" key (nights rated
-// before November 1) is ignored: those cards only keep their "?" when they had a performance.
+// before November 1) is ignored: those cards only keep their flame when they had a performance.
 export function whyChips(why: Why): WhyChip[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [

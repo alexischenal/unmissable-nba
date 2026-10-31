@@ -97,7 +97,7 @@ function explain(g: Game, notes: Notes = {}): void {
     : `min(${s.blowoutMax}, ${n1(competitivenessPoints(g))} + ${n1(perfs)})`;
   console.log(`Rating: ${base} = ${n1(raw)} → ${displayScore(g)}`);
   const why = whyOf(g);
-  console.log(`Why (the card's "?"): ${why ? whyLabels(why).join(' · ') : 'nothing, no "?" on this card'}`);
+  console.log(`Why (the card's flame): ${why ? whyLabels(why).join(' · ') : 'nothing, no flame on this card'}`);
 }
 
 // A night of a past season, from the box scores (and play-by-play) cached by season-stats.

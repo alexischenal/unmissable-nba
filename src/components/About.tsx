@@ -32,6 +32,9 @@ export function About() {
         Long story short: monster performances in close games are unmissable. You won't miss those if you check
         here before picking a replay.
       </p>
+      <p className="article__text">
+        A flame next to a percentage means somebody had a big night. Tap it to see how big. Never who.
+      </p>
 
       <h2 className="article__subtitle">Good to know</h2>
       <p className="article__text">
