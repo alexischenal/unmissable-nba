@@ -1,0 +1,55 @@
+@use "variables" as *;
+@use "mixins" as *;
+
+.article {
+  max-width: calc(800px + 2 * var(--stripe));
+  padding: 0 var(--stripe) 56px;
+
+  .article__title {
+    @include section-heading;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .article__subtitle {
+    margin: 36px 0 10px;
+    font-family: $font-text;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .article__text {
+    margin: 0 0 14px;
+    font-family: $font-body;
+    font-size: 18px;
+    line-height: 1.6;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 17px;
+    }
+  }
+
+  .article__link {
+    color: inherit;
+    text-underline-offset: 0.15em;
+  }
+
+  .article__promise {
+    margin-top: 28px;
+    font-weight: 600;
+  }
+
+  .article__figure {
+    margin: 24px 0 0;
+  }
+
+  .article__image {
+    display: block;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+  }
+}

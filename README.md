@@ -107,7 +107,7 @@ On the site, a card has three states, computed at page load: **upcoming** (the t
 time zone and format), **live** (no block in the middle, under an "In progress" heading), **rated**. Rated games come first, best first.
 A 100 is featured right away; otherwise the best game is featured once the whole night is rated.
 
-**Pre-launch:** the site carries a `noindex` meta tag and a blocking `robots.txt`. At launch, remove the meta tag in `index.html` and allow crawling in `public/robots.txt`.
+**Search engines:** `public/robots.txt` allows crawling and points to `public/sitemap.xml` (the four pages).
 
 ## About the NBA data
 

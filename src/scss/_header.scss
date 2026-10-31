@@ -1,4 +1,5 @@
 @use "variables" as *;
+@use "mixins" as *;
 
 $brand-size: 40px;
 $brand-size-tablet: 32px;
@@ -131,6 +132,15 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
+  .header__section {
+    margin-left: 0.5em;
+    font-size: 0.5em;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 0.6em;
+    }
+  }
+
   .header__home {
     color: inherit;
     text-decoration: none;
@@ -142,7 +152,7 @@ $burger-gap: $gap-ratio * 1em;
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: $muted;
+    color: $white;
   }
 
   @media (max-width: $breakpoint-mobile) {
@@ -166,31 +176,8 @@ $burger-gap: $gap-ratio * 1em;
   }
 
   .header__link {
-    position: relative;
+    @include underline-link;
     color: $white;
-    text-decoration: none;
-  }
-
-  .header__link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0.18em;
-    bottom: -4px;
-    height: 1px;
-    background-color: currentColor;
-    transform-origin: bottom right;
-    transition: transform 0.25s ease-out;
-  }
-
-  .header__link:hover::after {
-    transform: scaleX(0);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .header__link::after {
-      transition: none;
-    }
   }
 
   .header__heading {

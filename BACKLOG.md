@@ -36,6 +36,29 @@ Not decided. Possible changes, and what each one does.
     blowouts turned into close games (some from 4 to 72). Any small early deficit erased now counted.
 - **Kept as it is.** To check again later, the leak is the number to watch.
 
+## Algorithm evolutions
+
+New ingredients, from the play-by-play, only what happened on the court. Changing the algorithm during
+the season is fine: nights aren't compared across a season, and published ratings stay as they are.
+Same method for each: simulate on the past season (`season-stats`), look at which games move, then decide.
+
+1. **A game decided in the last seconds** (to try first). Today a lead change with 4:30 left weighs the
+   same as a game-winner at the buzzer: both are in the last-5-minutes window. Measure it from the last lead
+   change or tie in the final 24 seconds, or a one-possession margin on the last possession. Says the
+   ending was wild, not who won: no leak.
+2. **Several overtimes.** Suspense is capped by the clutch time, so a double or triple overtime earns about
+   as much as a single one. A small bonus from the second overtime on.
+3. **When the comeback happened.** Erasing a big deficit in the fourth is worth more than in the second;
+   today only the size of the loser's biggest lead counts. Weight it by moment, like lead changes.
+4. **Scoring runs.** An 18-0 that turns a close game around is partly covered by comeback and lead
+   changes, but not when the game stays close.
+5. **Shooting rather than points.** Offense counts points, not quality: a slow, well-played game gets
+   nothing, a high-scoring game full of bricks gets the full share. Both teams' shooting (true shooting,
+   from the box score) would measure "nobody could score" whatever the pace.
+
+Left out: dunks and highlight plays (they follow the teams' style and measure clips, not games), records
+and milestones (context, not play), fights and ejections.
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
@@ -127,9 +150,8 @@ Not decided. Possible changes, and what each one does.
      risky): the realistic option is only to stop adding the line from now on.
    - The "main branch isn't protected" banner: harmless for a personal project, dismiss it.
 7. **High priority — accessibility (audit of October 21: axe-core, keyboard, structure).**
-   - [ ] **Header label contrast**: "Night of…" / "Next night" is `$muted` (`#5c5a55`) on black: **3.04:1**, 4.5 needed
-     at 13px. Use a lighter grey in the header only (`$muted` stays right on the light page): `#7a776f` (4.7:1,
-     closest to today) or `#86837b` (5.55:1, more comfortable). To pick.
+   - [x] **Header label contrast**: "Night of…" / "Next night" was `$muted` (`#5c5a55`) on black, 3.04:1. Now white
+     (October 29): 21:1.
    - [ ] **City name on some reds: 4.34:1** (4.5 needed, small text): white on ATL/POR `#E03A3E`, and on the Sixers'
      red when they switch colors (PHI@NYK). Team names (large text) pass. Fixing means darkening those reds very
      slightly, away from the official colors: decide whether the 0.16 gap is worth it.
@@ -522,6 +544,7 @@ because of their Paris tip-off times. Same night, two days. Unmissable groups by
 
 ## Launch
 
-- Remove the `noindex` meta in `index.html` and allow crawling in `public/robots.txt`.
+- [x] Open to search engines (October 29): no `noindex`, `robots.txt` allows crawling, `sitemap.xml` with the four pages.
+  Next: a title and description per page, written at build time; How it works pre-rendered in the HTML.
 - README for the portfolio: screenshot, the zero-spoiler architecture, the adapter, the two-step algorithm,
   and how it differs from Thuuz (2014 app that rated game excitement live; Unmissable is for the morning after).
