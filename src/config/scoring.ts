@@ -41,6 +41,15 @@ export type ScoringConfig = {
   };
   // Scenario: lead changes and ties weighted by when they happened (replaces the plain count)
   swings: { fullAt: number; q1: number; q2: number; q3: number; q4: number; late: number };
+  // The "why" indicators on the cards (src/lib/why.ts). A tight finish or a big comeback always gets
+  // "Scenario"; these thresholds add the other intense games, and the individual nights.
+  why: {
+    scenarioPoints: number; // spectacle points (suspense + scenario + comeback + offense) for "Scenario"
+    scenarioSwings: number; // weighted lead changes + ties for "Scenario"
+    bigNight: number;       // efficiency for a "big night"
+    hugeNight: number;      // efficiency for a "huge night"
+    crazyNight: number;     // efficiency for a "crazy night" (the button gets a flame)
+  };
 };
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
@@ -56,6 +65,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
+  why: { scenarioPoints: 16, scenarioSwings: 16, bigNight: 37, hugeNight: 46, crazyNight: 56 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.

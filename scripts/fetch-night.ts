@@ -28,6 +28,7 @@ import {
   competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
 import { loadScoring } from './load-scoring.ts';
+import { whyOf } from '../src/lib/why.ts';
 import type { Game } from '../src/types/game.ts';
 import type { RawSchedule } from './nba/types.ts';
 import { nightIsComplete, type NightJson } from '../src/types/public.ts';
@@ -97,7 +98,8 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
 
     const rated = alreadyRated.get(label);
     if (rated) {
-      entries.push({ ...base, note: rated.note });
+      // Published once, never recalculated: the rating and its "why" stay as they were
+      entries.push({ ...base, note: rated.note, ...(rated.why ? { why: rated.why } : {}) });
       continue;
     }
     if (base.tipOff && Date.parse(base.tipOff) > now) {
@@ -159,7 +161,8 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
       console.warn(`${label}: no complete play-by-play, rated with v1.`);
     }
     logRated(game, buzzer, now);
-    entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)) });
+    const why = whyOf(game);
+    entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)), ...(why ? { why } : {}) });
   }
 
   return { version: 2, date, games: orderGames(previous, entries) };
@@ -173,7 +176,10 @@ async function fixtureNight(): Promise<NightJson> {
   ]);
   const games = [sasAtDen, wasAtMia, detAtPhi];
   games.forEach((g) => logRated(g, null, Date.now()));
-  const entries = games.map((g) => ({ away: g.away, home: g.home, note: displayScore(g), raw: round1(rawScore(g)) }));
+  const entries = games.map((g) => {
+    const why = whyOf(g);
+    return { away: g.away, home: g.home, note: displayScore(g), raw: round1(rawScore(g)), ...(why ? { why } : {}) };
+  });
   return { version: 2, date: '2026-04-04', games: orderGames([], entries) };
 }
 
