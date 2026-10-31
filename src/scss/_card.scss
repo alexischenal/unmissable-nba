@@ -138,7 +138,7 @@
     align-items: center;
     justify-content: center;
     background: $ink;
-    border: 2px solid $bg;
+    border: 2px solid $white;
     border-radius: 4px;
   }
 
@@ -148,7 +148,7 @@
     font-size: var(--note-size);
     line-height: 1;
     font-variant-numeric: tabular-nums;
-    color: $bg;
+    color: $white;
     position: relative;
     top: 0.02em;
 
@@ -187,15 +187,20 @@
     width: var(--why-size);
     height: var(--why-size);
     padding: 0;
-    border: 1.5px solid $bg;
+    border: 1.5px solid $white;
     border-radius: 50%;
     background: $ink;
-    color: $bg;
+    color: $white;
     font-family: $font-text;
     font-weight: 600;
     font-size: calc(var(--why-size) * 0.6);
     line-height: 1;
     cursor: pointer;
+    transition: background-color 0.15s ease-out, color 0.15s ease-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   .card__why-button::before {
@@ -204,9 +209,15 @@
     inset: -12px;
   }
 
-  .card__why-button[aria-expanded="true"] {
-    background: $bg;
+  .card__why-button[aria-expanded="true"],
+  .card__why-button:hover {
+    background: $white;
     color: $ink;
+  }
+
+  .card__why-button:focus-visible {
+    outline: 2px solid $white;
+    outline-offset: 2px;
   }
 }
 
@@ -261,7 +272,7 @@
   gap: 10px;
   padding: 14px var(--stripe);
   background: $ink;
-  color: $bg;
+  color: $white;
   font-family: $font-text;
   font-weight: 600;
   font-size: 14px;
@@ -290,7 +301,7 @@
 
   .card__why-chip {
     padding: 5px 12px 4px;
-    border: 1px solid $bg;
+    border: 1px solid $white;
     border-radius: 999px;
 
     @media (max-width: $breakpoint-mobile) {
