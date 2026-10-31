@@ -8,6 +8,14 @@ export type PublicGame = {
   tipOff?: string; // ISO time in UTC (version 2). Missing in version 1 files.
   note?: number; // displayed rating, 0 to 100 — only once the game is over
   // No raw rating here (some files from October 20, 2026 had one): see scripts/nba/order.ts.
+  why?: Why; // where the rating comes from, shown under the "?" of a rated card
+};
+
+// Never a name, a team, a number or how the game ends: only what kind of game it was.
+export type Why = {
+  scenario?: true; // the story of the game: a tight finish, a big comeback, lead changes…
+  huge?: number;   // players with a huge night
+  big?: number;    // players with a big night (not huge)
 };
 
 export type NightJson = {

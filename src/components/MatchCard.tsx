@@ -2,11 +2,12 @@
 // One game: away team on the left, home team on the right, and in the middle:
 //   - upcoming → the tip-off time, in the visitor's own time zone and format;
 //   - live     → nothing in the middle;
-//   - rated    → the rating.
+//   - rated    → the rating, and a "?" when there's something to say about it (src/lib/why.ts).
 
-import type { CSSProperties } from 'react';
+import { useId, useState, type CSSProperties } from 'react';
 import { TEAMS, type Team } from '../config/teams.ts';
 import { cardColors, type Colors } from '../lib/colors.ts';
+import { whyLabels } from '../lib/why.ts';
 import type { GameState, PublicGame } from '../types/public.ts';
 
 const FALLBACK_TEAM: Team = { location: '', name: '?', primary: '#5C5A55', secondary: '#141414' };
@@ -53,6 +54,9 @@ function TipOff({ iso }: { iso: string }) {
 type MatchCardProps = { game: PublicGame; state: GameState; rank: number; featured: boolean };
 
 export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
+  const [whyOpen, setWhyOpen] = useState(false);
+  const whyId = useId();
+  const why = state === 'rated' && game.why ? whyLabels(game.why) : [];
   const away = teamFor(game.away);
   const home = teamFor(game.home);
   // Two teams with the same color (PHI and NYK): one switches, so the diagonal stays visible
@@ -68,6 +72,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   // Fixed order and symmetric styling: away on the left, home on the right,
   // whatever the result (otherwise the layout would spoil the winner).
   return (
+    <>
     <article className={classes.filter(Boolean).join(' ')} aria-label={label}>
       <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
       <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
@@ -83,6 +88,28 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
           {state === 'upcoming' && game.tipOff && <TipOff iso={game.tipOff} />}
         </div>
       )}
+      {/* Only on the games with something to say: the card opens downwards, never a pop-up */}
+      {why.length > 0 && (
+        <button
+          type="button"
+          className="card__why-button"
+          aria-expanded={whyOpen}
+          aria-controls={whyId}
+          aria-label={`Why ${game.note}%?`}
+          onClick={() => setWhyOpen((o) => !o)}
+        >
+          ?
+        </button>
+      )}
     </article>
+    {why.length > 0 && (
+      <div id={whyId} className="card__why" hidden={!whyOpen}>
+        <span className="card__why-lead" aria-hidden="true">Why</span>
+        <ul className="card__why-list" aria-label={`Why ${game.note}%`}>
+          {why.map((label) => <li className="card__why-chip" key={label}>{label}</li>)}
+        </ul>
+      </div>
+    )}
+    </>
   );
 }

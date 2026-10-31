@@ -19,6 +19,7 @@ import { lateFrom, readPlayByPlay, timelineMatches, type RawPlayByPlay, type Tim
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
+import { whyLabels, whyOf } from '../src/lib/why.ts';
 import {
   closeByClutch, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
   loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore,
@@ -95,6 +96,8 @@ function explain(g: Game, notes: Notes = {}): void {
   const base = disputed ? `${disputedBaseFor(g)} + ${n1(competitivenessPoints(g))} + ${n1(perfs)}`
     : `min(${s.blowoutMax}, ${n1(competitivenessPoints(g))} + ${n1(perfs)})`;
   console.log(`Rating: ${base} = ${n1(raw)} → ${displayScore(g)}`);
+  const why = whyOf(g);
+  console.log(`Why (the card's "?"): ${why ? whyLabels(why).join(' · ') : 'nothing, no "?" on this card'}`);
 }
 
 // A night of a past season, from the box scores (and play-by-play) cached by season-stats.

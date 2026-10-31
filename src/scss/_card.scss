@@ -173,6 +173,89 @@
     font-size: 0.35em;
     vertical-align: baseline;
   }
+
+  .card__why-button {
+    position: absolute;
+    left: calc(50% + var(--note-w) / 2);
+    top: calc(50% - var(--note-h) / 2);
+    translate: -50% -50%;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1.5px solid $bg;
+    border-radius: 50%;
+    background: $ink;
+    color: $bg;
+    font-family: $font-text;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+
+    @media (max-width: $breakpoint-mobile) {
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+    }
+  }
+
+  .card__why-button::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+  }
+
+  .card__why-button[aria-expanded="true"] {
+    background: $bg;
+    color: $ink;
+  }
+}
+
+.card__why {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px var(--stripe);
+  background: $ink;
+  color: $bg;
+  font-family: $font-text;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  @media (max-width: $breakpoint-mobile) {
+    gap: 8px;
+    padding: 10px var(--stripe);
+    font-size: 12px;
+  }
+
+  .card__why-lead {
+    color: $muted-on-dark;
+  }
+
+  .card__why-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: inherit;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card__why-chip {
+    padding: 5px 12px 4px;
+    border: 1px solid $bg;
+    border-radius: 999px;
+  }
+}
+
+.card__why[hidden] {
+  display: none;
 }
 
 .card--featured {
