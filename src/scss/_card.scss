@@ -187,12 +187,12 @@
     width: var(--why-size);
     height: var(--why-size);
     padding: 0;
-    border: 1.5px solid $white;
+    border: 0;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 80%, #ffcf4a 0%, #ff7a1a 50%, #c8241b 100%);
     color: $white;
     cursor: pointer;
-    transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    transition: scale 0.15s ease-out, filter 0.15s ease-out;
     animation: why-ember 1.8s ease-in-out infinite alternate;
 
     @media (prefers-reduced-motion: reduce) {
@@ -208,12 +208,6 @@
     filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.5));
   }
 
-  .card__why-button[aria-expanded="true"] .card__why-icon,
-  .card__why-button:hover .card__why-icon {
-    color: #ff7a1a;
-    filter: none;
-  }
-
   .card__why-button::before {
     content: "";
     position: absolute;
@@ -222,8 +216,8 @@
 
   .card__why-button[aria-expanded="true"],
   .card__why-button:hover {
-    background: $white;
-    color: $ink;
+    scale: 1.1;
+    filter: brightness(1.12);
   }
 
   .card__why-button:focus-visible {
