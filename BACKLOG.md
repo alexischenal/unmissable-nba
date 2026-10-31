@@ -59,6 +59,21 @@ Same method for each: simulate on the past season (`season-stats`), look at whic
 Left out: dunks and highlight plays (they follow the teams' style and measure clips, not games), records
 and milestones (context, not play), fights and ejections.
 
+## Evolutions
+
+- **A "why" button on rated cards.** A small circled "?" under the percentage; it expands the card in
+  height (better than a pop-up on phones) and shows where the rating comes from. Only two indicators:
+  - **Scenario**: the story of the game was strong (the spectacle points as a whole). It never says which
+    ingredient (comeback, clutch, lead changes, shootout): no hint at how the game unfolds or ends.
+  - **Individual night**: a big night, or a huge one (×2 when two players had one). Never a name, never a
+    team.
+  Answers "why only 35%?" for a blowout lifted by one player (no scenario, huge night), and "why 82%?"
+  without reading How it works. Opt-in: only who clicks learns more.
+  - Never a tag that tells how it ends: no "Overtime" (it says the game is tied after regulation).
+  - Computed when the game is rated, written in the public JSON as plain keys (no numbers). The thresholds
+    are settings: they live in the scoring config, never in the public code.
+  - Accessible button (`aria-expanded`, keyboard), no layout jump for the cards around it.
+
 ## Next up — Monday
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
