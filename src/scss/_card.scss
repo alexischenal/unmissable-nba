@@ -175,7 +175,7 @@
   }
 
   .card__why-button {
-    --why-size: max(16px, calc(var(--note-w) * 0.19));
+    --why-size: max(21px, calc(var(--note-w) * 0.24));
     position: absolute;
     left: calc(50% + var(--note-w) / 2);
     top: calc(50% - var(--note-h) / 2);
