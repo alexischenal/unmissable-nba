@@ -6,6 +6,7 @@
 // Usage (after npm run season-stats -- 2025-26 --clutch, which fills .cache/):
 //   npm run flame-study -- 2025-26            → the study, focused on the current bigNight threshold
 //   npm run flame-study -- 2025-26 --at 40    → the same, focused on 40
+//   npm run flame-study -- 2025-26 --player "Stephen Curry"   → also that player's biggest scoring nights
 //
 // The nights are grouped by the UTC date of the game (all the cache keeps): close to the real nights,
 // not exact (a 1 p.m. Sunday game and the Saturday night games share a date).
@@ -138,13 +139,41 @@ function borderline(rows: Row[], at: number): void {
   console.log(`  at ${at}+ (${kinds.length} lines): 35+ points ${pct(scorer, kinds.length)} · triple-double ${pct(allAround, kinds.length)} · 18+ rebounds ${pct(glass, kinds.length)}`);
 }
 
+// The big scoring nights the efficiency leaves out: a player who had to shoot a lot to carry his team
+function scoringNights(rows: Row[], at: number): void {
+  title(`Big scoring nights and the flame at ${at}+`);
+  const lines = rows.flatMap((r) => r.g.players.map((p) => ({ r, p, e: efficiency(p) })));
+  for (const min of [35, 40, 45, 50]) {
+    const x = lines.filter((l) => l.p.pts >= min);
+    console.log(`  ${min}+ points: ${String(x.length).padStart(3)} lines, ${pct(x.filter((l) => l.e >= at).length, x.length).padStart(4)} with the flame`);
+  }
+  const missed = lines.filter((l) => l.p.pts >= 40 && l.e < at).sort((a, b) => b.p.pts - a.p.pts);
+  console.log(`  40+ points without the flame (${missed.length}):`);
+  for (const l of missed.slice(0, 25)) {
+    console.log(`    ${(l.p.name ?? '?').padEnd(24)} eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
+  }
+}
+
+function playerNights(rows: Row[], name: string, at: number): void {
+  title(`${name}: his biggest scoring nights`);
+  const lines = rows.flatMap((r) => r.g.players.filter((p) => p.name === name).map((p) => ({ r, p, e: efficiency(p) })));
+  if (lines.length === 0) {
+    console.log('  no game found under this name (check the spelling, accents included)');
+    return;
+  }
+  console.log(`  ${lines.length} games, ${lines.filter((l) => l.e >= at).length} with the flame at ${at}+`);
+  for (const l of [...lines].sort((a, b) => b.p.pts - a.p.pts).slice(0, 12)) {
+    console.log(`    ${l.e >= at ? 'flame' : '     '}  eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
   }
   const args = process.argv.slice(2);
   const season = args.find((a) => /^\d{4}-\d{2}$/.test(a));
-  if (!season) throw new Error('Usage: npm run flame-study -- 2025-26 [--at 40]');
+  if (!season) throw new Error('Usage: npm run flame-study -- 2025-26 [--at 40] [--player "Stephen Curry"]');
   loadScoring();
   const atArg = args.indexOf('--at');
   const at = atArg >= 0 ? Number(args[atArg + 1]) : SCORING.why.bigNight;
@@ -177,6 +206,9 @@ async function main(): Promise<void> {
   nightsReport(nights, at);
   concentration(rows, at);
   borderline(rows, at);
+  scoringNights(rows, at);
+  const playerArg = args.indexOf('--player');
+  if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
 
 main().catch((error: unknown) => {
