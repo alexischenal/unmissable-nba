@@ -7,6 +7,7 @@
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
 //   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), the
 //                                                comparison v1 (box score) vs v2 (with the play-by-play),
+//                                                the "?" on the cards (how often, and why),
 //                                                and .cache/ratings-2025-26.csv (every game's rating)
 //
 // The box scores are kept in .cache/ (ignored by Git), reduced to what the algorithm reads:
@@ -24,10 +25,11 @@ import { isFinal, toGame } from './nba/adapter.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore,
+  closeByClutch, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore,
   isDisputed, loserBiggestLead, marginAfterQ3, performancePoints, playerPoints, rawScore, regulationMargin,
 } from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
+import { hasScenario, whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
@@ -101,7 +103,7 @@ function report(games: CachedGame[]): void {
   // 2. Individual performances
   title('Individual performances (efficiency)');
   const lines = games.flatMap((g) => g.players.map((p) => ({ g, p, eff: efficiency(p) })));
-  for (const t of [30, 35, 40, 45, 50, 55, 60]) {
+  for (const t of [30, 35, 38, 40, 45, 50, 55, 60]) {
     const k = lines.filter((x) => x.eff >= t).length;
     console.log(`  ≥ ${t}: ${String(k).padStart(5)} player-games  ≈ ${n1(k / nights).padStart(5)} per night  ${k ? `(one every ${n1(n / k)} games)` : ''}`);
   }
@@ -272,6 +274,44 @@ function comebackBonusReport(games: CachedGame[], late: Map<string, NonNullable<
   }
 }
 
+// The "?" on the cards (src/lib/why.ts), with the settings in use: how often, and why.
+function whyReport(games: CachedGame[], late: Map<string, NonNullable<Game['late']>>): void {
+  const w = SCORING.why;
+  title(`Why — the "?" on the cards (big ${w.bigNight}, huge ${w.hugeNight}, crazy ${w.crazyNight})`);
+  const rows = games.map((g0) => {
+    const g = late.has(g0.id) ? { ...g0, late: late.get(g0.id)! } : g0;
+    return { g, note: displayScore(g), why: whyOf(g), tight: closeByClutch(g) };
+  });
+  const n = rows.length;
+  const nights = new Set(games.map((g) => g.date).filter(Boolean)).size || 165;
+  const k = (f: (r: (typeof rows)[number]) => boolean) => rows.filter(f).length;
+  const line = (name: string, count: number, of = n) =>
+    console.log(`  ${name.padEnd(34)} ${String(count).padStart(5)}  ${pct(count, of).padStart(6)}  ≈ ${n1(count / nights).padStart(4)} per night`);
+
+  line('games with a "?"', k((r) => r.why !== undefined));
+  line('  with Scenario', k((r) => r.why?.scenario === true));
+  line('  with a big performance', k((r) => (r.why?.big ?? 0) > 0));
+  line('  with a huge performance', k((r) => (r.why?.huge ?? 0) > 0));
+  line('  with a crazy performance', k((r) => (r.why?.crazy ?? 0) > 0));
+  const high = rows.filter((r) => r.note >= 50);
+  const low = rows.filter((r) => r.note < 50);
+  console.log(`  "?" at 50% or more: ${pct(high.filter((r) => r.why).length, high.length)}  ·  under 50%: ${pct(low.filter((r) => r.why).length, low.length)}`);
+
+  // Why Scenario, rule by rule (a game can match several)
+  const scen = rows.filter((r) => hasScenario(r.g));
+  const swingsOk = (r: (typeof rows)[number]) => r.g.late !== undefined && r.g.late.weightedSwings >= w.scenarioSwings;
+  console.log(`  Scenario (${scen.length} games), by rule:`);
+  console.log(`    tight finish ${scen.filter((r) => r.tight).length} · big comeback ${scen.filter((r) => loserBiggestLead(r.g) >= SCORING.disputed.minLoserBiggestLead).length} · lead changes ${scen.filter(swingsOk).length} · spectacle points ${scen.filter((r) => competitivenessPoints(r.g) >= w.scenarioPoints).length}`);
+
+  // Check: a tight finish always gets Scenario
+  const missed = rows.filter((r) => r.tight && !r.why?.scenario);
+  console.log(`  Check, tight finishes without Scenario: ${missed.length} (must be 0)`);
+
+  // Players per tier (each in one tier only)
+  const players = (tier: 'big' | 'huge' | 'crazy') => rows.reduce((s, r) => s + (r.why?.[tier] ?? 0), 0);
+  console.log(`  Players: big ${players('big')} · huge ${players('huge')} · crazy ${players('crazy')}`);
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('season-stats prints the details of the settings: never on GitHub Actions (public logs).');
@@ -307,6 +347,7 @@ async function main(): Promise<void> {
     }
     clutchReport(games, pbp);
     comebackBonusReport(games, new Map([...pbp].map(([id, x]) => [id, x.late])));
+    whyReport(games, new Map([...pbp].map(([id, x]) => [id, x.late])));
 
     // Every game's rating (v2 when the play-by-play is there), for charts. Teams, date and rating only:
     // no score, no settings.
