@@ -24,7 +24,8 @@ import type { Game } from '../src/types/game.ts';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
 
-// The margin with 2:00 left that the final-margin rule would also need (null: today's rule).
+// The margin with 2:00 left that the final-margin rule would also need (null: the rule before November 2,
+// "today" below). Adopted on November 2: the real maxMarginAt2, spare.
 // "spare": the limit doesn't apply when the loser got within 5 at some point in the last 5 minutes
 // (clutch time > 0): a real run that came close, even if the leader pulled away again before 2:00.
 type Variant = { limit: number | null; spare: boolean };
@@ -76,9 +77,11 @@ async function main(): Promise<void> {
     games.push(existsSync(pbp) ? { ...g, late: lateFrom(JSON.parse(await readFile(pbp, 'utf8')) as Timeline, g.periods.length) } : g);
   }
 
-  // Sanity check: the "today" variant must give the published ratings
-  const mismatches = games.filter((g) => rating(g, VARIANTS[0]!) !== displayScore(g)).length;
-  console.log(`Close-game rule, ${season}: ${games.length} games. Check, today's rule vs the real rating: ${mismatches} mismatch(es) (must be 0).`);
+  // Sanity check: the adopted variant (10, spare; real settings) must give the ratings of src/lib/scoring.ts.
+  // "today" in the tables below is the rule before November 2.
+  const adopted = { limit: SCORING.disputed.maxMarginAt2, spare: true };
+  const mismatches = games.filter((g) => rating(g, adopted) !== displayScore(g)).length;
+  console.log(`Close-game rule, ${season}: ${games.length} games. Check, the adopted rule vs the real rating: ${mismatches} mismatch(es) (must be 0).`);
 
   const today = new Map(games.map((g) => [g.id, rating(g, VARIANTS[0]!)]));
   console.log('\n=== Overview: final margin ≤ 10 also needs the margin at 2:00 ≤ limit ===');
