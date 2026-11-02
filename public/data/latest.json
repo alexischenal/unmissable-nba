@@ -3,6 +3,15 @@
   "date": "2026-11-01",
   "games": [
     {
+      "away": "TOR",
+      "home": "LAL",
+      "tipOff": "2026-11-02T02:00:00Z",
+      "note": 87,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "BKN",
       "home": "IND",
       "tipOff": "2026-11-01T22:00:00Z",
@@ -22,11 +31,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "TOR",
-      "home": "LAL",
-      "tipOff": "2026-11-02T02:00:00Z"
     }
   ]
 }
