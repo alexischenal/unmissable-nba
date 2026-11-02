@@ -17,7 +17,11 @@
     {
       "away": "LAC",
       "home": "GSW",
-      "tipOff": "2026-11-02T01:30:00Z"
+      "tipOff": "2026-11-02T01:30:00Z",
+      "note": 15,
+      "why": {
+        "big": 1
+      }
     },
     {
       "away": "TOR",
