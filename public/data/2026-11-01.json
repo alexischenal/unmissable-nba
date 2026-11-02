@@ -3,15 +3,16 @@
   "date": "2026-11-01",
   "games": [
     {
+      "away": "BKN",
+      "home": "IND",
+      "tipOff": "2026-11-01T22:00:00Z",
+      "note": 51
+    },
+    {
       "away": "BOS",
       "home": "ORL",
       "tipOff": "2026-11-01T20:30:00Z",
       "note": 47
-    },
-    {
-      "away": "BKN",
-      "home": "IND",
-      "tipOff": "2026-11-01T22:00:00Z"
     },
     {
       "away": "LAC",
