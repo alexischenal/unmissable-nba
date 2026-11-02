@@ -11,7 +11,8 @@
 export type ScoringConfig = {
   // Step 1: a game is "competitive" if at least one condition is true
   disputed: {
-    maxRegulationMargin: number; // margin at the end of regulation
+    maxRegulationMargin: number; // margin at the end of regulation…
+    maxMarginAt2: number;        // …only if within this margin with 2:00 left, or the loser got within 5 late
     maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter
     minLoserBiggestLead: number; // biggest lead of the losing team (comeback)
   };
@@ -52,7 +53,7 @@ export type ScoringConfig = {
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
 export const EXAMPLE_SCORING: ScoringConfig = {
-  disputed: { maxRegulationMargin: 12, maxMarginAfterQ3: 6, minLoserBiggestLead: 10 },
+  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, minLoserBiggestLead: 10 },
   disputedBase: 50,
   q3OnlyBase: 42,
   blowoutMax: 49,

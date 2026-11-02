@@ -42,6 +42,16 @@ New ingredients, from the play-by-play, only what happened on the court. Changin
 the season is fine: nights aren't compared across a season, and published ratings stay as they are.
 Same method for each: simulate on the past season (`season-stats`), look at which games move, then decide.
 
+- [x] **Garbage time no longer makes a close game** (November 2). A final margin of 10 or less only counts
+  if the game was still within 10 with 2:00 left, or if the loser got within 5 at some point in the last
+  5 minutes (a real run, even one that fell short). Setting `disputed.maxMarginAt2`. Found on TOR @ LAL
+  (November 1): 22 after Q3, 14 at 2:00, 6 at the buzzer, 87% thanks to Dončić. Simulated on 2025-26
+  (`npm run close-rule-sim`): 41 games move, all with the loser never within 5 late; no game decided by
+  5 or less is touched; 50%+ goes from 54% to 51%, the 15 games at 100% stay. Miami at Denver (95%, 15
+  after Q3) becomes a blowout with Jokić's flame. TOR @ LAL itself stays: Toronto got within 5 for 7 s.
+  Not fixed: a game that stays 7 to 9 points apart all along (BKN @ IND, 51%). Stricter option kept for
+  later: 8 at 2:00 (64 games, but touches a 5-point game).
+
 1. **A game decided in the last seconds** (to try first). Today a lead change with 4:30 left weighs the
    same as a game-winner at the buzzer: both are in the last-5-minutes window. Measure it from the last lead
    change or tie in the final 24 seconds, or a one-possession margin on the last possession. Says the

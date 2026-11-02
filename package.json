@@ -15,6 +15,7 @@
     "fetch": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts",
     "season-stats": "node --experimental-strip-types --no-warnings scripts/season-stats.ts",
     "check-window": "node --experimental-strip-types --no-warnings scripts/check-window.ts",
+    "close-rule-sim": "node --experimental-strip-types --no-warnings scripts/close-rule-sim.ts",
     "flame-study": "node --experimental-strip-types --no-warnings scripts/flame-study.ts",
     "explain": "node --experimental-strip-types --no-warnings scripts/explain.ts",
     "fetch:fixture": "node --experimental-strip-types --no-warnings scripts/fetch-night.ts --fixture",

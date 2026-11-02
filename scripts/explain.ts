@@ -21,7 +21,7 @@ import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import { whyLabels, whyOf } from '../src/lib/why.ts';
 import {
-  closeByClutch, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
+  closeByClutch, closeFinalMargin, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
   loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore,
   regulationMargin,
 } from '../src/lib/scoring.ts';
@@ -54,7 +54,9 @@ function explain(g: Game, notes: Notes = {}): void {
 
   const q3Only = disputed && disputedBaseFor(g) !== SCORING.disputedBase;
   console.log(`Step 1 — close game? ${disputed ? (q3Only ? 'YES, only after Q3 (lower base)' : 'YES') : 'NO, blowout'}`);
-  console.log(`  ${check(regulationMargin(g) <= c.maxRegulationMargin)}  margin end of regulation  ${regulationMargin(g)} (≤ ${c.maxRegulationMargin})`);
+  const garbage = g.late && regulationMargin(g) <= c.maxRegulationMargin && !closeFinalMargin(g)
+    ? `, but garbage time: ${g.late.marginAt2} at 2:00 (≤ ${c.maxMarginAt2}) and never within 5 late` : '';
+  console.log(`  ${check(closeFinalMargin(g))}  margin end of regulation  ${regulationMargin(g)} (≤ ${c.maxRegulationMargin})${garbage}`);
   console.log(`  ${check(marginAfterQ3(g) <= c.maxMarginAfterQ3)}  margin after Q3           ${marginAfterQ3(g)} (≤ ${c.maxMarginAfterQ3})`);
   console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead})`);
   if (g.late) {

@@ -2,7 +2,7 @@
 // With the example settings (EXAMPLE_SCORING): never the real ones.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { closeByClutch, competitivenessDetails, disputedBaseFor, isDisputed, rawScore } from './scoring.ts';
+import { closeByClutch, closeFinalMargin, competitivenessDetails, disputedBaseFor, isDisputed, rawScore } from './scoring.ts';
 import { sasAtDen } from '../../fixtures/2026-04-04-sas-den.ts';
 import { detAtPhi } from '../../fixtures/2026-04-04-det-phi.ts';
 
@@ -29,6 +29,22 @@ test('v2: a blowout by the final margin, but tight at the end, is a close game f
   assert.equal(disputedBaseFor(tightEnd), 50);
   const stillBlowout = { ...detAtPhi, late: { clutchSeconds: 60, marginAt2: 12, weightedSwings: 0 } };
   assert.equal(isDisputed(stillBlowout), false);
+});
+
+test('garbage time: a close final margin only counts if the game was within reach late', () => {
+  // Home up 20 after Q3, the visitors cut it to 6 at the buzzer; they never led by more than 3
+  const g = {
+    ...detAtPhi,
+    periods: [{ home: 30, away: 20 }, { home: 30, away: 25 }, { home: 30, away: 25 }, { home: 20, away: 34 }],
+    biggestLead: { home: 24, away: 3 },
+  };
+  const late = (marginAt2: number, clutchSeconds: number) => ({ ...g, late: { clutchSeconds, marginAt2, weightedSwings: 0 } });
+  assert.equal(closeFinalMargin(g), true);                 // v1: the final margin alone, as before
+  assert.equal(closeFinalMargin(late(14, 0)), false);      // decided at 2:00, never within 5: garbage time
+  assert.equal(isDisputed(late(14, 0)), false);
+  assert.equal(closeFinalMargin(late(14, 7)), true);       // within 5 for a few seconds: a real run
+  assert.equal(closeFinalMargin(late(11, 0)), true);       // example limit: 11 at 2:00 still counts
+  assert.equal(closeFinalMargin(late(12, 0)), false);
 });
 
 test('comeback: linear up to fullAt, then a bonus per extra point, uncapped', () => {

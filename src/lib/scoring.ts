@@ -40,12 +40,17 @@ export const closeByClutch = (g: Game) =>
   g.late !== undefined
   && (g.late.clutchSeconds >= SCORING.clutch.closeSeconds || g.late.marginAt2 <= SCORING.clutch.closeMarginAt2);
 
-// Close at the end, or a big comeback: the game stayed alive until the end.
-const closeToTheEnd = (g: Game) => {
+// A close final margin, unless garbage time made it: with the play-by-play, the game must also have been
+// within reach with 2:00 left, or the loser must have got within 5 at some point in the last minutes.
+export const closeFinalMargin = (g: Game) => {
   const c = SCORING.disputed;
-  return regulationMargin(g) <= c.maxRegulationMargin || loserBiggestLead(g) >= c.minLoserBiggestLead
-    || closeByClutch(g);
+  if (regulationMargin(g) > c.maxRegulationMargin) return false;
+  return g.late === undefined || g.late.marginAt2 <= c.maxMarginAt2 || g.late.clutchSeconds > 0;
 };
+
+// Close at the end, or a big comeback: the game stayed alive until the end.
+const closeToTheEnd = (g: Game) =>
+  closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g);
 
 export const isDisputed = (g: Game) =>
   closeToTheEnd(g) || marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
