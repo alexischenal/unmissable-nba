@@ -30,9 +30,21 @@
       "note": 45
     },
     {
+      "away": "MIL",
+      "home": "MIN",
+      "tipOff": "2026-11-03T01:00:00Z",
+      "note": 44
+    },
+    {
       "away": "CHI",
       "home": "PHI",
       "tipOff": "2026-11-03T00:30:00Z",
+      "note": 9
+    },
+    {
+      "away": "SAC",
+      "home": "DAL",
+      "tipOff": "2026-11-03T01:00:00Z",
       "note": 9
     },
     {
@@ -45,18 +57,8 @@
       }
     },
     {
-      "away": "MIL",
-      "home": "MIN",
-      "tipOff": "2026-11-03T01:00:00Z"
-    },
-    {
       "away": "NOP",
       "home": "MEM",
-      "tipOff": "2026-11-03T01:00:00Z"
-    },
-    {
-      "away": "SAC",
-      "home": "DAL",
       "tipOff": "2026-11-03T01:00:00Z"
     },
     {
