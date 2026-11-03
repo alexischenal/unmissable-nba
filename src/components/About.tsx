@@ -1,11 +1,22 @@
 // src/components/About.tsx
 // The "How it works" page: where the percentages come from. Ingredients only, never the settings.
 
-// The card's flame, at text size: read as "flame" by screen readers
-function Flame() {
+// The card's flame, at text size: read as "flame" by screen readers, unless the word is already next to it
+function Flame({ decorative = false }: { decorative?: boolean }) {
+  const a11y = decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': 'flame' };
   return (
-    <span className="article__flame" role="img" aria-label="flame">
+    <span className="article__flame" {...a11y}>
       <svg className="article__flame-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
+    </span>
+  );
+}
+
+// The hidden level's button, at text size, crackling. Only shown next to its name: hidden from screen readers.
+function SpicyRock() {
+  return (
+    <span className="article__flame article__flame--nuclear" aria-hidden="true">
+      <span className="article__sparks" aria-hidden="true" />
+      <svg className="article__flame-icon" aria-hidden="true"><use href="/sprite.svg#nuclear" /></svg>
     </span>
   );
 }
@@ -23,12 +34,10 @@ export function About() {
 
       <h2 className="article__subtitle">Step one: blowout or close game?</h2>
       <p className="article__text">
-        Blowouts start at 0% and can never go above 49%, even with a crazy performance: players get their{' '}
-        {/* "own", the flame and "!" stay on the same line */}
+        Blowouts start at 0% and never go above 49%, whatever happens. Big performances get{' '}
+        {/* "a", the flame and "instead!" stay on the same line */}
         <span className="article__nowrap">
-          own{' '}
-          <Flame />
-          !
+          a <Flame /> instead!
         </span>
         <br />
         Close games start at 50%.
@@ -49,12 +58,17 @@ export function About() {
       </p>
 
       <h2 className="article__subtitle">
-        Good to know – the <Flame />
+        Good to know – the flame <Flame decorative />
       </h2>
       <p className="article__text">
         A flame next to a percentage means somebody cooked. Tap it to see the performances: big, huge or crazy.
         Best case: several! No spoilers.
       </p>
+
+      <h2 className="article__subtitle">
+        Good to know – the spicy rock <SpicyRock />
+      </h2>
+      <p className="article__text">Bro, WTF! Just watch it!</p>
 
       <h2 className="article__subtitle">Good to know – the math</h2>
       <p className="article__text">

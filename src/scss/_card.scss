@@ -205,59 +205,12 @@
   }
 
   .card__why-button--nuclear {
-    background: radial-gradient(circle at var(--fire-x) var(--fire-y), #f2ffb8 0%, #9be04a var(--fire-core), #3f8f2a var(--fire-mid), #123a12 100%);
-    box-shadow: 0 0 5px 1px rgba(130, 225, 70, 0.5);
-    animation-duration: 1.2s;
+    @include nuclear-pastille;
   }
 
   .card__why-sparks {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .card__why-sparks::before,
-  .card__why-sparks::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 2px;
-    height: 2px;
-    margin: -1px 0 0 -1px;
-    border-radius: 50%;
-    animation: why-crackle 0.9s steps(1) infinite;
-  }
-
-  .card__why-sparks::before {
-    box-shadow:
-      calc(var(--why-size) * 0.82) calc(var(--why-size) * 0.02) 0 0px #d8ff8a,
-      calc(var(--why-size) * 0.42) calc(var(--why-size) * 0.61) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.27) calc(var(--why-size) * 0.66) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.57) calc(var(--why-size) * 0.27) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.66) calc(var(--why-size) * -0.45) 0 0px #d8ff8a,
-      calc(var(--why-size) * 0.02) calc(var(--why-size) * -0.68) 0 0px #d8ff8a,
-      calc(var(--why-size) * 0.5) calc(var(--why-size) * -0.41) 0 0px #d8ff8a;
-  }
-
-  .card__why-sparks::after {
-    box-shadow:
-      calc(var(--why-size) * 0.56) calc(var(--why-size) * 0.69) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.0) calc(var(--why-size) * 0.71) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.78) calc(var(--why-size) * 0.2) 0 0px #d8ff8a,
-      calc(var(--why-size) * -0.55) calc(var(--why-size) * -0.37) 0 0px #d8ff8a,
-      calc(var(--why-size) * 0.13) calc(var(--why-size) * -0.63) 0 0px #d8ff8a,
-      calc(var(--why-size) * 0.81) calc(var(--why-size) * -0.24) 0 0.5px #d8ff8a;
-    animation-duration: 1.3s;
-    animation-delay: -0.4s;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .card__why-sparks::before,
-    .card__why-sparks::after {
-      animation: none;
-      opacity: 0.7;
-    }
+    color: #d8ff8a;
+    @include nuclear-sparks;
   }
 
   .card__why-button::before {
