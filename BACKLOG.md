@@ -85,7 +85,7 @@ and milestones (context, not play), fights and ejections.
     had to take every shot still had a big night. Big tier only, and the flame only: the rating doesn't change.
     Last season, efficiency alone missed 36 nights of 40 to 44 points (45+ were all lit); Curry's four 42+
     nights all had the flame.
-  - **A hidden level: nuclear** (November 3). Never announced (How it works speaks of three levels): 60+ points,
+  - **A hidden level: nuclear** (November 3). Teased since November 3 in How it works ("Good to know – the spicy rock", the icon and "Bro, WTF! Just watch it!"), never the rules: 60+ points,
     70+ efficiency or a quadruple-double (settings `why.nuclearPoints`, `why.nuclearEff`). The button turns
     radioactive (the trefoil, a green fire, crackling sparks instead of the glow), the chip says "WTF???"
     (screen readers: "Historic performance"). The only level visible before the click: that's the point.

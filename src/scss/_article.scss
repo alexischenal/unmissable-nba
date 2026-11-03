@@ -53,6 +53,17 @@
     @include fire-pastille;
   }
 
+  .article__flame--nuclear {
+    --why-size: 1.35em;
+    position: relative;
+    @include nuclear-pastille;
+  }
+
+  .article__sparks {
+    color: #4f9e26;
+    @include nuclear-sparks;
+  }
+
   .article__flame-icon {
     width: 72%;
     height: 72%;

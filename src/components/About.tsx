@@ -10,6 +10,16 @@ function Flame() {
   );
 }
 
+// The hidden level's button, at text size, crackling: read as "radioactive sign"
+function SpicyRock() {
+  return (
+    <span className="article__flame article__flame--nuclear" role="img" aria-label="radioactive sign">
+      <span className="article__sparks" aria-hidden="true" />
+      <svg className="article__flame-icon" aria-hidden="true"><use href="/sprite.svg#nuclear" /></svg>
+    </span>
+  );
+}
+
 export function About() {
   return (
     <article className="article">
@@ -55,6 +65,11 @@ export function About() {
         A flame next to a percentage means somebody cooked. Tap it to see the performances: big, huge or crazy.
         Best case: several! No spoilers.
       </p>
+
+      <h2 className="article__subtitle">
+        Good to know – the spicy rock <SpicyRock />
+      </h2>
+      <p className="article__text">Bro, WTF! Just watch it!</p>
 
       <h2 className="article__subtitle">Good to know – the math</h2>
       <p className="article__text">
