@@ -24,6 +24,12 @@
       "note": 60
     },
     {
+      "away": "BKN",
+      "home": "NYK",
+      "tipOff": "2026-11-03T00:30:00Z",
+      "note": 45
+    },
+    {
       "away": "CHI",
       "home": "PHI",
       "tipOff": "2026-11-03T00:30:00Z",
@@ -37,11 +43,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "BKN",
-      "home": "NYK",
-      "tipOff": "2026-11-03T00:30:00Z"
     },
     {
       "away": "MIL",
