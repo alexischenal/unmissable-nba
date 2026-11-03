@@ -51,6 +51,7 @@ export type ScoringConfig = {
     // Never announced: a historic night (the button turns radioactive). Any of these, or a quadruple-double.
     nuclearPoints: number;  // points
     nuclearEff: number;     // efficiency
+    nuclearDuel: number;    // …or two players (or more) at this efficiency in the same game: all of them
   };
 };
 
@@ -67,7 +68,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
-  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56, nuclearPoints: 58, nuclearEff: 68 },
+  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.
