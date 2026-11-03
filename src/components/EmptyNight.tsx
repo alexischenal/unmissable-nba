@@ -16,6 +16,7 @@ export function EmptyNight({ next }: { next: NightJson | null }) {
         Sorry,{' '}
         <span className="empty__subtitle">there's nothing to display anymore…</span>
       </h2>
+      <p className="article__text">(No games last night.)</p>
 
       <figure className="empty__gif">
         {/* Plays by itself, muted, in a loop; under reduced motion it waits on its first frame */}
