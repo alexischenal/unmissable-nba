@@ -12,6 +12,12 @@
       }
     },
     {
+      "away": "WAS",
+      "home": "ORL",
+      "tipOff": "2026-11-03T00:30:00Z",
+      "note": 60
+    },
+    {
       "away": "ATL",
       "home": "IND",
       "tipOff": "2026-11-03T00:30:00Z"
@@ -29,11 +35,6 @@
     {
       "away": "DET",
       "home": "CHA",
-      "tipOff": "2026-11-03T00:30:00Z"
-    },
-    {
-      "away": "WAS",
-      "home": "ORL",
       "tipOff": "2026-11-03T00:30:00Z"
     },
     {
