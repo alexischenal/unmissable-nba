@@ -132,6 +132,11 @@ and milestones (context, not play), fights and ejections.
    Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy
    Curry night discovered too late. The rating tells which game is close; the spicy rock must tell **which
    player had the night of his life**. Now that it's teased in How it works, it has to be right.
+   - **The compass, for every decision on this**: *the flame says "somebody shone", the spicy rock says "you
+     won't see that again anytime soon".* The flame stays absolute (what happened: Jokić shines often, so
+     Denver often has one, and that's true); the spicy rock is relative (out of the ordinary **for that
+     player**). Jokić gets many flames and few rocks: for him too, the exceptional is rare. Don't hunt the
+     white whale: build around it.
    - **The gap today**: its doors are absolute (60 points, 65 efficiency, quadruple-double, duels), so they
      favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
      Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas
