@@ -17,7 +17,9 @@ import { ABOUT_URL, HOME_URL, LEGAL_URL, NEXT_URL, PAGE, nightDates, nightLabel 
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
-const LOADED_AT = Date.now();
+// In development only, ?now=2026-11-04T07:00Z pretends to be at that time (to preview the empty screen).
+const DEV_NOW = import.meta.env.DEV ? Date.parse(new URLSearchParams(window.location.search).get('now') ?? '') : NaN;
+const LOADED_AT = Number.isNaN(DEV_NOW) ? Date.now() : DEV_NOW;
 // A specific night asked for in the URL (?date=…) is always shown as it is, never as "no games"
 const DATE_IN_URL = new URLSearchParams(window.location.search).has('date');
 
