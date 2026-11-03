@@ -119,7 +119,10 @@ and milestones (context, not play), fights and ejections.
    efficiency or 45 points) was set on 2025-26 alone: a small sample for events this rare (6 nuclear nights).
    The branch `flame-study-seasons` reads several seasons and lists the nuclear nights per season.
    - Download (about 25 min per season, kept in `.cache/`):
-     `npm run season-stats -- 2021-22 --clutch`, then 2022-23, 2023-24, 2024-25. Before 2021-22: no
+     `npm run season-stats -- 2021-22 --clutch`, then 2022-23, 2023-24, 2024-25, **and 2025-26 again**:
+     since November 3 the cache keeps each player's id, his 3-pointers made and the scorer of every basket
+     (for the threes, buzzer-beater and "relative to the player" doors). Delete `.cache/boxscores/2025-26` and
+     `.cache/playbyplay/2025-26` first, or the old files (without them) are kept. Before 2021-22: no
      (2020-21 had 72 games, 2019-20 was cut short). If the NBA no longer serves an old season, keep the others.
    - Then: `npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-flame.txt`.
    - Check: about 6 nuclear nights a season? Not always the same players (Jokić)? Flames still ~30% of the

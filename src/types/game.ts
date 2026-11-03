@@ -7,6 +7,7 @@ export type Side = 'home' | 'away';
 export type PlayerLine = {
   team: Side;
   name?: string; // only for the developer's explanations, never used by the rating
+  id?: number;   // the NBA's personId: to match a player with the play-by-play (who scored) and his history
   pts: number;
   reb: number;
   ast: number;
@@ -17,6 +18,7 @@ export type PlayerLine = {
   ftm: number;
   fta: number;
   tov: number;
+  fg3m?: number; // 3-pointers made (box scores downloaded before November 2026 don't have it)
 };
 
 export type Game = {
