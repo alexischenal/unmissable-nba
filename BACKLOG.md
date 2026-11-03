@@ -166,6 +166,15 @@ and milestones (context, not play), fights and ejections.
        for a week or two. No spoiler: it says a player went off, not who won.
      - We can't measure who comes how often (no cookies, by choice): GoatCounter only gives visits per day.
        So: think for both, and watch the visits on the mornings after a rock.
+   - **A buzzer-beater door?** 40 points **and** the shot that wins (or ties) the game at the buzzer: the very
+     definition of a legendary night. Two cautions:
+     - **Spoiler**: the rock never says why ("WTF???"), and the rules are secret, so it doesn't tell the ending
+       by itself. But if the rule ever becomes known, a rock on a 40-point night would hint at a last-second
+       finish. Keep it in the secret rules only.
+     - **Data**: the play-by-play timeline we keep only has the period, the clock and the score, not who
+       scored. We'd need the scorer of the last basket (the play-by-play has it: `personId`), so a change in
+       `scripts/nba/clutch.ts` and new downloads. Goes with algorithm evolution 1 (a game decided in the last
+       seconds), which needs the same reading.
    - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
