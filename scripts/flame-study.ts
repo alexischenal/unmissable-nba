@@ -21,10 +21,11 @@ import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import { displayScore, efficiency } from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
+import { whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
-type Row = { g: CachedGame; note: number; effs: number[]; best: number; maxPts: number };
+type Row = { g: CachedGame; season: string; note: number; effs: number[]; best: number; maxPts: number };
 
 // The flame at an efficiency threshold, with the points rule of the big nights (src/lib/why.ts)
 const litLine = (p: PlayerLine, at: number) => efficiency(p) >= at || p.pts >= SCORING.why.bigPoints;
@@ -206,40 +207,60 @@ function nuclearReport(rows: Row[]): void {
   for (const l of top) console.log(`    ${(l.r.g.date ?? '').padEnd(10)} ${(l.p.name ?? '?').padEnd(24)} eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
 }
 
+// The nuclear level with the settings in use (src/lib/why.ts): every night it would have shown, per season
+function nuclearNights(rows: Row[]): void {
+  title('The radioactive button with the current settings');
+  const bySeason = new Map<string, Row[]>();
+  for (const r of rows) {
+    if (!whyOf(r.g)?.nuclear) continue;
+    bySeason.set(r.season, [...(bySeason.get(r.season) ?? []), r]);
+  }
+  for (const season of [...new Set(rows.map((r) => r.season))].sort()) {
+    const games = (bySeason.get(season) ?? []).sort((a, b) => (a.g.date ?? '').localeCompare(b.g.date ?? ''));
+    console.log(`  ${season}: ${games.length}`);
+    for (const r of games) {
+      const who = r.g.players.filter((p) => efficiency(p) >= 45 || p.pts >= 45).map((p) => `${p.name ?? '?'} ${p.pts} pts eff ${efficiency(p)}`).join(' · ');
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${who}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
   }
   const args = process.argv.slice(2);
-  const season = args.find((a) => /^\d{4}-\d{2}$/.test(a));
-  if (!season) throw new Error('Usage: npm run flame-study -- 2025-26 [--at 40] [--player "Stephen Curry"]');
+  // One season or several: npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26
+  const seasons = args.filter((a) => /^\d{4}-\d{2}$/.test(a));
+  if (seasons.length === 0) throw new Error('Usage: npm run flame-study -- 2025-26 [2024-25 …] [--at 40] [--player "Stephen Curry"]');
   loadScoring();
   const atArg = args.indexOf('--at');
   const at = atArg >= 0 ? Number(args[atArg + 1]) : SCORING.why.bigNight;
   if (!Number.isFinite(at)) throw new Error('--at needs a number, e.g. --at 40');
 
-  const dir = path.join(ROOT, '.cache', 'boxscores', season);
-  const files = existsSync(dir) ? (await readdir(dir)).filter((f) => f.endsWith('.json')) : [];
-  if (files.length === 0) throw new Error(`No box score in ${dir}: run npm run season-stats -- ${season} --clutch first.`);
-  const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
-
   const rows: Row[] = [];
   let v2 = 0;
-  for (const f of files) {
-    const g0 = JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame;
-    const pbp = path.join(pbpDir, f);
-    let g = g0;
-    if (existsSync(pbp)) {
-      g = { ...g0, late: lateFrom(JSON.parse(await readFile(pbp, 'utf8')) as Timeline, g0.periods.length) };
-      v2++;
+  for (const season of seasons) {
+    const dir = path.join(ROOT, '.cache', 'boxscores', season);
+    const files = existsSync(dir) ? (await readdir(dir)).filter((f) => f.endsWith('.json')) : [];
+    if (files.length === 0) throw new Error(`No box score in ${dir}: run npm run season-stats -- ${season} --clutch first.`);
+    const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
+    for (const f of files) {
+      const g0 = JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame;
+      const pbp = path.join(pbpDir, f);
+      let g = g0;
+      if (existsSync(pbp)) {
+        g = { ...g0, late: lateFrom(JSON.parse(await readFile(pbp, 'utf8')) as Timeline, g0.periods.length) };
+        v2++;
+      }
+      const effs = g.players.map(efficiency);
+      rows.push({ g, season, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)) });
     }
-    const effs = g.players.map(efficiency);
-    rows.push({ g, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)) });
   }
   const nights = new Map<string, Row[]>();
   for (const r of rows) nights.set(r.g.date ?? '?', [...(nights.get(r.g.date ?? '?') ?? []), r]);
 
-  console.log(`Flame study, ${season}: ${rows.length} games (${v2} rated with the play-by-play), focus on ${at}+`);
+  console.log(`Flame study, ${seasons.join(' + ')}: ${rows.length} games (${v2} rated with the play-by-play), focus on ${at}+`);
   console.log(`The flame: efficiency at the threshold, or ${SCORING.why.bigPoints}+ points (setting why.bigPoints).`);
   distribution(rows);
   thresholdTable(rows, nights);
@@ -248,6 +269,7 @@ async function main(): Promise<void> {
   borderline(rows, at);
   scoringNights(rows, at);
   nuclearReport(rows);
+  nuclearNights(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }

@@ -86,13 +86,14 @@ and milestones (context, not play), fights and ejections.
     Last season, efficiency alone missed 36 nights of 40 to 44 points (45+ were all lit); Curry's four 42+
     nights all had the flame.
   - **A hidden level: nuclear** (November 3). Never announced (How it works speaks of three levels): 60+ points,
-    70+ efficiency or a quadruple-double (settings `why.nuclearPoints`, `why.nuclearEff`). The button turns
+    65+ efficiency (70 at first, 65 since November 3: a step of 10 above crazy, like the others) or a quadruple-double (settings `why.nuclearPoints`, `why.nuclearEff`). The button turns
     radioactive (the trefoil, a green fire, crackling sparks instead of the glow), the chip says "WTF???"
     (screen readers: "Historic performance"). The only level visible before the click: that's the point.
     Last season: 3 nights (Jokić 56-16-15 on December 26, Adebayo's 83 points, Dončić's 60), no quadruple-double.
     Also a duel (November 3): two players (or more) at 50+ efficiency in the same game are both nuclear
-    ("WTF???", never counted on screen), teammates or not (setting `why.nuclearDuel`). Last season: 2 games, both at 100% (Jokić and
-    Murray's 53 points against Dallas, Jokić and Wembanyama on April 4). 5 nuclear nights a season in all.
+    ("WTF???", never counted on screen), teammates or not (setting `why.nuclearDuel`). Last season: 2 games, both
+    at 100% (Jokić and Murray's 53 points against Dallas, Jokić and Wembanyama on April 4). 6 nuclear nights a
+    season in all (with Jokić's 55 points and 66 efficiency on November 13).
     And a scoring duel: two players (or more) at 45+ points in the same game (setting `why.nuclearDuelPoints`).
     Never happened last season (5 games at 40+ points, none at 45+): a lottery ticket, like the quadruple-double.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
@@ -109,6 +110,20 @@ and milestones (context, not play), fights and ejections.
     to know (How it works) explains it.
 
 ## Next up — Monday
+
+0. **Urgent — check the flame and nuclear levels on five seasons, not one** (November 3). Every threshold
+   (big 38 or 40 points, huge 45, crazy 55, nuclear 60 points / 65 efficiency / quadruple-double / duels at 50
+   efficiency or 45 points) was set on 2025-26 alone: a small sample for events this rare (6 nuclear nights).
+   The branch `flame-study-seasons` reads several seasons and lists the nuclear nights per season.
+   - Download (about 25 min per season, kept in `.cache/`):
+     `npm run season-stats -- 2021-22 --clutch`, then 2022-23, 2023-24, 2024-25. Before 2021-22: no
+     (2020-21 had 72 games, 2019-20 was cut short). If the NBA no longer serves an old season, keep the others.
+   - Then: `npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-flame.txt`.
+   - Check: about 6 nuclear nights a season? Not always the same players (Jokić)? Flames still ~30% of the
+     cards? Then merge the branch.
+   - With the same data, look at a "record threes" door for the nuclear level (13+ threes: Curry's kind of
+     historic night, which efficiency doesn't see). Needs the 3-pointers made in the box score data first
+     (`PlayerLine` only keeps all field goals).
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
