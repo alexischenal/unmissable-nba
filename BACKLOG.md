@@ -93,8 +93,9 @@ and milestones (context, not play), fights and ejections.
     (screen readers: "Historic performance"). The only level visible before the click: that's the point.
     Last season: 3 nights (Jokić 56-16-15 on December 26, Adebayo's 83 points, Dončić's 60), no quadruple-double.
     Also a duel (November 3): two players (or more) at 50+ efficiency in the same game are both nuclear
-    ("WTF??? ×2"), teammates or not (setting `why.nuclearDuel`). Last season: 2 games, both at 100% (Jokić and
-    Murray's 53 points against Dallas, Jokić and Wembanyama on April 4). 6 nuclear nights a season in all (with Jokić's 55 points and 66 efficiency on November 13).
+    ("WTF???", never counted on screen), teammates or not (setting `why.nuclearDuel`). Last season: 2 games, both
+    at 100% (Jokić and Murray's 53 points against Dallas, Jokić and Wembanyama on April 4). 6 nuclear nights a
+    season in all (with Jokić's 55 points and 66 efficiency on November 13).
     And a scoring duel: two players (or more) at 45+ points in the same game (setting `why.nuclearDuelPoints`).
     Never happened last season (5 games at 40+ points, none at 45+): a lottery ticket, like the quadruple-double.
   - Never a name, a team, a number, or how the game ends (no "Overtime").

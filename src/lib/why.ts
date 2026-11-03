@@ -43,13 +43,13 @@ export function whyOf(g: Game): Why | undefined {
 // spoken: what screen readers say instead of the label, when the label doesn't read well aloud
 export type WhyChip = { label: string; spoken?: string; heat?: 'big' | 'huge' | 'crazy' | 'nuclear' };
 
-// The chips, in display order: "Crazy performance", "Huge performance ×2", "Big performance".
+// The chips, in display order: "WTF???" (never counted on screen), "Crazy performance", "Huge performance ×2", "Big performance".
 // Each carries a heat level: the card shows them on fire, lightly to fully. A "scenario" key (nights rated
 // before November 1) is ignored: those cards only keep their flame when they had a performance.
 export function whyChips(why: Why): WhyChip[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [
-    ...(why.nuclear ? [{ label: `WTF???${times(why.nuclear)}`, spoken: `Historic performance${times(why.nuclear)}`, heat: 'nuclear' as const }] : []),
+    ...(why.nuclear ? [{ label: 'WTF???', spoken: why.nuclear > 1 ? `${why.nuclear} historic performances` : 'Historic performance', heat: 'nuclear' as const }] : []),
     ...(why.crazy ? [{ label: `Crazy performance${times(why.crazy)}`, heat: 'crazy' as const }] : []),
     ...(why.huge ? [{ label: `Huge performance${times(why.huge)}`, heat: 'huge' as const }] : []),
     ...(why.big ? [{ label: `Big performance${times(why.big)}`, heat: 'big' as const }] : []),
