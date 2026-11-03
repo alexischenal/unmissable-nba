@@ -58,7 +58,7 @@ export function About() {
       </p>
 
       <h2 className="article__subtitle">
-        Good to know – the flame <Flame decorative />
+        The flame <Flame decorative />
       </h2>
       <p className="article__text">
         A flame next to a percentage means somebody cooked. Tap it to see the performances: big, huge or crazy.
@@ -66,11 +66,11 @@ export function About() {
       </p>
 
       <h2 className="article__subtitle">
-        Good to know – the spicy rock <SpicyRock />
+        The spicy rock <SpicyRock />
       </h2>
       <p className="article__text">Bro, WTF! Just watch it!</p>
 
-      <h2 className="article__subtitle">Good to know – the math</h2>
+      <h2 className="article__subtitle">The math</h2>
       <p className="article__text">
         The math has no ceiling: a crazy night keeps adding points, because nobody should put a limit on
         what players can do. The display stops at 100%, which simply means unmissable.
