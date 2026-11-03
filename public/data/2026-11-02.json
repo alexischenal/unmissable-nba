@@ -21,6 +21,12 @@
       }
     },
     {
+      "away": "POR",
+      "home": "DEN",
+      "tipOff": "2026-11-03T02:00:00Z",
+      "note": 70
+    },
+    {
       "away": "WAS",
       "home": "ORL",
       "tipOff": "2026-11-03T00:30:00Z",
@@ -79,11 +85,6 @@
       "home": "SAS",
       "tipOff": "2026-11-03T01:30:00Z",
       "note": 3
-    },
-    {
-      "away": "POR",
-      "home": "DEN",
-      "tipOff": "2026-11-03T02:00:00Z"
     },
     {
       "away": "MIA",
