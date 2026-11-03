@@ -12,6 +12,12 @@
       }
     },
     {
+      "away": "PHX",
+      "home": "GSW",
+      "tipOff": "2026-11-03T03:00:00Z",
+      "note": 77
+    },
+    {
       "away": "OKC",
       "home": "CLE",
       "tipOff": "2026-11-03T00:00:00Z",
@@ -94,11 +100,6 @@
       "home": "SAS",
       "tipOff": "2026-11-03T01:30:00Z",
       "note": 3
-    },
-    {
-      "away": "PHX",
-      "home": "GSW",
-      "tipOff": "2026-11-03T03:00:00Z"
     },
     {
       "away": "TOR",
