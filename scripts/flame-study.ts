@@ -179,6 +179,17 @@ function nuclearReport(rows: Row[]): void {
   for (const n of [50, 55, 60, 65, 70]) console.log(`  ${n}+ points: ${lines.filter((l) => l.p.pts >= n).length}`);
   for (const n of [60, 65, 68, 70, 75]) console.log(`  efficiency ${n}+: ${lines.filter((l) => l.e >= n).length}`);
   console.log(`  quadruple-doubles: ${lines.filter((l) => quad(l.p)).length}`);
+  // Scoring duels: two players (or more) at 40, 45, 50 points in the same game
+  for (const n of [40, 45, 50]) {
+    const duels = rows.filter((r) => r.g.players.filter((p) => p.pts >= n).length >= 2);
+    console.log(`  games with 2+ players at ${n}+ points: ${duels.length}`);
+    if (n >= 45) {
+      for (const r of duels) {
+        const best = r.g.players.filter((p) => p.pts >= n).map((p) => `${p.name ?? '?'} ${p.pts} pts (eff ${efficiency(p)})`).join(' · ');
+        console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${best}`);
+      }
+    }
+  }
   // Duels: two players (or more) at a high efficiency in the same game
   for (const n of [45, 50, 55]) {
     const duels = rows.filter((r) => r.effs.filter((e) => e >= n).length >= 2);

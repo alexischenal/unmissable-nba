@@ -60,5 +60,9 @@ test('why: two players at the duel efficiency in the same game are both nuclear'
   assert.deepEqual(whyOf({ ...flat, players: [player(49), player(52), player(40)] }), { nuclear: 2, big: 1 });
   assert.deepEqual(whyOf({ ...flat, players: [player(52), player(47)] }), { huge: 2 }); // only one at 48+
   assert.deepEqual(whyLabels({ nuclear: 2 }), ['WTF??? ×2']);
+  // Two scorers at the duel points (example: 48), even with a modest efficiency
+  const scorer: PlayerLine = { ...player(0), pts: 50, fgm: 17, fga: 38, ftm: 10, fta: 12, tov: 4 };
+  assert.deepEqual(whyOf({ ...flat, players: [scorer, { ...scorer, team: 'away' }] }), { nuclear: 2 });
+  assert.deepEqual(whyOf({ ...flat, players: [scorer] }), { big: 1 }); // alone: a big night (50 points ≥ 41)
 });
 
