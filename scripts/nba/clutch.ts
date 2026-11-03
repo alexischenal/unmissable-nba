@@ -7,12 +7,13 @@ import type { Game } from '../../src/types/game.ts';
 // with the margin at 5 points or less. Measured from the play-by-play (every action, with the clock
 // and the score), reduced to a score timeline. Used by season-stats to compare with the final margin.
 
-// [period, seconds left in the period, home score, away score], in game order, one per score change
-export type ScoreEvent = [number, number, number, number];
+// [period, seconds left in the period, home score, away score, scorer], in game order, one per score change.
+// The scorer (the NBA's personId) is missing from timelines downloaded before November 2026.
+export type ScoreEvent = [number, number, number, number, number?];
 export type Timeline = ScoreEvent[];
 
 export type RawPlayByPlay = {
-  game: { gameId: string; actions: { period: number; clock: string; scoreHome: string; scoreAway: string; timeActual?: string }[] };
+  game: { gameId: string; actions: { period: number; clock: string; scoreHome: string; scoreAway: string; timeActual?: string; personId?: number }[] };
 };
 
 export type Clutch = {
@@ -66,7 +67,9 @@ export function toTimeline(pbp: RawPlayByPlay): Timeline {
     const h = Number(a.scoreHome), w = Number(a.scoreAway);
     if (h !== home || w !== away) {
       home = h; away = w;
-      out.push([a.period, parseClock(a.clock), home, away]);
+      out.push(typeof a.personId === 'number' && a.personId > 0
+        ? [a.period, parseClock(a.clock), home, away, a.personId]
+        : [a.period, parseClock(a.clock), home, away]);
     }
   }
   return out;

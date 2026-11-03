@@ -32,13 +32,14 @@ export type RawPlayerStatistics = {
   freeThrowsMade: number;
   freeThrowsAttempted: number;
   turnovers: number;
+  threePointersMade?: number;
 };
 
 export type RawBoxscoreTeam = {
   teamTricode: string;
   score: number;
   periods: { period: number; periodType: string; score: number }[];
-  players: { name?: string; statistics: RawPlayerStatistics }[];
+  players: { personId?: number; name?: string; statistics: RawPlayerStatistics }[];
   statistics: {
     biggestLead: number;
     leadChanges: number;

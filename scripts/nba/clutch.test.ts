@@ -42,6 +42,9 @@ test('the play-by-play is reduced to score changes, and a bad format fails loudl
     { period: 1, clock: 'PT11M20.00S', scoreHome: '2', scoreAway: '0' },
   ] } };
   assert.deepEqual(toTimeline(pbp), [[1, 700, 2, 0]]);
+  // With the scorer, when the NBA gives it
+  const withScorer = { game: { gameId: 'x', actions: [{ period: 1, clock: 'PT11M40.00S', scoreHome: '0', scoreAway: '3', personId: 201939 }] } };
+  assert.deepEqual(toTimeline(withScorer as never), [[1, 700, 0, 3, 201939]]);
   assert.throws(() => toTimeline({ game: { gameId: 'x', actions: [{ clock: 'x' }] } } as never));
 });
 

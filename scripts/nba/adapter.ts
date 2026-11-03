@@ -56,6 +56,7 @@ function toPlayers(team: RawBoxscoreTeam, side: Side): PlayerLine[] {
     return {
       team: side,
       ...(p.name ? { name: p.name } : {}),
+      ...(typeof p.personId === 'number' ? { id: p.personId } : {}),
       pts: num(s.points, `${label} points`),
       reb: num(s.reboundsTotal, `${label} reboundsTotal`),
       ast: num(s.assists, `${label} assists`),
@@ -66,6 +67,7 @@ function toPlayers(team: RawBoxscoreTeam, side: Side): PlayerLine[] {
       ftm: num(s.freeThrowsMade, `${label} freeThrowsMade`),
       fta: num(s.freeThrowsAttempted, `${label} freeThrowsAttempted`),
       tov: num(s.turnovers, `${label} turnovers`),
+      ...(typeof s.threePointersMade === 'number' ? { fg3m: s.threePointersMade } : {}),
     };
   });
 }
