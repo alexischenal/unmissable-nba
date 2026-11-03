@@ -46,12 +46,12 @@ function NightName({ date }: { date: string }) {
   );
 }
 
-// "Next night · October 23–24": with its date, since it isn't always tomorrow (days off are skipped)
+// "Next night: October 23–24": with its date, since it isn't always tomorrow (days off are skipped)
 function NextNightName({ date }: { date: string }) {
   return (
     <>
-      <span className="header__long">Next night · {nightDates(date)}</span>
-      <span className="header__short">Next night · {nightDates(date, { short: true })}</span>
+      <span className="header__long">Next night: {nightDates(date)}</span>
+      <span className="header__short">Next night: {nightDates(date, { short: true })}</span>
     </>
   );
 }

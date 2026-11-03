@@ -41,8 +41,8 @@ export function EmptyNight({ next }: { next: NightJson | null }) {
 
       {next ? (
         <a className="empty__next" href={NEXT_URL}>
-          <span className="empty__long">Next night · {nightDates(next.date)}</span>
-          <span className="empty__short">Next night · {nightDates(next.date, { short: true })}</span>
+          <span className="empty__long">Next night: {nightDates(next.date)}</span>
+          <span className="empty__short">Next night: {nightDates(next.date, { short: true })}</span>
         </a>
       ) : (
         <p className="article__text">The season is over. See you in October.</p>
