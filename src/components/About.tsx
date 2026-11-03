@@ -1,19 +1,20 @@
 // src/components/About.tsx
 // The "How it works" page: where the percentages come from. Ingredients only, never the settings.
 
-// The card's flame, at text size: read as "flame" by screen readers
-function Flame() {
+// The card's flame, at text size: read as "flame" by screen readers, unless the word is already next to it
+function Flame({ decorative = false }: { decorative?: boolean }) {
+  const a11y = decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': 'flame' };
   return (
-    <span className="article__flame" role="img" aria-label="flame">
+    <span className="article__flame" {...a11y}>
       <svg className="article__flame-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
     </span>
   );
 }
 
-// The hidden level's button, at text size, crackling: read as "radioactive sign"
+// The hidden level's button, at text size, crackling. Only shown next to its name: hidden from screen readers.
 function SpicyRock() {
   return (
-    <span className="article__flame article__flame--nuclear" role="img" aria-label="radioactive sign">
+    <span className="article__flame article__flame--nuclear" aria-hidden="true">
       <span className="article__sparks" aria-hidden="true" />
       <svg className="article__flame-icon" aria-hidden="true"><use href="/sprite.svg#nuclear" /></svg>
     </span>
@@ -59,7 +60,7 @@ export function About() {
       </p>
 
       <h2 className="article__subtitle">
-        Good to know – the <Flame />
+        Good to know – the flame <Flame decorative />
       </h2>
       <p className="article__text">
         A flame next to a percentage means somebody cooked. Tap it to see the performances: big, huge or crazy.
