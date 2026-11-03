@@ -20,16 +20,18 @@
     {
       "away": "ATL",
       "home": "IND",
-      "tipOff": "2026-11-03T00:30:00Z"
-    },
-    {
-      "away": "BKN",
-      "home": "NYK",
-      "tipOff": "2026-11-03T00:30:00Z"
+      "tipOff": "2026-11-03T00:30:00Z",
+      "note": 60
     },
     {
       "away": "CHI",
       "home": "PHI",
+      "tipOff": "2026-11-03T00:30:00Z",
+      "note": 9
+    },
+    {
+      "away": "BKN",
+      "home": "NYK",
       "tipOff": "2026-11-03T00:30:00Z"
     },
     {
