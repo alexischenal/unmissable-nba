@@ -128,6 +128,31 @@ and milestones (context, not play), fights and ejections.
      historic night, which efficiency doesn't see). Needs the 3-pointers made in the box score data first
      (`PlayerLine` only keeps all field goals).
 
+0. **High priority — the spicy rock, the heart of the site: never miss a player's peak** (November 3).
+   Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy
+   Curry night discovered too late. The rating tells which game is close; the spicy rock must tell **which
+   player had the night of his life**. Now that it's teased in How it works, it has to be right.
+   - **The gap today**: its doors are absolute (60 points, 65 efficiency, quadruple-double, duels), so they
+     favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
+     Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas
+     would be a Huge.
+   - **The idea: a door relative to the player**, with two conditions at once:
+     1. a peak **for him**: one of his top 3 nights over the last seasons, or a personal record (efficiency or
+        points);
+     2. **and** a big night for everyone: at least Huge (45 efficiency), so the rock keeps its meaning.
+     Examples: Curry's 57 → yes. A player who scores 45 for the first time → yes. A backup center's 22 points
+     for a 7-point career average → no (a great night for him, not a must-watch for the others). Jokić at 50
+     efficiency → no (huge, but normal for him): it also fixes the Denver concentration.
+     The absolute doors stay (83 points is historic whoever scores them).
+   - **What it needs**: each player's history over a few seasons, the data of the five-season study above
+     (same downloads). A "personal bests" file the script reads when it rates a game and updates when a record
+     falls: public stats, no spoiler, it can live in the repo. Players without history (rookies): the absolute
+     doors only, or their own season so far.
+   - **To calibrate on five seasons**: how often (keep it rare: ~500 players, a "top 3 for him" happens almost
+     every night without the floor), who lights it (more different players than today?), and the "record
+     threes" door (13+, Curry's kind of night).
+   - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
+
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
    GitHub API. GitHub's schedule stays as a fallback.
