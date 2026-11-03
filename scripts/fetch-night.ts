@@ -243,6 +243,8 @@ async function main(): Promise<void> {
     // whatever the settings. Never on a real night.
     const [first, ...rest] = night.games;
     const games = first ? [{ ...first, why: { crazy: 1, huge: 1, big: 1 } }, ...rest] : rest;
+    // ?date=2099-04-04 also shows the hidden level, on the second game
+    if (games[1]) games[1] = { ...games[1], why: { nuclear: 1 } };
     await save({ ...night, date: DEMO_DATE, games }, { latest: false });
     console.log(`Open the site with ?date=${DEMO_DATE}`);
     return;

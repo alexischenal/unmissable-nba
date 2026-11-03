@@ -92,6 +92,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
     if (whyOpen && !buttonRef.current?.contains(event.target as Node)) setWhyOpen(false);
   };
   const why = state === 'rated' && game.why ? whyChips(game.why) : [];
+  const nuclear = state === 'rated' && (game.why?.nuclear ?? 0) > 0;
   const away = teamFor(game.away);
   const home = teamFor(game.home);
   // Two teams with the same color (PHI and NYK): one switches, so the diagonal stays visible
@@ -128,13 +129,15 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
           <button
             ref={buttonRef}
             type="button"
-            className="card__why-button"
+            className={nuclear ? 'card__why-button card__why-button--nuclear' : 'card__why-button'}
             aria-expanded={whyOpen}
             aria-controls={whyId}
             aria-label={`Why ${game.note}%?`}
             onClick={() => setWhyOpen((o) => !o)}
           >
-            <svg className="card__why-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
+            {/* A historic night, never announced: the radioactive sign, crackling */}
+            {nuclear && <span className="card__why-sparks" aria-hidden="true" />}
+            <svg className="card__why-icon" aria-hidden="true"><use href={nuclear ? '/sprite.svg#nuclear' : '/sprite.svg#flame'} /></svg>
           </button>
         )}
       </article>

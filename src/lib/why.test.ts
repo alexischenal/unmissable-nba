@@ -43,3 +43,14 @@ test('why: big and huge nights are counted, never named', () => {
   assert.deepEqual(why, { crazy: 1, huge: 2, big: 1 });
   assert.deepEqual(whyLabels(why!), ['Crazy performance', 'Huge performance ×2', 'Big performance']);
 });
+
+test('why: a historic night is nuclear, never announced, and counted once', () => {
+  // Example settings: 58 points, or 68 of efficiency, or a quadruple-double
+  const sixty: PlayerLine = { ...player(0), pts: 61, fgm: 20, fga: 40, ftm: 15, fta: 18, tov: 5 };
+  const quadruple: PlayerLine = { ...player(0), pts: 18, reb: 12, ast: 11, blk: 10 };
+  assert.deepEqual(whyOf({ ...flat, players: [sixty] }), { nuclear: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [quadruple] }), { nuclear: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [player(70), player(60)] }), { nuclear: 1, crazy: 1 });
+  assert.deepEqual(whyLabels({ nuclear: 1, big: 1 }), ['Nuclear performance', 'Big performance']);
+});
+

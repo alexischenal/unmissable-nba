@@ -14,7 +14,8 @@ export type PublicGame = {
 // Never a name, a team or a number: only how many players had a big night.
 export type Why = {
   scenario?: true; // no longer written (nights rated before November 1), ignored by the cards
-  crazy?: number;  // players with a crazy night
+  nuclear?: number; // players with a historic night (never announced: the button turns radioactive)
+  crazy?: number;  // players with a crazy night (not nuclear)
   huge?: number;   // players with a huge night (not crazy)
   big?: number;    // players with a big night (not huge)
 };

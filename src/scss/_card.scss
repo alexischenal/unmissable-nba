@@ -204,6 +204,62 @@
     filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.5));
   }
 
+  .card__why-button--nuclear {
+    background: radial-gradient(circle at var(--fire-x) var(--fire-y), #f2ffb8 0%, #9be04a var(--fire-core), #3f8f2a var(--fire-mid), #123a12 100%);
+    box-shadow: 0 0 5px 1px rgba(130, 225, 70, 0.5);
+    animation-duration: 1.2s;
+  }
+
+  .card__why-sparks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .card__why-sparks::before,
+  .card__why-sparks::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 2px;
+    margin: -1px 0 0 -1px;
+    border-radius: 50%;
+    animation: why-crackle 0.9s steps(1) infinite;
+  }
+
+  .card__why-sparks::before {
+    box-shadow:
+      calc(var(--why-size) * 0.82) calc(var(--why-size) * 0.02) 0 0px #d8ff8a,
+      calc(var(--why-size) * 0.42) calc(var(--why-size) * 0.61) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.27) calc(var(--why-size) * 0.66) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.57) calc(var(--why-size) * 0.27) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.66) calc(var(--why-size) * -0.45) 0 0px #d8ff8a,
+      calc(var(--why-size) * 0.02) calc(var(--why-size) * -0.68) 0 0px #d8ff8a,
+      calc(var(--why-size) * 0.5) calc(var(--why-size) * -0.41) 0 0px #d8ff8a;
+  }
+
+  .card__why-sparks::after {
+    box-shadow:
+      calc(var(--why-size) * 0.56) calc(var(--why-size) * 0.69) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.0) calc(var(--why-size) * 0.71) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.78) calc(var(--why-size) * 0.2) 0 0px #d8ff8a,
+      calc(var(--why-size) * -0.55) calc(var(--why-size) * -0.37) 0 0px #d8ff8a,
+      calc(var(--why-size) * 0.13) calc(var(--why-size) * -0.63) 0 0px #d8ff8a,
+      calc(var(--why-size) * 0.81) calc(var(--why-size) * -0.24) 0 0.5px #d8ff8a;
+    animation-duration: 1.3s;
+    animation-delay: -0.4s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card__why-sparks::before,
+    .card__why-sparks::after {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+
   .card__why-button::before {
     content: "";
     position: absolute;
@@ -238,6 +294,40 @@
   syntax: "<percentage>";
   inherits: false;
   initial-value: 16%;
+}
+
+@keyframes why-crackle {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  14% {
+    opacity: 0.15;
+  }
+
+  28% {
+    opacity: 0.9;
+    transform: rotate(38deg) scale(1.06);
+  }
+
+  45% {
+    opacity: 0;
+  }
+
+  58% {
+    opacity: 1;
+    transform: rotate(-24deg) scale(0.96);
+  }
+
+  76% {
+    opacity: 0.25;
+    transform: rotate(70deg) scale(1.08);
+  }
+
+  88% {
+    opacity: 0.85;
+  }
 }
 
 @keyframes why-fire {
@@ -345,6 +435,14 @@
     border-color: #ff9a2e;
     background: rgba(255, 122, 26, 0.2);
     box-shadow: 0 0 7px 1px rgba(255, 140, 26, 0.65);
+  }
+
+  .card__why-chip--nuclear {
+    border-color: #b8f070;
+    background: radial-gradient(ellipse at 50% 85%, #c9f56a 0%, #5fb52e 50%, #1d4a16 100%);
+    color: $white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 12px 3px rgba(130, 225, 70, 0.8);
   }
 
   .card__why-chip--crazy {
