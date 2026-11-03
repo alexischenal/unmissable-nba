@@ -90,6 +90,9 @@ and milestones (context, not play), fights and ejections.
     radioactive (the trefoil, a green fire, crackling sparks instead of the glow), the chip says "WTF???"
     (screen readers: "Historic performance"). The only level visible before the click: that's the point.
     Last season: 3 nights (Jokić 56-16-15 on December 26, Adebayo's 83 points, Dončić's 60), no quadruple-double.
+    Also a duel (November 3): two players (or more) at 50+ efficiency in the same game are both nuclear
+    ("WTF??? ×2"), teammates or not (setting `why.nuclearDuel`). Last season: 2 games, both at 100% (Jokić and
+    Murray's 53 points against Dallas, Jokić and Wembanyama on April 4). 5 nuclear nights a season in all.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
     config (`why.*`). Ratings published before October 31 have no "?".

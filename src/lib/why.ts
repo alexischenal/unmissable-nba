@@ -13,9 +13,12 @@ const quadrupleDouble = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].f
 
 export function whyOf(g: Game): Why | undefined {
   const w = SCORING.why;
+  // A duel: two players (or more) at nuclearDuel efficiency in the same game are all nuclear
+  const duel = g.players.filter((p) => efficiency(p) >= w.nuclearDuel).length >= 2;
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
-    return { eff, pts: p.pts, nuclear: p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) };
+    const nuclear = p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && eff >= w.nuclearDuel);
+    return { eff, pts: p.pts, nuclear };
   });
   // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by
   // points: a scorer who had to take every shot still had a big night, even if his misses pull his
