@@ -3,6 +3,15 @@
   "date": "2026-11-02",
   "games": [
     {
+      "away": "NOP",
+      "home": "MEM",
+      "tipOff": "2026-11-03T01:00:00Z",
+      "note": 81,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "OKC",
       "home": "CLE",
       "tipOff": "2026-11-03T00:00:00Z",
@@ -55,11 +64,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "NOP",
-      "home": "MEM",
-      "tipOff": "2026-11-03T01:00:00Z"
     },
     {
       "away": "BOS",
