@@ -36,6 +36,11 @@ export function Legal() {
         anonymous statistics only (pages viewed, referring site, country, browser, screen size), without cookies
         and without tracking you across sites.
       </p>
+      <p className="article__text">
+        On mornings after a night without games, the home page plays a GIF hosted by{' '}
+        <a className="article__link" href="https://tenor.com">Tenor</a> (Google): your browser loads it from their
+        servers, which see your IP address like any website you visit.
+      </p>
     </article>
   );
 }

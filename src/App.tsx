@@ -7,15 +7,21 @@
 // The header says where you are; the other pages are in the burger menu.
 
 import { About } from './components/About.tsx';
+import { EmptyNight } from './components/EmptyNight.tsx';
 import { Legal } from './components/Legal.tsx';
 import { MatchCard } from './components/MatchCard.tsx';
 import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
+import { emptyNightDate, isEmptyNow, staleAt } from './lib/empty.ts';
 import { ABOUT_URL, HOME_URL, LEGAL_URL, NEXT_URL, PAGE, nightDates, nightLabel } from './lib/night.ts';
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
-const LOADED_AT = Date.now();
+// In development only, ?now=2026-11-04T07:00Z pretends to be at that time (to preview the empty screen).
+const DEV_NOW = import.meta.env.DEV ? Date.parse(new URLSearchParams(window.location.search).get('now') ?? '') : NaN;
+const LOADED_AT = Number.isNaN(DEV_NOW) ? Date.now() : DEV_NOW;
+// A specific night asked for in the URL (?date=…) is always shown as it is, never as "no games"
+const DATE_IN_URL = new URLSearchParams(window.location.search).has('date');
 
 // The text pages: their name next to the brand, and in the browser tab
 const SECTION = PAGE === 'about' ? 'How it works' : PAGE === 'legal' ? 'Legal notice' : null;
@@ -40,12 +46,12 @@ function NightName({ date }: { date: string }) {
   );
 }
 
-// "Next night · October 23–24": with its date, since it isn't always tomorrow (days off are skipped)
+// "Next night: October 23–24": with its date, since it isn't always tomorrow (days off are skipped)
 function NextNightName({ date }: { date: string }) {
   return (
     <>
-      <span className="header__long">Next night · {nightDates(date)}</span>
-      <span className="header__short">Next night · {nightDates(date, { short: true })}</span>
+      <span className="header__long">Next night: {nightDates(date)}</span>
+      <span className="header__short">Next night: {nightDates(date, { short: true })}</span>
     </>
   );
 }
@@ -59,8 +65,17 @@ export function App() {
 
   const homeNight = home.status === 'ready' ? home.night : null;
   const nextNight = next.status === 'ready' ? next.night : null;
+  // A whole night went by without games: the home page says so instead of showing yesterday's cards.
+  // Decided once the next night is known (its first tip-off ends the empty screen).
+  const stale = !DATE_IN_URL && homeNight !== null && LOADED_AT >= staleAt(homeNight);
+  const homeEmpty = stale && next.status === 'ready' && isEmptyNow(homeNight, nextNight, LOADED_AT);
+  const waitingForNext = stale && next.status === 'loading';
+  // The night the home page stands for: the one without games when empty
+  const homeDate = homeNight ? (homeEmpty ? emptyNightDate(homeNight, nextNight) : homeNight.date) : null;
+  const showEmpty = PAGE === 'home' && homeEmpty;
   // The night on screen (none on the text pages)
-  const night: NightJson | null = PAGE === 'next' ? nextNight : PAGE === 'home' ? homeNight : null;
+  const night: NightJson | null =
+    PAGE === 'next' ? nextNight : PAGE === 'home' && !homeEmpty && !waitingForNext ? homeNight : null;
   const complete = night !== null && nightIsComplete(night);
 
   // The games split by state, keeping the JSON's order (rated: best first; others: by tip-off)
@@ -72,9 +87,9 @@ export function App() {
 
   let status: string | null = null;
   if (PAGE === 'home') {
-    if (home.status === 'loading') status = 'Loading games…';
+    if (home.status === 'loading' || waitingForNext) status = 'Loading games…';
     else if (home.status === 'error') status = "Last night's games aren't available yet. Try again in a little while.";
-    else if (homeNight?.games.length === 0) status = 'No games last night. Come back tomorrow morning.';
+    else if (!homeEmpty && homeNight?.games.length === 0) status = 'No games last night. Come back tomorrow morning.';
   } else if (PAGE === 'next') {
     if (next.status === 'loading') status = 'Loading games…';
     else if (next.status === 'error') status = "The next night's games aren't available yet. Try again in a little while.";
@@ -83,7 +98,7 @@ export function App() {
 
   // The menu: the other nights first, then the text pages (never the page you're on)
   const menuItems: MenuItem[] = [];
-  if (PAGE !== 'home' && homeNight) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeNight.date} /> });
+  if (PAGE !== 'home' && homeDate) menuItems.push({ key: 'home', href: HOME_URL, label: <NightName date={homeDate} /> });
   if (PAGE !== 'next' && nextNight) menuItems.push({ key: 'next', href: NEXT_URL, label: <NextNightName date={nextNight.date} /> });
   if (PAGE !== 'about') menuItems.push(ABOUT_ITEM);
   if (PAGE !== 'legal') menuItems.push(LEGAL_ITEM);
@@ -108,13 +123,14 @@ export function App() {
             <p className="header__night header__current">
               {PAGE === 'next'
                 ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
-                : homeNight ? <NightName date={homeNight.date} /> : ' '}
+                : homeDate ? <NightName date={homeDate} /> : ' '}
             </p>
           )}
         </header>
 
         {PAGE === 'about' && <About />}
         {PAGE === 'legal' && <Legal />}
+        {showEmpty && <EmptyNight next={nextNight} />}
 
         <p className="page__status" role="status" hidden={status === null}>{status}</p>
 
