@@ -30,13 +30,17 @@
       "note": 9
     },
     {
-      "away": "BKN",
-      "home": "NYK",
-      "tipOff": "2026-11-03T00:30:00Z"
-    },
-    {
       "away": "DET",
       "home": "CHA",
+      "tipOff": "2026-11-03T00:30:00Z",
+      "note": 8,
+      "why": {
+        "big": 1
+      }
+    },
+    {
+      "away": "BKN",
+      "home": "NYK",
       "tipOff": "2026-11-03T00:30:00Z"
     },
     {
