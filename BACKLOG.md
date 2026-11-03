@@ -85,8 +85,7 @@ and milestones (context, not play), fights and ejections.
     had to take every shot still had a big night. Big tier only, and the flame only: the rating doesn't change.
     Last season, efficiency alone missed 36 nights of 40 to 44 points (45+ were all lit); Curry's four 42+
     nights all had the flame.
-  - **A hidden level: nuclear** (November 3). Teased since November 3 in How it works ("Good to know – the spicy
-    rock", the icon and "Bro, WTF! Just watch it!"), never the rules: 60+ points, 65+ efficiency (70 at first,
+  - **A hidden level: nuclear** (November 3). Teased since November 3 in How it works ("The spicy rock", the icon and "Bro, WTF! Just watch it!"), never the rules: 60+ points, 65+ efficiency (70 at first,
     65 since November 3: a step of 10 above crazy, like the others) or a quadruple-double (settings
     `why.nuclearPoints`, `why.nuclearEff`). The button turns
     radioactive (the trefoil, a green fire, crackling sparks instead of the glow), the chip says "WTF???"
@@ -98,6 +97,8 @@ and milestones (context, not play), fights and ejections.
     season in all (with Jokić's 55 points and 66 efficiency on November 13).
     And a scoring duel: two players (or more) at 45+ points in the same game (setting `why.nuclearDuelPoints`).
     Never happened last season (5 games at 40+ points, none at 45+): a lottery ticket, like the quadruple-double.
+  - **To do once the rules settle: redraw the season chart of How it works.** It dates from before the
+    garbage-time rule (its alt text says 54% at 50%+; 51% now). `season-stats --clutch` writes the ratings CSV.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
     config (`why.*`). Ratings published before October 31 have no "?".
