@@ -141,14 +141,23 @@ and milestones (context, not play), fights and ejections.
      favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
      Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas
      would be a Huge.
-   - **The idea: a door relative to the player**, with two conditions at once:
-     1. a peak **for him**: one of his top 3 nights over the last seasons, or a personal record (efficiency or
-        points);
-     2. **and** a big night for everyone: at least Huge (45 efficiency), so the rock keeps its meaning.
-     Examples: Curry's 57 → yes. A player who scores 45 for the first time → yes. A backup center's 22 points
-     for a 7-point career average → no (a great night for him, not a must-watch for the others). Jokić at 50
-     efficiency → no (huge, but normal for him): it also fixes the Denver concentration.
-     The absolute doors stay (83 points is historic whoever scores them).
+   - **The idea: a door relative to the player** (direction chosen November 3: the "personal top 1%").
+     A rock when the night is in **the best 1% of his own games** over the last seasons, **and** above an
+     absolute floor (Huge, 45 efficiency), so the rock keeps its meaning for everyone.
+     - Curry (~70 games a season): his 3–4 best nights over five seasons, about his top 10 over a career.
+       That's the goal: never miss them.
+     - Jokić: his top 1% is his 65–70 efficiency nights, not his 50s: one or two rocks a season, like the
+       others. The nerf is automatic: the stronger a player usually is, the higher his own bar. Nobody is
+       penalized, everyone is measured against himself.
+     - A backup center's 22 points (his top 1%) → blocked by the floor. Jokić at 50 → no (normal for him).
+     - Rejected: a quota per player (hides a real 3rd historic night), "beat your record" (too strict: only
+       Curry's number 1), all relative (loses pure records like Adebayo's 83).
+     - Keep absolute doors for pure history, a bit higher: 60 points, quadruple-double, efficiency back to
+       70 (the personal door now covers Jokić's 65s), and the duels.
+     - To calibrate on five seasons: 1% or 2%? Huge or Crazy as the floor? Check that Curry's top 10 is there
+       and that Jokić is back to the others' level.
+   - **What the spicy rock becomes: the editors' pick.** Not a stat tag: "la reco de la rédac", the one night
+     the site would tell a friend to watch. Every choice above serves that.
    - **What it needs**: each player's history over a few seasons, the data of the five-season study above
      (same downloads). A "personal bests" file the script reads when it rates a game and updates when a record
      falls: public stats, no spoiler, it can live in the repo. Players without history (rookies): the absolute
