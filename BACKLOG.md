@@ -85,6 +85,11 @@ and milestones (context, not play), fights and ejections.
     had to take every shot still had a big night. Big tier only, and the flame only: the rating doesn't change.
     Last season, efficiency alone missed 36 nights of 40 to 44 points (45+ were all lit); Curry's four 42+
     nights all had the flame.
+  - **A hidden level: nuclear** (November 3). Never announced (How it works speaks of three levels): 60+ points,
+    70+ efficiency or a quadruple-double (settings `why.nuclearPoints`, `why.nuclearEff`). The button turns
+    radioactive (the trefoil, a green fire, crackling sparks instead of the glow), the chip says "WTF???"
+    (screen readers: "Historic performance"). The only level visible before the click: that's the point.
+    Last season: 3 nights (Jokić 56-16-15 on December 26, Adebayo's 83 points, Dončić's 60), no quadruple-double.
   - Never a name, a team, a number, or how the game ends (no "Overtime").
   - Computed when the game is rated, in the public JSON (`why`), never recalculated. Thresholds in the secret
     config (`why.*`). Ratings published before October 31 have no "?".
