@@ -128,6 +128,77 @@ and milestones (context, not play), fights and ejections.
      historic night, which efficiency doesn't see). Needs the 3-pointers made in the box score data first
      (`PlayerLine` only keeps all field goals).
 
+0. **High priority — the spicy rock, the heart of the site: never miss a player's peak** (November 3).
+   Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy
+   Curry night discovered too late. The rating tells which game is close; the spicy rock must tell **which
+   player had the night of his life**. Now that it's teased in How it works, it has to be right.
+   - **The compass, for every decision on this**: *the flame says "somebody shone", the spicy rock says "you
+     won't see that again anytime soon".* The flame stays absolute (what happened: Jokić shines often, so
+     Denver often has one, and that's true); the spicy rock is relative (out of the ordinary **for that
+     player**). Jokić gets many flames and few rocks: for him too, the exceptional is rare. Don't hunt the
+     white whale: build around it.
+   - **The gap today**: its doors are absolute (60 points, 65 efficiency, quadruple-double, duels), so they
+     favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
+     Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas
+     would be a Huge.
+   - **The idea: a door relative to the player** (direction chosen November 3: the "personal top 1%").
+     A rock when the night is in **the best 1% of his own games** over the last seasons, **and** above an
+     absolute floor (Huge, 45 efficiency), so the rock keeps its meaning for everyone.
+     - Curry (~70 games a season): his 3–4 best nights over five seasons, about his top 10 over a career.
+       That's the goal: never miss them.
+     - Jokić: his top 1% is his 65–70 efficiency nights, not his 50s: one or two rocks a season, like the
+       others. The nerf is automatic: the stronger a player usually is, the higher his own bar. Nobody is
+       penalized, everyone is measured against himself.
+     - A backup center's 22 points (his top 1%) → blocked by the floor. Jokić at 50 → no (normal for him).
+     - Rejected: a quota per player (hides a real 3rd historic night), "beat your record" (too strict: only
+       Curry's number 1), all relative (loses pure records like Adebayo's 83).
+     - Keep absolute doors for pure history, a bit higher: 60 points, quadruple-double, efficiency back to
+       70 (the personal door now covers Jokić's 65s), and the duels.
+     - To calibrate on five seasons: 1% or 2%? Huge or Crazy as the floor? Check that Curry's top 10 is there
+       and that Jokić is back to the others' level.
+   - **What the spicy rock becomes: the editors' pick.** Not a stat tag: "la reco de la rédac", the one night
+     the site would tell a friend to watch. Every choice above serves that.
+   - **What it needs**: each player's history over a few seasons, the data of the five-season study above
+     (same downloads). A "personal bests" file the script reads when it rates a game and updates when a record
+     falls: public stats, no spoiler, it can live in the repo. Players without history (rookies): the absolute
+     doors only, or their own season so far.
+   - **To calibrate on five seasons**: how often (keep it rare: ~500 players, a "top 3 for him" happens almost
+     every night without the floor), who lights it (more different players than today?), and the "record
+     threes" door (13+, Curry's kind of night).
+   - **Two kinds of visitors, two scales of rarity.** We calibrate over a season (soon five); a visitor sees
+     only the mornings he comes. 6 rocks a season is perfect for someone who comes every day (one every month
+     or so, special). For someone who comes once a week, it's 6 chances in 166 nights per visit: about **one
+     rock a season**, often none. Both must get some.
+     - Leads: a slightly higher frequency, if the five seasons allow it without losing the "WTF"; and above
+       all **letting a rock live longer than its morning**, without becoming an archive: e.g. "Latest spicy
+       rock: night of March 10" (a link to `?date=`), on the home page, in the menu or on the empty screen,
+       for a week or two. No spoiler: it says a player went off, not who won.
+     - We can't measure who comes how often (no cookies, by choice): GoatCounter only gives visits per day.
+       So: think for both, and watch the visits on the mornings after a rock.
+   - **A buzzer-beater door?** 40 points **and** the shot that wins (or ties) the game at the buzzer: the very
+     definition of a legendary night. Two cautions:
+     - **Spoiler**: the rock never says why ("WTF???"), and the rules are secret, so it doesn't tell the ending
+       by itself. But if the rule ever becomes known, a rock on a 40-point night would hint at a last-second
+       finish. Keep it in the secret rules only.
+     - **Data**: the play-by-play timeline we keep only has the period, the clock and the score, not who
+       scored. We'd need the scorer of the last basket (the play-by-play has it: `personId`), so a change in
+       `scripts/nba/clutch.ts` and new downloads. Goes with algorithm evolution 1 (a game decided in the last
+       seconds), which needs the same reading.
+   - **Never hide a rock because the play-by-play was late: re-rate once it arrives.** Today a game without
+     its play-by-play after 4 h is rated from the box score alone (v1), and nothing is ever recalculated: a
+     door that needs the play-by-play (the buzzer-beater) would stay shut for good, and the v1 rating can be
+     wrong. How it works already says the data is "sometimes published with a delay". Decision (November 3):
+     1. **A game published in v1 is rated again, once, when its play-by-play arrives**: rating, tags (a rock
+        can appear) and the order of the night.
+     2. **Only until the next night starts**: after that, the night is over and nothing moves.
+     3. **Not for the NBA's small stat corrections** afterwards (MEM @ GSW, October 23): a point at most, not
+        worth moving a card.
+     Mostly a few points, but not always: two rules only exist with the play-by-play. A tight finish can lift
+     a 12-point game from blowout to close (+~50), garbage time can drop a 7-point game the other way (−~50):
+     exactly the cases where v1 was wrong. Visitors see it on their next load; with "update without F5"
+     (Next up 9), without reloading.
+   - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
+
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
    GitHub API. GitHub's schedule stays as a fallback.
