@@ -156,6 +156,16 @@ and milestones (context, not play), fights and ejections.
    - **To calibrate on five seasons**: how often (keep it rare: ~500 players, a "top 3 for him" happens almost
      every night without the floor), who lights it (more different players than today?), and the "record
      threes" door (13+, Curry's kind of night).
+   - **Two kinds of visitors, two scales of rarity.** We calibrate over a season (soon five); a visitor sees
+     only the mornings he comes. 6 rocks a season is perfect for someone who comes every day (one every month
+     or so, special). For someone who comes once a week, it's 6 chances in 166 nights per visit: about **one
+     rock a season**, often none. Both must get some.
+     - Leads: a slightly higher frequency, if the five seasons allow it without losing the "WTF"; and above
+       all **letting a rock live longer than its morning**, without becoming an archive: e.g. "Latest spicy
+       rock: night of March 10" (a link to `?date=`), on the home page, in the menu or on the empty screen,
+       for a week or two. No spoiler: it says a player went off, not who won.
+     - We can't measure who comes how often (no cookies, by choice): GoatCounter only gives visits per day.
+       So: think for both, and watch the visits on the mornings after a rock.
    - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
