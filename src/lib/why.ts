@@ -42,7 +42,7 @@ export type WhyChip = { label: string; heat?: 'big' | 'huge' | 'crazy' | 'nuclea
 export function whyChips(why: Why): WhyChip[] {
   const times = (n: number) => (n > 1 ? ` ×${n}` : '');
   return [
-    ...(why.nuclear ? [{ label: `Nuclear performance${times(why.nuclear)}`, heat: 'nuclear' as const }] : []),
+    ...(why.nuclear ? [{ label: `WTF???${times(why.nuclear)}`, heat: 'nuclear' as const }] : []),
     ...(why.crazy ? [{ label: `Crazy performance${times(why.crazy)}`, heat: 'crazy' as const }] : []),
     ...(why.huge ? [{ label: `Huge performance${times(why.huge)}`, heat: 'huge' as const }] : []),
     ...(why.big ? [{ label: `Big performance${times(why.big)}`, heat: 'big' as const }] : []),
