@@ -110,6 +110,20 @@ and milestones (context, not play), fights and ejections.
 
 ## Next up — Monday
 
+0. **Urgent — check the flame and nuclear levels on five seasons, not one** (November 3). Every threshold
+   (big 38 or 40 points, huge 45, crazy 55, nuclear 60 points / 65 efficiency / quadruple-double / duels at 50
+   efficiency or 45 points) was set on 2025-26 alone: a small sample for events this rare (6 nuclear nights).
+   The branch `flame-study-seasons` reads several seasons and lists the nuclear nights per season.
+   - Download (about 25 min per season, kept in `.cache/`):
+     `npm run season-stats -- 2021-22 --clutch`, then 2022-23, 2023-24, 2024-25. Before 2021-22: no
+     (2020-21 had 72 games, 2019-20 was cut short). If the NBA no longer serves an old season, keep the others.
+   - Then: `npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-flame.txt`.
+   - Check: about 6 nuclear nights a season? Not always the same players (Jokić)? Flames still ~30% of the
+     cards? Then merge the branch.
+   - With the same data, look at a "record threes" door for the nuclear level (13+ threes: Curry's kind of
+     historic night, which efficiency doesn't see). Needs the 3-pointers made in the box score data first
+     (`PlayerLine` only keeps all field goals).
+
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
    runs 5 to 20 minutes late; cron-job.org starts the workflow on the minute, every 5 minutes, through the
    GitHub API. GitHub's schedule stays as a fallback.
