@@ -201,8 +201,8 @@ function nuclearReport(rows: Row[]): void {
       }
     }
   }
-  const top = lines.filter((l) => l.p.pts >= 55 || l.e >= 65 || quad(l.p)).sort((a, b) => b.e - a.e);
-  console.log(`  the nights at 55+ points, 65+ efficiency or a quadruple-double (${top.length}):`);
+  const top = lines.filter((l) => l.p.pts >= 55 || l.e >= 60 || quad(l.p)).sort((a, b) => b.e - a.e);
+  console.log(`  the nights at 55+ points, 60+ efficiency or a quadruple-double (${top.length}):`);
   for (const l of top) console.log(`    ${(l.r.g.date ?? '').padEnd(10)} ${(l.p.name ?? '?').padEnd(24)} eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
 }
 
