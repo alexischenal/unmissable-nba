@@ -175,6 +175,12 @@ and milestones (context, not play), fights and ejections.
        scored. We'd need the scorer of the last basket (the play-by-play has it: `personId`), so a change in
        `scripts/nba/clutch.ts` and new downloads. Goes with algorithm evolution 1 (a game decided in the last
        seconds), which needs the same reading.
+   - **Never hide a rock because the play-by-play was late.** Today a game without its play-by-play after 4 h
+     is rated from the box score alone, and nothing is ever recalculated: a door that needs the play-by-play
+     (the buzzer-beater) would stay shut for good. Decision (November 3): an exception to "never
+     recalculated", for the `why` only and only upward. When the play-by-play arrives later, the script
+     checks again and **adds** a rock (never removes a flame, never touches the rating). Visitors see it on
+     their next load; with the "update without F5" item (Next up 9), even without reloading.
    - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
