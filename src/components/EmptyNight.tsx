@@ -12,8 +12,8 @@ const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').m
 export function EmptyNight({ next }: { next: NightJson | null }) {
   return (
     <section className="article empty" aria-labelledby="empty-title">
-      <h2 className="article__title empty__title" id="empty-title">
-        Sorry,
+      <h2 className="article__title" id="empty-title">
+        Sorry,{' '}
         <span className="empty__subtitle">there's nothing to display anymore…</span>
       </h2>
 

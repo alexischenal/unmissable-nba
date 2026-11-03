@@ -2,11 +2,6 @@
 @use "mixins" as *;
 
 .empty {
-  .empty__title {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
 
   .empty__subtitle {
     font-family: $font-text;
