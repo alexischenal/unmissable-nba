@@ -51,6 +51,15 @@
       "note": 44
     },
     {
+      "away": "MIA",
+      "home": "LAL",
+      "tipOff": "2026-11-03T03:00:00Z",
+      "note": 28,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "CHI",
       "home": "PHI",
       "tipOff": "2026-11-03T00:30:00Z",
@@ -85,11 +94,6 @@
       "home": "SAS",
       "tipOff": "2026-11-03T01:30:00Z",
       "note": 3
-    },
-    {
-      "away": "MIA",
-      "home": "LAL",
-      "tipOff": "2026-11-03T03:00:00Z"
     },
     {
       "away": "PHX",
