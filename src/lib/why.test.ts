@@ -34,12 +34,12 @@ test('why: a big scoring night is a big night, even with a low efficiency', () =
   const scorer: PlayerLine = { ...player(0), pts: 44, fgm: 16, fga: 40, ftm: 8, fta: 8, tov: 6 };
   assert.deepEqual(whyOf({ ...flat, players: [scorer] }), { big: 1 });
   // Never above big on points alone, never counted twice
-  assert.deepEqual(whyOf({ ...flat, players: [{ ...player(60), pts: 60 }] }), { crazy: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [{ ...player(57), pts: 57 }] }), { crazy: 1 });
   assert.equal(whyOf({ ...flat, players: [{ ...scorer, pts: 40 }] }), undefined);
 });
 
 test('why: big and huge nights are counted, never named', () => {
-  const why = whyOf({ ...flat, players: [player(60), player(50), player(48), player(40), player(30)] }); // example: 37 / 46 / 56
+  const why = whyOf({ ...flat, players: [player(57), player(50), player(48), player(40), player(30)] }); // example: 37 / 46 / 56
   assert.deepEqual(why, { crazy: 1, huge: 2, big: 1 });
   assert.deepEqual(whyLabels(why!), ['Crazy performance', 'Huge performance ×2', 'Big performance']);
 });
@@ -50,7 +50,7 @@ test('why: a historic night is nuclear, never announced, and counted once', () =
   const quadruple: PlayerLine = { ...player(0), pts: 18, reb: 12, ast: 11, blk: 10 };
   assert.deepEqual(whyOf({ ...flat, players: [sixty] }), { nuclear: 1 });
   assert.deepEqual(whyOf({ ...flat, players: [quadruple] }), { nuclear: 1 });
-  assert.deepEqual(whyOf({ ...flat, players: [player(70), player(60)] }), { nuclear: 1, crazy: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [player(70), player(57)] }), { nuclear: 1, crazy: 1 });
   assert.deepEqual(whyLabels({ nuclear: 1, big: 1 }), ['Nuclear performance', 'Big performance']);
 });
 
