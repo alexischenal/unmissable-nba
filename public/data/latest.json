@@ -5,7 +5,11 @@
     {
       "away": "OKC",
       "home": "CLE",
-      "tipOff": "2026-11-03T00:00:00Z"
+      "tipOff": "2026-11-03T00:00:00Z",
+      "note": 75,
+      "why": {
+        "big": 1
+      }
     },
     {
       "away": "ATL",
