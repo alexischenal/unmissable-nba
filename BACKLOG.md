@@ -175,12 +175,19 @@ and milestones (context, not play), fights and ejections.
        scored. We'd need the scorer of the last basket (the play-by-play has it: `personId`), so a change in
        `scripts/nba/clutch.ts` and new downloads. Goes with algorithm evolution 1 (a game decided in the last
        seconds), which needs the same reading.
-   - **Never hide a rock because the play-by-play was late.** Today a game without its play-by-play after 4 h
-     is rated from the box score alone, and nothing is ever recalculated: a door that needs the play-by-play
-     (the buzzer-beater) would stay shut for good. Decision (November 3): an exception to "never
-     recalculated", for the `why` only and only upward. When the play-by-play arrives later, the script
-     checks again and **adds** a rock (never removes a flame, never touches the rating). Visitors see it on
-     their next load; with the "update without F5" item (Next up 9), even without reloading.
+   - **Never hide a rock because the play-by-play was late: re-rate once it arrives.** Today a game without
+     its play-by-play after 4 h is rated from the box score alone (v1), and nothing is ever recalculated: a
+     door that needs the play-by-play (the buzzer-beater) would stay shut for good, and the v1 rating can be
+     wrong. How it works already says the data is "sometimes published with a delay". Decision (November 3):
+     1. **A game published in v1 is rated again, once, when its play-by-play arrives**: rating, tags (a rock
+        can appear) and the order of the night.
+     2. **Only until the next night starts**: after that, the night is over and nothing moves.
+     3. **Not for the NBA's small stat corrections** afterwards (MEM @ GSW, October 23): a point at most, not
+        worth moving a card.
+     Mostly a few points, but not always: two rules only exist with the play-by-play. A tight finish can lift
+     a 12-point game from blowout to close (+~50), garbage time can drop a 7-point game the other way (−~50):
+     exactly the cases where v1 was wrong. Visitors see it on their next load; with "update without F5"
+     (Next up 9), without reloading.
    - The origin story itself is the best pitch of the site: worth a place (About, README, launch post).
 
 1. **Top priority — cron-job.org, before Tuesday 9 p.m. (first tip-off).** GitHub's own schedule can start
