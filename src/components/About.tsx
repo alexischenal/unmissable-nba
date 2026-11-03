@@ -34,12 +34,10 @@ export function About() {
 
       <h2 className="article__subtitle">Step one: blowout or close game?</h2>
       <p className="article__text">
-        Blowouts start at 0% and can never go above 49%, even with a crazy performance: players get their{' '}
-        {/* "own", the flame and "!" stay on the same line */}
+        Blowouts start at 0% and never go above 49%, whatever happens. Big performances get{' '}
+        {/* "a", the flame and "instead!" stay on the same line */}
         <span className="article__nowrap">
-          own{' '}
-          <Flame />
-          !
+          a <Flame /> instead!
         </span>
         <br />
         Close games start at 50%.
