@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { closeByClutch } from './scoring.ts';
-import { whyLabels, whyOf } from './why.ts';
+import { whyChips, whyLabels, whyOf } from './why.ts';
 import { detAtPhi } from '../../fixtures/2026-04-04-det-phi.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 
@@ -52,5 +52,6 @@ test('why: a historic night is nuclear, never announced, and counted once', () =
   assert.deepEqual(whyOf({ ...flat, players: [quadruple] }), { nuclear: 1 });
   assert.deepEqual(whyOf({ ...flat, players: [player(70), player(57)] }), { nuclear: 1, crazy: 1 });
   assert.deepEqual(whyLabels({ nuclear: 1, big: 1 }), ['WTF???', 'Big performance']);
+  assert.equal(whyChips({ nuclear: 1 })[0]!.spoken, 'Historic performance'); // what screen readers hear
 });
 
