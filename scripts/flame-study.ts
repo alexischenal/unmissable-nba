@@ -171,6 +171,19 @@ function playerNights(rows: Row[], name: string, at: number): void {
   }
 }
 
+// The hidden level: how often would a historic night show? Points, efficiency, quadruple-doubles.
+function nuclearReport(rows: Row[]): void {
+  title('Historic nights (the hidden nuclear level)');
+  const lines = rows.flatMap((r) => r.g.players.map((p) => ({ r, p, e: efficiency(p) })));
+  const quad = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
+  for (const n of [50, 55, 60, 65, 70]) console.log(`  ${n}+ points: ${lines.filter((l) => l.p.pts >= n).length}`);
+  for (const n of [60, 65, 68, 70, 75]) console.log(`  efficiency ${n}+: ${lines.filter((l) => l.e >= n).length}`);
+  console.log(`  quadruple-doubles: ${lines.filter((l) => quad(l.p)).length}`);
+  const top = lines.filter((l) => l.p.pts >= 55 || l.e >= 65 || quad(l.p)).sort((a, b) => b.e - a.e);
+  console.log(`  the nights at 55+ points, 65+ efficiency or a quadruple-double (${top.length}):`);
+  for (const l of top) console.log(`    ${(l.r.g.date ?? '').padEnd(10)} ${(l.p.name ?? '?').padEnd(24)} eff ${String(l.e).padStart(2)}  ${line(l.p)}   game ${l.r.note}%`);
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -212,6 +225,7 @@ async function main(): Promise<void> {
   concentration(rows, at);
   borderline(rows, at);
   scoringNights(rows, at);
+  nuclearReport(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }

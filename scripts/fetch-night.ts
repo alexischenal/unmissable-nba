@@ -239,10 +239,11 @@ async function main(): Promise<void> {
   // shown with ?date=2099-04-04.
   if (useFixture) {
     const night = await fixtureNight();
-    // Demo only: the best game shows every "why" chip at once (the three performance flames),
+    // Demo only: the best game shows every "why" chip at once (the four levels),
     // whatever the settings. Never on a real night.
     const [first, ...rest] = night.games;
-    const games = first ? [{ ...first, why: { crazy: 1, huge: 1, big: 1 } }, ...rest] : rest;
+    // The first one also has the hidden nuclear level (the radioactive button), the second a plain flame.
+    const games = first ? [{ ...first, why: { nuclear: 1, crazy: 1, huge: 1, big: 1 } }, ...rest] : rest;
     await save({ ...night, date: DEMO_DATE, games }, { latest: false });
     console.log(`Open the site with ?date=${DEMO_DATE}`);
     return;
