@@ -1,9 +1,12 @@
 // src/config/gifs.ts
-// The GIFs of the empty screens, from GIPHY (media.giphy.com): the official files, never a copy here.
-// One is picked at random per visit, so returning visitors don't always see the same one.
-// id: the end of the GIPHY page address (giphy.com/gifs/futurama-…-<id>). alt: what happens in it.
+// The GIF of the "no games last night" screen, from Tenor (media.tenor.com): the official files, never
+// a copy here. The video rather than the .gif (lighter): MP4 for every browser, WebM first when supported.
 
-export type Gif = { id: string; alt: string };
-
-// "No games last night"
-export const EMPTY_NIGHT_GIFS: Gif[] = [];
+export const EMPTY_NIGHT_GIF = {
+  mp4: 'https://media.tenor.com/uVVXjJTG36gAAAPo/jt-futurama.mp4',
+  webm: 'https://media.tenor.com/uVVXjJTG36gAAAPs/jt-futurama.webm',
+  page: 'https://tenor.com/view/jt-futurama-philip-j-fry-fry-professor-gif-13354676531340173224',
+  width: 480,
+  height: 270,
+  alt: 'Futurama: at the end of the universe, Fry shakes his empty can and sighs "Oh, the vast emptiness"; the Professor hands him a full one.',
+};
