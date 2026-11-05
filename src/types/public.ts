@@ -12,6 +12,9 @@ export type PublicGame = {
   // Rated without its play-by-play (late at the NBA): rated again, once, when it arrives, until the next
   // night starts. Not read by the site.
   v1?: true;
+  // Over, but its rating waits for the play-by-play (late at the NBA, up to 4 hours). No score, nothing
+  // about the game: only that it's finished.
+  waiting?: true;
 };
 
 // Never a name, a team or a number: only how many players had a big night.
@@ -33,10 +36,12 @@ export type NightJson = {
 };
 
 // A game's state, as the site shows it. "Live" isn't stored: tip-off passed and no rating yet.
-export type GameState = 'upcoming' | 'live' | 'rated';
+// "Waiting": over, its rating waits for more stats.
+export type GameState = 'upcoming' | 'live' | 'waiting' | 'rated';
 
 export function gameState(game: PublicGame, now: number): GameState {
   if (game.note !== undefined) return 'rated';
+  if (game.waiting) return 'waiting';
   if (game.tipOff && Date.parse(game.tipOff) > now) return 'upcoming';
   return 'live';
 }

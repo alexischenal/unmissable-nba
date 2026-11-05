@@ -183,7 +183,7 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
       const waitUntil = base.tipOff ? Date.parse(base.tipOff) + 4 * 60 * 60 * 1000 : 0;
       if (now < waitUntil && !nightIsOver) {
         console.log(`${label}: over, waiting for its play-by-play (${error instanceof Error ? error.message : error}).`);
-        entries.push(base);
+        entries.push({ ...base, waiting: true });
         continue;
       }
       console.warn(`${label}: no complete play-by-play, rated with v1.`);
