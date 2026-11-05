@@ -3,6 +3,7 @@
 // Only the individual nights, never a name, a team or a number. Nothing about the story of the game
 // (comeback, close finish, lead changes…): knowing which one counted would tell the whole story.
 
+import { PEAKS } from '../config/peaks.ts';
 import { SCORING } from '../config/scoring.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 import type { Why } from '../types/public.ts';
@@ -23,10 +24,19 @@ export function whyOf(g: Game): Why | undefined {
   // A big performance (a flame) capped by a buzzer beater that wins the game or forces overtime
   const buzzer = (p: PlayerLine) => p.id !== undefined && p.id === g.late?.buzzerBeater
     && (efficiency(p) >= w.bigNight || p.pts >= w.bigPoints);
+  // A personal peak: in the player's own top 1% (src/config/peaks.ts) and above an absolute floor, on
+  // efficiency or on points (the same stat for both)
+  const peaks = PEAKS();
+  const peak = (p: PlayerLine) => {
+    const bar = peaks && p.id !== undefined ? peaks.players.get(p.id) : undefined;
+    if (!peaks || !bar) return false;
+    const eff = efficiency(p);
+    return (eff >= peaks.eff && eff >= bar.eff) || (p.pts >= peaks.pts && p.pts >= bar.pts);
+  };
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
     const nuclear = competitive
-      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)) || buzzer(p));
+      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)) || buzzer(p) || peak(p));
     return { eff, pts: p.pts, nuclear };
   });
   // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by

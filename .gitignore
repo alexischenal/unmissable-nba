@@ -6,6 +6,8 @@ dist
 public/data/2099-*.json
 # The real settings of the algorithm (see src/config/scoring.ts)
 scoring.secret.json
+# The personal peaks of the spicy rock (npm run player-peaks)
+player-peaks.secret.json
 # Box scores downloaded by npm run season-stats
 .cache/
 # Local reports (season-stats, explain…): they print the real settings

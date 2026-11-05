@@ -84,6 +84,11 @@ it is never published, nor are the details in the GitHub logs.
 (*Settings → Secrets and variables → Actions*), or in a local `scoring.secret.json` (ignored by Git) to test with
 them. Without either, the script runs with the examples and says so; on GitHub, it refuses to publish.
 
+Same for the personal peaks of the spicy rock (each player's top 1%, and the floors of that door):
+`npm run player-peaks -- --eff <floor> --pts <floor>` builds `player-peaks.secret.json` (ignored by Git) from the
+downloaded seasons, to paste into the `PLAYER_PEAKS` secret. Once a season, before the first night. Without it,
+that door is shut and everything else works.
+
 ## Deployment
 
 `.github/workflows/update.yml` runs on GitHub Actions:

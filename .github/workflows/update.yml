@@ -64,6 +64,8 @@ jobs:
           DATE: ${{ github.event.inputs.date }}
           # The real settings of the algorithm (Settings → Secrets and variables → Actions)
           SCORING_CONFIG: ${{ secrets.SCORING_CONFIG }}
+          # Each player's top 1%, for the personal door of the spicy rock (npm run player-peaks)
+          PLAYER_PEAKS: ${{ secrets.PLAYER_PEAKS }}
         run: |
           if [ -n "$DATE" ]; then ARGS="--date=$DATE"; else ARGS=""; fi
           node --experimental-strip-types --no-warnings scripts/fetch-night.ts $ARGS

@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { fetchBoxscore, fetchPlayByPlay, fetchSchedule, pause } from './nba/client.ts';
 import { lateFrom, readPlayByPlay, timelineMatches, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { gamesOnDate, isFinal, toGame } from './nba/adapter.ts';
+import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import { whyLabels, whyOf } from '../src/lib/why.ts';
@@ -134,6 +135,7 @@ async function main(): Promise<void> {
     throw new Error('explain prints the details of the settings: never on GitHub Actions (public logs).');
   }
   loadScoring();
+  loadPeaks();
   const args = process.argv.slice(2);
 
   if (args.includes('--fixture')) {
