@@ -49,10 +49,15 @@ async function loadFile(file: string, signal?: AbortSignal): Promise<NightJson |
   return json;
 }
 
+// ?showcase: a hand-made night to show the site at its best (every level, close games and blowouts).
+// Not a real night: the header says "Showcase", and search engines are told not to index it.
+export const SHOWCASE = new URLSearchParams(window.location.search).has('showcase');
+
 // The home page night: the latest published one by default; ?date=2026-04-04 for a specific night.
 export async function loadNight(signal?: AbortSignal): Promise<NightJson> {
   const requested = new URLSearchParams(window.location.search).get('date');
-  const file = requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) ? `${requested}.json` : 'latest.json';
+  const file = SHOWCASE ? 'showcase.json'
+    : requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) ? `${requested}.json` : 'latest.json';
   const night = await loadFile(file, signal);
   if (!night) throw new Error(`${file} not found`);
   return night;

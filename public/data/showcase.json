@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "date": "2026-11-04",
+  "games": [
+    { "away": "LAL", "home": "SAS", "note": 100, "why": { "nuclear": 1, "big": 1 } },
+    { "away": "BOS", "home": "MIA", "note": 94, "why": { "crazy": 1, "big": 1 } },
+    { "away": "HOU", "home": "DEN", "note": 88, "why": { "huge": 1 } },
+    { "away": "OKC", "home": "MIN", "note": 81, "why": { "big": 2 } },
+    { "away": "GSW", "home": "CLE", "note": 73, "why": { "huge": 1, "big": 1 } },
+    { "away": "TOR", "home": "CHA", "note": 66 },
+    { "away": "ATL", "home": "ORL", "note": 57, "why": { "big": 1 } },
+    { "away": "POR", "home": "MIL", "note": 41, "why": { "crazy": 1 } },
+    { "away": "NOP", "home": "PHI", "note": 23 },
+    { "away": "DET", "home": "IND", "note": 12, "why": { "big": 1 } },
+    { "away": "SAC", "home": "UTA", "note": 6 }
+  ]
+}

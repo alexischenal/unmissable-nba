@@ -13,7 +13,7 @@ import { MatchCard } from './components/MatchCard.tsx';
 import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
 import { emptyNightDate, isEmptyNow, staleAt } from './lib/empty.ts';
-import { ABOUT_URL, HOME_URL, LEGAL_URL, NEXT_URL, PAGE, nightDates, nightLabel } from './lib/night.ts';
+import { ABOUT_URL, HOME_URL, LEGAL_URL, NEXT_URL, PAGE, SHOWCASE, nightDates, nightLabel } from './lib/night.ts';
 import { gameState, nightIsComplete, type GameState, type NightJson, type PublicGame } from './types/public.ts';
 
 // Card states are computed once, at page load: no card changes under the visitor's eyes.
@@ -21,7 +21,16 @@ import { gameState, nightIsComplete, type GameState, type NightJson, type Public
 const DEV_NOW = import.meta.env.DEV ? Date.parse(new URLSearchParams(window.location.search).get('now') ?? '') : NaN;
 const LOADED_AT = Number.isNaN(DEV_NOW) ? Date.now() : DEV_NOW;
 // A specific night asked for in the URL (?date=…) is always shown as it is, never as "no games"
-const DATE_IN_URL = new URLSearchParams(window.location.search).has('date');
+const DATE_IN_URL = new URLSearchParams(window.location.search).has('date') || SHOWCASE;
+
+// The showcase is never indexed (it isn't a real night)
+if (SHOWCASE) {
+  const robots = document.createElement('meta');
+  robots.name = 'robots';
+  robots.content = 'noindex, nofollow';
+  document.head.append(robots);
+  document.title = 'Showcase — Unmissable';
+}
 
 // The text pages: their name next to the brand, and in the browser tab
 const SECTION = PAGE === 'about' ? 'How it works' : PAGE === 'legal' ? 'Legal notice' : null;
@@ -123,7 +132,7 @@ export function App() {
             <p className="header__night header__current">
               {PAGE === 'next'
                 ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
-                : homeDate ? <NightName date={homeDate} /> : ' '}
+                : SHOWCASE ? 'Showcase' : homeDate ? <NightName date={homeDate} /> : ' '}
             </p>
           )}
         </header>
