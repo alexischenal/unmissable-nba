@@ -11,7 +11,7 @@
 // The nights are grouped by the UTC date of the game (all the cache keeps): close to the real nights,
 // not exact (a 1 p.m. Sunday game and the Saturday night games share a date).
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -452,6 +452,63 @@ function personalPeaks(rows: Row[]): void {
   }
 }
 
+// Season by season, as the cards would show it with every rule in use: the cards by their hottest level,
+// and the spicy rocks by door. The personal door is simulated like the site runs it: each player's top 1%
+// from the seasons before (60 games minimum), with the floors of player-peaks.secret.json (no file: no
+// personal door here). A game can open several doors: counted under each.
+function seasonSummary(rows: Row[]): void {
+  title('Season by season: the flames and the spicy rocks');
+  const file = path.join(ROOT, 'player-peaks.secret.json');
+  const floors = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) as { eff: number; pts: number } : null;
+  if (!floors) console.log('  (no player-peaks.secret.json: no personal door below)');
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const top = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t[Math.max(0, Math.ceil(t.length * 0.99) - 1)]!; };
+  const history = new Map<number, { eff: number[]; pts: number[] }>();
+  const w = SCORING.why;
+  console.log(`  ${'season'.padEnd(8)} ${'games'.padStart(5)}  ${'flame'.padStart(5)}   big  huge crazy  rock │ rocks by door: 60 pts  eff  quad  duel  buzzer  personal`);
+  for (const season of seasons) {
+    const rs = rows.filter((r) => r.season === season);
+    // The bars of this season: every game before it
+    const bars = new Map<number, { eff: number; pts: number }>();
+    for (const [id, h] of history) if (h.eff.length >= 60) bars.set(id, { eff: top(h.eff), pts: top(h.pts) });
+    const c = { flame: 0, big: 0, huge: 0, crazy: 0, rock: 0, pts: 0, eff: 0, quad: 0, duel: 0, buzzer: 0, personal: 0 };
+    for (const r of rs) {
+      const why = whyOf(r.g);
+      const competitive = r.note > SCORING.blowoutMax;
+      const personal = !!floors && competitive && r.g.players.some((p) => {
+        const b = p.id !== undefined ? bars.get(p.id) : undefined;
+        const e = efficiency(p);
+        return !!b && ((e >= floors.eff && e >= b.eff) || (p.pts >= floors.pts && p.pts >= b.pts));
+      });
+      if (why?.nuclear || personal) {
+        c.rock++;
+        if (competitive) {
+          if (r.g.players.some((p) => p.pts >= w.nuclearPoints)) c.pts++;
+          if (r.g.players.some((p) => efficiency(p) >= w.nuclearEff)) c.eff++;
+          if (r.g.players.some(quad)) c.quad++;
+          if (mixedDuel(r.g)) c.duel++;
+          const shooter = r.g.players.find((p) => p.id !== undefined && p.id === r.g.late?.buzzerBeater);
+          if (shooter && (efficiency(shooter) >= w.bigNight || shooter.pts >= w.bigPoints)) c.buzzer++;
+          if (personal) c.personal++;
+        }
+      } else if (why?.crazy) c.crazy++;
+      else if (why?.huge) c.huge++;
+      else if (why?.big) c.big++;
+      if (why || personal) c.flame++;
+    }
+    const pc = (n: number) => `${String(n).padStart(4)}`;
+    console.log(`  ${season.padEnd(8)} ${String(rs.length).padStart(5)}  ${pct(c.flame, rs.length).padStart(5)}  ${pc(c.big)}  ${pc(c.huge)}  ${pc(c.crazy)}  ${pc(c.rock)} │ ${' '.repeat(14)}${pc(c.pts)} ${pc(c.eff)}  ${pc(c.quad)}  ${pc(c.duel)}  ${pc(c.buzzer).padStart(6)}  ${floors ? pc(c.personal).padStart(8) : '       -'}`);
+    // Then this season joins the history of the next ones
+    for (const r of rs) for (const p of r.g.players) {
+      if (p.id === undefined || !played(p)) continue;
+      const h = history.get(p.id) ?? { eff: [], pts: [] };
+      h.eff.push(efficiency(p)); h.pts.push(p.pts);
+      history.set(p.id, h);
+    }
+  }
+  console.log('  (cards counted once, by their hottest level; "rock" includes the personal door; a rock can open several doors)');
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -502,6 +559,7 @@ async function main(): Promise<void> {
   rockVariants(rows);
   buzzerBeaters(rows);
   personalPeaks(rows);
+  seasonSummary(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
