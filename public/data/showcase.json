@@ -24,8 +24,8 @@
       "note": 86
     },
     {
-      "away": "OKC",
-      "home": "MIN",
+      "away": "MIN",
+      "home": "OKC",
       "note": 81
     },
     {
@@ -48,8 +48,8 @@
       "note": 57
     },
     {
-      "away": "POR",
-      "home": "MIL",
+      "away": "MIL",
+      "home": "POR",
       "note": 41,
       "why": {
         "crazy": 1
@@ -66,7 +66,7 @@
       "note": 12
     },
     {
-      "away": "SAC",
+      "away": "CHI",
       "home": "UTA",
       "note": 6
     }
