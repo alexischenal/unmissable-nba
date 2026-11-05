@@ -41,7 +41,11 @@
     {
       "away": "CLE",
       "home": "OKC",
-      "tipOff": "2026-11-05T01:00:00Z"
+      "tipOff": "2026-11-05T01:00:00Z",
+      "note": 4,
+      "why": {
+        "big": 1
+      }
     },
     {
       "away": "UTA",
