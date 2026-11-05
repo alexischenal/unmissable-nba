@@ -39,6 +39,15 @@
       "note": 52
     },
     {
+      "away": "TOR",
+      "home": "DEN",
+      "tipOff": "2026-11-05T02:00:00Z",
+      "note": 24,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "POR",
       "home": "PHX",
       "tipOff": "2026-11-05T02:00:00Z",
@@ -64,11 +73,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "TOR",
-      "home": "DEN",
-      "tipOff": "2026-11-05T02:00:00Z"
     },
     {
       "away": "DAL",
