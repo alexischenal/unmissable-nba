@@ -229,7 +229,8 @@ function nuclearNights(rows: Row[]): void {
 // doors (each player at nuclearDuel efficiency or nuclearDuelPoints points). The nights the 50%+
 // condition drops, told from the play-by-play: were they really decided early?
 const quad = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
-const soloRock = (p: PlayerLine) => p.pts >= SCORING.why.nuclearPoints || efficiency(p) >= SCORING.why.nuclearEff || quad(p);
+const soloRock = (p: PlayerLine) => p.pts >= SCORING.why.nuclearPoints || efficiency(p) >= SCORING.why.nuclearEff || quad(p)
+  || (p.fg3m ?? 0) >= SCORING.why.nuclearThrees;
 const duelist = (p: PlayerLine) => efficiency(p) >= SCORING.why.nuclearDuel || p.pts >= SCORING.why.nuclearDuelPoints;
 const mixedDuel = (g: Game) => g.players.filter(duelist).length >= 2;
 const pureDuel = (g: Game) => g.players.filter((p) => efficiency(p) >= SCORING.why.nuclearDuel).length >= 2

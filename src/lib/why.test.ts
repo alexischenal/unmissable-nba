@@ -110,3 +110,10 @@ test('why: a personal peak (his top 1%, above the floor, same stat) is nuclear',
   assert.throws(() => usePeaks({ eff: 50, players: {} }), /must be numbers/);
   assert.throws(() => usePeaks({ eff: 50, pts: 48, players: { 7: [47] } }), /bad entry/);
 });
+
+test('why: a night of threes is nuclear (example: 11 threes)', () => {
+  const shooter: PlayerLine = { ...player(0), pts: 41, fgm: 14, fga: 30, fg3m: 11, ftm: 2, fta: 2, tov: 2 };
+  assert.deepEqual(whyOf({ ...close, players: [shooter] }), { nuclear: 1 });
+  assert.deepEqual(whyOf({ ...close, players: [{ ...shooter, fg3m: 10 }] }), { big: 1 }); // 41 points: a flame
+  assert.deepEqual(whyOf({ ...flat, players: [shooter] }), { big: 1 }); // a blowout: never a rock
+});
