@@ -21,13 +21,14 @@
       "note": 8
     },
     {
-      "away": "CHA",
-      "home": "BKN",
-      "tipOff": "2026-11-05T00:30:00Z"
-    },
-    {
       "away": "CHI",
       "home": "NYK",
+      "tipOff": "2026-11-05T00:30:00Z",
+      "note": 6
+    },
+    {
+      "away": "CHA",
+      "home": "BKN",
       "tipOff": "2026-11-05T00:30:00Z"
     },
     {
