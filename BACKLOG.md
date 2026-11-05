@@ -159,6 +159,14 @@ and milestones (context, not play), fights and ejections.
      favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
      Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas
      would be a Huge.
+   - **Done (November 5): the personal door.** A night in the player's own top 1% (efficiency or points,
+     over his games of the seasons downloaded, 60 games minimum) and above an absolute floor on the same
+     stat, in a competitive game. Floors chosen on six seasons (2019-20 partial to 2025-26): about 16 more
+     rocks on 2025-26 (the closest to production, with the longest history), about 21 in all, one every
+     8 nights; 44 different players over five seasons, nobody above 10. Thresholds in the `PLAYER_PEAKS`
+     secret (`npm run player-peaks`), rebuilt once a season. Rejected on the way: the record (beat it): too
+     strict for the greatest (Curry's 56 under his 62); low floors: the record nights of role players
+     (Cameron Payne, Clarkson) only interest their team's fans, who watch every game anyway.
    - **The idea: a door relative to the player** (direction chosen November 3: the "personal top 1%").
      A rock when the night is in **the best 1% of his own games** over the last seasons, **and** above an
      absolute floor (Huge, 45 efficiency), so the rock keeps its meaning for everyone.

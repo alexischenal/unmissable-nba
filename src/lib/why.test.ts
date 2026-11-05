@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { closeByClutch, displayScore } from './scoring.ts';
 import { whyChips, whyLabels, whyOf } from './why.ts';
+import { usePeaks } from '../config/peaks.ts';
 import { detAtPhi } from '../../fixtures/2026-04-04-det-phi.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 
@@ -87,4 +88,25 @@ test('why: a big night capped by a buzzer beater is nuclear', () => {
   // The buzzer beater of somebody else, or without a big night: nothing more
   assert.deepEqual(whyOf({ ...close, late: { ...late, buzzerBeater: 8 }, players: [shooter] }), { big: 1 });
   assert.equal(whyOf({ ...close, late, players: [{ ...player(20), id: 7 }] }), undefined);
+});
+
+test('why: a personal peak (his top 1%, above the floor, same stat) is nuclear', () => {
+  // Floors 50 efficiency / 48 points; player 7: top 1% at 47 efficiency, 44 points
+  usePeaks({ eff: 50, pts: 48, players: { 7: [47, 44] } });
+  try {
+    // 51 efficiency: above his top 1% and the floor
+    assert.deepEqual(whyOf({ ...close, players: [{ ...player(51), pts: 30, reb: 21, id: 7 }] }), { nuclear: 1 });
+    // 48 points at a modest efficiency: points side
+    const scorer: PlayerLine = { ...player(0), id: 7, pts: 48, fgm: 17, fga: 40, ftm: 10, fta: 12, tov: 4 };
+    assert.deepEqual(whyOf({ ...close, players: [scorer] }), { nuclear: 1 });
+    // Above his top 1% but under the floor: a flame only
+    assert.deepEqual(whyOf({ ...close, players: [{ ...player(49), pts: 30, reb: 19, id: 7 }] }), { huge: 1 });
+    // Another player (no bar), or a blowout: nothing personal
+    assert.deepEqual(whyOf({ ...close, players: [{ ...player(51), id: 8 }] }), { huge: 1 });
+    assert.deepEqual(whyOf({ ...flat, players: [{ ...player(51), id: 7 }] }), { huge: 1 });
+  } finally {
+    usePeaks(null);
+  }
+  assert.throws(() => usePeaks({ eff: 50, players: {} }), /must be numbers/);
+  assert.throws(() => usePeaks({ eff: 50, pts: 48, players: { 7: [47] } }), /bad entry/);
 });

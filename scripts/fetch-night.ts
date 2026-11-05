@@ -27,6 +27,7 @@ import { nextDay, planRun, type Published } from './nba/plan.ts';
 import {
   competitivenessPoints, displayScore, isDisputed, performancePoints, rawScore,
 } from '../src/lib/scoring.ts';
+import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
 import { whyOf } from '../src/lib/why.ts';
 import type { Game } from '../src/types/game.ts';
@@ -278,6 +279,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const useFixture = args.includes('--fixture');
   loadScoring();
+  loadPeaks();
   const dateArg = args.find((a) => a.startsWith('--date='))?.slice('--date='.length);
   if (dateArg && !/^\d{4}-\d{2}-\d{2}$/.test(dateArg)) throw new Error(`Invalid date: ${dateArg}`);
 
