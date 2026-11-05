@@ -101,8 +101,10 @@ test('why: a personal peak (his top 1%, above the floor, same stat) is nuclear',
     assert.deepEqual(whyOf({ ...close, players: [scorer] }), { nuclear: 1 });
     // Above his top 1% but under the floor: a flame only
     assert.deepEqual(whyOf({ ...close, players: [{ ...player(49), pts: 30, reb: 19, id: 7 }] }), { huge: 1 });
-    // Another player (no bar), or a blowout: nothing personal
-    assert.deepEqual(whyOf({ ...close, players: [{ ...player(51), id: 8 }] }), { huge: 1 });
+    // A player without a bar (a rookie): the floors alone
+    assert.deepEqual(whyOf({ ...close, players: [{ ...player(51), id: 8 }] }), { nuclear: 1 });
+    assert.deepEqual(whyOf({ ...close, players: [{ ...player(49), pts: 30, reb: 19, id: 8 }] }), { huge: 1 });
+    // A blowout: nothing personal
     assert.deepEqual(whyOf({ ...flat, players: [{ ...player(51), id: 7 }] }), { huge: 1 });
   } finally {
     usePeaks(null);
