@@ -151,13 +151,7 @@ export function App() {
           return (
             <section className="games" key={groupState}>
               {title && (
-                <h2 className="games__heading">
-                  {title}
-                  {/* Three dots appearing one after the other: games still going */}
-                  {groupState === 'live' && (
-                    <svg className="games__dots" aria-hidden="true"><use href="/sprite.svg#dots" /></svg>
-                  )}
-                </h2>
+                <h2 className="games__heading">{title}</h2>
               )}
               <ol className="games__list" aria-label={label}>
                 {games.map(({ game, index }) => (
