@@ -7,16 +7,15 @@
       "home": "SAS",
       "note": 100,
       "why": {
-        "nuclear": 1,
-        "big": 1
+        "nuclear": 1
       }
     },
     {
       "away": "BOS",
-      "home": "MIA",
+      "home": "NOP",
       "note": 94,
       "why": {
-        "crazy": 1
+        "crazy": 2
       }
     },
     {
@@ -57,7 +56,7 @@
       }
     },
     {
-      "away": "NOP",
+      "away": "MIA",
       "home": "PHI",
       "note": 23
     },
