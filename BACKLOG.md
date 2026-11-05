@@ -142,13 +142,16 @@ and milestones (context, not play), fights and ejections.
      Denver often has one, and that's true); the spicy rock is relative (out of the ordinary **for that
      player**). Jokić gets many flames and few rocks: for him too, the exceptional is rare. Don't hunt the
      white whale: build around it.
-   - **Being tested (November 5, `flame-study`, section "Spicy rock variants")**: the rock only in 50%+
-     games; a mixed duel (two players, each through the efficiency door or the points door, replacing the
-     two duel rules: the points one never fired in five seasons); and, for every rock night under 50%, the
-     margin after each quarter, at 6:00 and 2:00, the loser's biggest lead, the lead changes and the stars'
-     Q4 points. The real risk is a game wrongly rated as a blowout: a historic night often makes the gap
-     itself in the fourth quarter. If such games show up, the hole is in the blowout definition (for every
-     game), not in the rock.
+   - **Decided November 5 (five seasons, `flame-study` section "Spicy rock variants")**: the rock only in
+     competitive games (rated above the blowout cap), and one mixed duel rule (two players, each through the
+     efficiency door or the points door; the points-only duel never fired in five seasons). About 3 rocks a
+     season. The mixed duel adds Curry–LeBron in double overtime (January 2024). Of the 7 rock nights the
+     50%+ condition drops, 4 were real blowouts, 2 missed a door by one point (accepted: every threshold has
+     a game just under it, and the night keeps its Crazy chip).
+   - **To test later, for every game, not just the rock**: a game close after Q3 (within ~7) that a star
+     puts away himself in the fourth (Giannis, 64 points, December 2023: +7 after Q3, 26 points in Q4, +14
+     at the end) is rated a blowout. A door like "close after Q3 + a star's big fourth quarter" changes the
+     blowout definition: simulate it on a whole season with `close-rule-sim` first.
    - **Five seasons downloaded (November 3)**: the study groups players by name, so "Jokic" and "Jokić"
      (and Dončić) count as two players; group by `personId`, and count the games actually played, not the
      team's games, before any personal top 1%.

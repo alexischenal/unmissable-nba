@@ -48,11 +48,14 @@ export type ScoringConfig = {
     bigPoints: number;      // …or this many points, whatever the efficiency (a scorer carrying his team)
     hugeNight: number;      // efficiency for a "huge night"
     crazyNight: number;     // efficiency for a "crazy night"
-    // Never announced: a historic night (the button turns radioactive). Any of these, or a quadruple-double.
+    // Never announced: a historic night in a competitive game (the button turns radioactive).
+    // Any of these, or a quadruple-double.
     nuclearPoints: number;  // points
     nuclearEff: number;     // efficiency
-    nuclearDuel: number;    // …or two players (or more) at this efficiency in the same game: all of them
-    nuclearDuelPoints: number; // …or two players (or more) scoring this many points in the same game
+    // …or a duel: two players (or more) in the same game, each at nuclearDuel efficiency or scoring
+    // nuclearDuelPoints: all of them
+    nuclearDuel: number;
+    nuclearDuelPoints: number;
   };
 };
 
