@@ -85,8 +85,8 @@ it is never published, nor are the details in the GitHub logs.
 them. Without either, the script runs with the examples and says so; on GitHub, it refuses to publish.
 
 Same for the personal peaks of the spicy rock (each player's top 1%, and the floors of that door):
-`npm run player-peaks -- --eff <floor> --pts <floor>` builds `player-peaks.secret.json` (ignored by Git) from the
-downloaded seasons, to paste into the `PLAYER_PEAKS` secret. Once a season, before the first night. Without it,
+`npm run player-peaks -- --eff <floor> --pts <floor>` builds `player-peaks.secret.json` (ignored by Git) from each
+player's games of the last three years, to paste into the `PLAYER_PEAKS` secret. Once a week during the season. Without it,
 that door is shut and everything else works.
 
 ## Deployment

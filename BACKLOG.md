@@ -165,7 +165,8 @@ and milestones (context, not play), fights and ejections.
      stat, in a competitive game. Floors chosen on six seasons (2019-20 partial to 2025-26): about 16 more
      rocks on 2025-26 (the closest to production, with the longest history), about 21 in all, one every
      8 nights; 44 different players over five seasons, nobody above 10. Thresholds in the `PLAYER_PEAKS`
-     secret (`npm run player-peaks`), rebuilt once a season. Rejected on the way: the record (beat it): too
+     secret (`npm run player-peaks`), rebuilt once a week during the season, from each player's last three
+     years only (November 5): the bar follows his level, a star past his prime isn't measured against it forever. Rejected on the way: the record (beat it): too
      strict for the greatest (Curry's 56 under his 62); low floors: the record nights of role players
      (Cameron Payne, Clarkson) only interest their team's fans, who watch every game anyway.
    - **The idea: a door relative to the player** (direction chosen November 3: the "personal top 1%").
