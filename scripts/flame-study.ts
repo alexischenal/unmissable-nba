@@ -414,8 +414,14 @@ function personalPeaks(rows: Row[]): void {
   }
   // A higher floor: crazy efficiency, or 50 points. Only the very big nights, when they're also his peak.
   const crazy = SCORING.why.crazyNight;
-  variants.push({ label: `record, eff ≥ ${crazy} / pts ≥ 50`, bar: record, strict: true, effFloor: crazy, ptsFloor: 50 });
   variants.push({ label: `top 1%, eff ≥ ${crazy} / pts ≥ 50`, bar: top(0.01), strict: false, effFloor: crazy, ptsFloor: 50 });
+  // His top 1% between the huge and the crazy floors: a grid to choose how often
+  for (const effFloor of [50, crazy]) {
+    for (const ptsFloor of [45, 48, 50]) {
+      if (effFloor === crazy && ptsFloor === 50) continue; // already above
+      variants.push({ label: `top 1%, eff ≥ ${effFloor} / pts ≥ ${ptsFloor}`, bar: top(0.01), strict: false, effFloor, ptsFloor });
+    }
+  }
 
   const hits = (v: Variant): (Line & { via: string })[] => targets.flatMap((t) => bySeason.get(t)!.flatMap((l) => {
     const k = peaks.get(t)!.get(l.p.id!);
@@ -437,7 +443,7 @@ function personalPeaks(rows: Row[]): void {
     console.log(`  ${v.label.padEnd(30)} ${per.map((n) => String(n).padStart(8)).join('')}   ${(h.length / targets.length).toFixed(1).padStart(10)}   ${String(count.size).padStart(7)}   ${most}`);
   }
 
-  for (const { v, h } of all.filter(({ v }) => v.ptsFloor === 50)) {
+  for (const { v, h } of all.filter(({ v }) => v.label === 'top 1%, eff ≥ 50 / pts ≥ 45')) {
     console.log(`\n  ${v.label}: the ${h.length} nights`);
     for (const x of [...h].sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
       const k = peaks.get(x.r.season)!.get(x.p.id!)!;
