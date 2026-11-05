@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
-import { displayScore, efficiency } from '../src/lib/scoring.ts';
+import { displayScore, efficiency, isDisputed } from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
 import { whyOf } from '../src/lib/why.ts';
 
@@ -604,6 +604,26 @@ function peakWindows(rows: Row[]): void {
   }
 }
 
+// Do big scorers shoot better in close games? (November 5: "in a close game, a player stops before his
+// percentages get ugly"). The big scoring nights, split by close game or blowout (isDisputed, not the
+// rating: the rating counts efficiency, which would bias the split), with their shooting.
+function scoringByCloseness(rows: Row[]): void {
+  title('Big scoring nights: close games vs blowouts');
+  const ts = (p: PlayerLine) => (p.fga + 0.44 * p.fta > 0 ? p.pts / (2 * (p.fga + 0.44 * p.fta)) : 0);
+  const median = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t.length ? t[Math.floor(t.length / 2)]! : NaN; };
+  const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN);
+  console.log('  points   kind       lines   true shooting (median, average)   FG% median   efficiency median   eff below 38');
+  for (const min of [40, 45, 48]) {
+    const lines = rows.flatMap((r) => r.g.players.filter((p) => p.pts >= min).map((p) => ({ p, close: isDisputed(r.g) })));
+    for (const [label, part] of [['close', lines.filter((l) => l.close)], ['blowout', lines.filter((l) => !l.close)]] as const) {
+      const t = part.map((l) => ts(l.p));
+      const fg = part.map((l) => (l.p.fga ? l.p.fgm / l.p.fga : 0));
+      const e = part.map((l) => efficiency(l.p));
+      console.log(`  ${String(min).padStart(3)}+    ${label.padEnd(8)} ${String(part.length).padStart(6)}   ${(100 * median(t)).toFixed(1).padStart(10)}%  ${(100 * avg(t)).toFixed(1).padStart(10)}%        ${(100 * median(fg)).toFixed(1).padStart(6)}%   ${String(median(e)).padStart(17)}   ${pct(e.filter((x) => x < 38).length, e.length).padStart(12)}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -657,6 +677,7 @@ async function main(): Promise<void> {
   seasonSummary(rows);
   threesNights(rows);
   peakWindows(rows);
+  scoringByCloseness(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
