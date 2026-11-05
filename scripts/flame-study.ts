@@ -365,6 +365,83 @@ function buzzerBeaters(rows: Row[]): void {
   }
 }
 
+// A door relative to the player (November 5): a night in his own top, from his games of the seasons
+// before (as the site will do it: thresholds computed once a season, from the past only), above an
+// absolute floor, in a competitive game. On efficiency (floor: huge) or on points (floor: a few values).
+// Only the target seasons that have at least one season before them in the cache.
+const played = (p: PlayerLine) => p.pts + p.reb + p.ast + p.stl + p.blk + p.fga + p.fta + p.tov > 0;
+
+function personalPeaks(rows: Row[]): void {
+  title('Personal peaks (a door relative to the player)');
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const targets = seasons.slice(1);
+  if (targets.length === 0) { console.log('  needs at least two seasons'); return; }
+  const MIN_GAMES = 60;
+  type Line = { p: PlayerLine; r: Row; e: number };
+  const linesOf = (season: string): Line[] => rows.filter((r) => r.season === season)
+    .flatMap((r) => r.g.players.filter((p) => p.id !== undefined && played(p)).map((p) => ({ p, r, e: efficiency(p) })));
+  const bySeason = new Map(seasons.map((s) => [s, linesOf(s)]));
+  const names = new Map<number, string>();
+  for (const ls of bySeason.values()) for (const l of ls) if (l.p.name) names.set(l.p.id!, l.p.name);
+
+  // The thresholds of a target season: every game of the seasons before it
+  type Peaks = { games: number; effs: number[]; pts: number[] };
+  const peaksFor = (target: string) => {
+    const m = new Map<number, Peaks>();
+    for (const s of seasons.filter((x) => x < target)) {
+      for (const l of bySeason.get(s)!) {
+        const k = m.get(l.p.id!) ?? { games: 0, effs: [], pts: [] };
+        k.games++; k.effs.push(l.e); k.pts.push(l.p.pts);
+        m.set(l.p.id!, k);
+      }
+    }
+    for (const k of m.values()) { k.effs.sort((a, b) => a - b); k.pts.sort((a, b) => a - b); }
+    return m;
+  };
+  const peaks = new Map(targets.map((t) => [t, peaksFor(t)]));
+
+  // A variant: where his personal bar is (record, or a top share of his games), and the absolute floors
+  type Variant = { label: string; bar: (xs: number[]) => number; strict: boolean; effFloor: number; ptsFloor: number };
+  const record = (xs: number[]) => xs[xs.length - 1]!;
+  const top = (share: number) => (xs: number[]) => xs[Math.max(0, Math.ceil(xs.length * (1 - share)) - 1)]!;
+  const huge = SCORING.why.hugeNight;
+  const variants: Variant[] = [];
+  for (const ptsFloor of [40, 45]) {
+    variants.push({ label: `record (beat it), pts ≥ ${ptsFloor}`, bar: record, strict: true, effFloor: huge, ptsFloor });
+    variants.push({ label: `top 0.5%, pts ≥ ${ptsFloor}`, bar: top(0.005), strict: false, effFloor: huge, ptsFloor });
+    variants.push({ label: `top 1%, pts ≥ ${ptsFloor}`, bar: top(0.01), strict: false, effFloor: huge, ptsFloor });
+    variants.push({ label: `top 2%, pts ≥ ${ptsFloor}`, bar: top(0.02), strict: false, effFloor: huge, ptsFloor });
+  }
+
+  const hits = (v: Variant): (Line & { via: string })[] => targets.flatMap((t) => bySeason.get(t)!.flatMap((l) => {
+    const k = peaks.get(t)!.get(l.p.id!);
+    if (!k || k.games < MIN_GAMES || l.r.note <= SCORING.blowoutMax || whyOf(l.r.g)?.nuclear) return [];
+    const beats = (x: number, bar: number) => (v.strict ? x > bar : x >= bar);
+    const viaEff = l.e >= v.effFloor && beats(l.e, v.bar(k.effs));
+    const viaPts = l.p.pts >= v.ptsFloor && beats(l.p.pts, v.bar(k.pts));
+    return viaEff || viaPts ? [{ ...l, via: viaEff && viaPts ? 'eff+pts' : viaEff ? 'eff' : 'pts' }] : [];
+  }));
+
+  console.log(`  thresholds from the seasons before each target (${targets.join(', ')}), at least ${MIN_GAMES} games played; efficiency floor ${huge} (huge); game 50%+; not already a rock`);
+  console.log(`  ${'variant'.padEnd(26)} ${targets.map((t) => t.padStart(8)).join('')}   per season   players   most rocks`);
+  const all = variants.map((v) => ({ v, h: hits(v) }));
+  for (const { v, h } of all) {
+    const per = targets.map((t) => h.filter((x) => x.r.season === t).length);
+    const count = new Map<number, number>();
+    for (const x of h) count.set(x.p.id!, (count.get(x.p.id!) ?? 0) + 1);
+    const most = [...count].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([id, n]) => `${names.get(id) ?? id} ${n}`).join(' · ');
+    console.log(`  ${v.label.padEnd(26)} ${per.map((n) => String(n).padStart(8)).join('')}   ${(h.length / targets.length).toFixed(1).padStart(10)}   ${String(count.size).padStart(7)}   ${most}`);
+  }
+
+  for (const { v, h } of all.filter(({ v }) => v.ptsFloor === 40 && (v.strict || v.label.startsWith('top 1%')))) {
+    console.log(`\n  ${v.label}: the ${h.length} nights`);
+    for (const x of [...h].sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
+      const k = peaks.get(x.r.season)!.get(x.p.id!)!;
+      console.log(`    ${(x.r.g.date ?? '').padEnd(10)} ${(x.p.name ?? '?').padEnd(24)} ${line(x.p)}   eff ${String(x.e).padStart(2)} (bar ${v.bar(k.effs)}) pts bar ${v.bar(k.pts)} · ${x.via} · ${k.games} games before · game ${x.r.note}%`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -414,6 +491,7 @@ async function main(): Promise<void> {
   nuclearNights(rows);
   rockVariants(rows);
   buzzerBeaters(rows);
+  personalPeaks(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
