@@ -127,9 +127,10 @@ and milestones (context, not play), fights and ejections.
    - Then: `npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-flame.txt`.
    - Check: about 6 nuclear nights a season? Not always the same players (Jokić)? Flames still ~30% of the
      cards? Then merge the branch.
-   - With the same data, look at a "record threes" door for the nuclear level (13+ threes: Curry's kind of
-     historic night, which efficiency doesn't see). Needs the 3-pointers made in the box score data first
-     (`PlayerLine` only keeps all field goals).
+   - **Done (November 5): a threes door** for the nuclear level (`why.nuclearThrees`): Curry's kind of
+     historic night, which efficiency doesn't see. Six seasons: a handful of such nights in competitive games,
+     about half already rocks through the personal door; it adds about one rock every two years (Curry's
+     48 points and 12 threes, December 2025).
 
 0. **High priority — the spicy rock, the heart of the site: never miss a player's peak** (November 3).
    Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy

@@ -57,6 +57,7 @@ export type ScoringConfig = {
     nuclearDuel: number;
     nuclearDuelPoints: number;
     // …or a big night (bigNight / bigPoints) capped by a buzzer beater that wins or ties the game
+    nuclearThrees: number;  // …or this many threes made (the shooter's night, which efficiency doesn't see)
   };
 };
 
@@ -73,7 +74,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   performance: { threshold: 28, divisor: 25 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
-  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48, nuclearDuelPoints: 48 },
+  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48, nuclearDuelPoints: 48, nuclearThrees: 11 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.

@@ -36,7 +36,8 @@ export function whyOf(g: Game): Why | undefined {
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
     const nuclear = competitive
-      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)) || buzzer(p) || peak(p));
+      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (p.fg3m ?? 0) >= w.nuclearThrees
+        || (duel && duelist(p)) || buzzer(p) || peak(p));
     return { eff, pts: p.pts, nuclear };
   });
   // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by
