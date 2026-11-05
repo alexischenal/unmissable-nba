@@ -7,26 +7,25 @@
       "home": "SAS",
       "note": 100,
       "why": {
-        "nuclear": 1,
-        "big": 1
+        "nuclear": 1
       }
     },
     {
       "away": "BOS",
-      "home": "MIA",
+      "home": "NOP",
       "note": 94,
       "why": {
-        "crazy": 1
+        "crazy": 2
       }
     },
     {
       "away": "HOU",
       "home": "DEN",
-      "note": 88
+      "note": 86
     },
     {
-      "away": "OKC",
-      "home": "MIN",
+      "away": "MIN",
+      "home": "OKC",
       "note": 81
     },
     {
@@ -49,15 +48,15 @@
       "note": 57
     },
     {
-      "away": "POR",
-      "home": "MIL",
+      "away": "MIL",
+      "home": "POR",
       "note": 41,
       "why": {
         "crazy": 1
       }
     },
     {
-      "away": "NOP",
+      "away": "MIA",
       "home": "PHI",
       "note": 23
     },
@@ -67,7 +66,7 @@
       "note": 12
     },
     {
-      "away": "SAC",
+      "away": "CHI",
       "home": "UTA",
       "note": 6
     }

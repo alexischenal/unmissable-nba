@@ -54,7 +54,7 @@ test('why: a historic night is nuclear, never announced, and counted once', () =
   assert.deepEqual(whyOf({ ...close, players: [sixty] }), { nuclear: 1 });
   assert.deepEqual(whyOf({ ...close, players: [quadruple] }), { nuclear: 1 });
   assert.deepEqual(whyOf({ ...close, players: [player(70), player(40)] }), { nuclear: 1, big: 1 });
-  assert.deepEqual(whyLabels({ nuclear: 1, big: 1 }), ['WTF???', 'Big performance']);
+  assert.deepEqual(whyLabels({ nuclear: 1, big: 1 }), ['WTF???']); // a rock: its chip alone
   assert.equal(whyChips({ nuclear: 1 })[0]!.spoken, 'Historic performance'); // what screen readers hear
 });
 
