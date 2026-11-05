@@ -15,6 +15,12 @@
       "note": 57
     },
     {
+      "away": "CHA",
+      "home": "BKN",
+      "tipOff": "2026-11-05T00:30:00Z",
+      "note": 52
+    },
+    {
       "away": "ATL",
       "home": "WAS",
       "tipOff": "2026-11-05T00:00:00Z",
@@ -25,11 +31,6 @@
       "home": "NYK",
       "tipOff": "2026-11-05T00:30:00Z",
       "note": 6
-    },
-    {
-      "away": "CHA",
-      "home": "BKN",
-      "tipOff": "2026-11-05T00:30:00Z"
     },
     {
       "away": "CLE",
