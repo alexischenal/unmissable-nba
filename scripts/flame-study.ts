@@ -530,6 +530,80 @@ function threesNights(rows: Row[]): void {
   }
 }
 
+// The window of the personal door (November 5): all the history, or only his recent level? With all of
+// it, a player past his prime is compared with his prime (and never gets there again), a rising player
+// with his weaker years. Each window, as the site would run it (bars from before the season, fixed for
+// it), with the floors of player-peaks.secret.json; only the personal door, in 50%+ games, not already a
+// rock through another door.
+function peakWindows(rows: Row[]): void {
+  title('Personal door: the window of the history');
+  const file = path.join(ROOT, 'player-peaks.secret.json');
+  if (!existsSync(file)) { console.log('  needs player-peaks.secret.json (the floors)'); return; }
+  const floors = JSON.parse(readFileSync(file, 'utf8')) as { eff: number; pts: number };
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const targets = seasons.slice(2);
+  const top = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t[Math.max(0, Math.ceil(t.length * 0.99) - 1)]!; };
+  type Past = { season: string; eff: number; pts: number };
+  // Every player's games, in order
+  const ordered = [...rows].sort((a, b) => a.season.localeCompare(b.season) || (a.g.date ?? '').localeCompare(b.g.date ?? ''));
+  type Window = { label: string; keep: (past: Past[], target: string) => Past[] };
+  const windows: Window[] = [
+    { label: 'all the history', keep: (past) => past },
+    { label: 'last 3 seasons', keep: (past, t) => past.filter((x) => seasons.indexOf(t) - seasons.indexOf(x.season) <= 3) },
+    { label: 'last 2 seasons', keep: (past, t) => past.filter((x) => seasons.indexOf(t) - seasons.indexOf(x.season) <= 2) },
+    { label: 'last 200 games', keep: (past) => past.slice(-200) },
+  ];
+  type Hit = { key: string; r: Row; p: PlayerLine; bar: { eff: number; pts: number } };
+  const hitsOf = (w: Window): Hit[] => {
+    const out: Hit[] = [];
+    const history = new Map<number, Past[]>();
+    for (const season of seasons) {
+      const rs = ordered.filter((r) => r.season === season);
+      if (targets.includes(season)) {
+        const bars = new Map<number, { eff: number; pts: number }>();
+        for (const [id, past] of history) {
+          const kept = w.keep(past, season);
+          if (kept.length >= 60) bars.set(id, { eff: top(kept.map((x) => x.eff)), pts: top(kept.map((x) => x.pts)) });
+        }
+        for (const r of rs) {
+          if (r.note <= SCORING.blowoutMax || whyOf(r.g)?.nuclear) continue;
+          for (const p of r.g.players) {
+            const bar = p.id !== undefined ? bars.get(p.id) : undefined;
+            const e = efficiency(p);
+            if (bar && ((e >= floors.eff && e >= bar.eff) || (p.pts >= floors.pts && p.pts >= bar.pts))) {
+              out.push({ key: `${r.g.id}:${p.id}`, r, p, bar });
+            }
+          }
+        }
+      }
+      for (const r of rs) for (const p of r.g.players) {
+        if (p.id === undefined || !played(p)) continue;
+        const past = history.get(p.id) ?? [];
+        past.push({ season, eff: efficiency(p), pts: p.pts });
+        history.set(p.id, past);
+      }
+    }
+    return out;
+  };
+  console.log(`  personal rocks by season (targets ${targets.join(', ')}: at least two seasons of history), 60 games minimum in the window`);
+  console.log(`  ${'window'.padEnd(18)} ${targets.map((t) => t.padStart(8)).join('')}   players`);
+  const all = windows.map((w) => ({ w, h: hitsOf(w) }));
+  for (const { w, h } of all) {
+    console.log(`  ${w.label.padEnd(18)} ${targets.map((t) => String(h.filter((x) => x.r.season === t).length).padStart(8)).join('')}   ${String(new Set(h.map((x) => x.p.id)).size).padStart(7)}`);
+  }
+  const base = new Set(all[0]!.h.map((x) => x.key));
+  for (const { w, h } of all.slice(1, 3)) {
+    const keys = new Set(h.map((x) => x.key));
+    const added = h.filter((x) => !base.has(x.key));
+    const removed = all[0]!.h.filter((x) => !keys.has(x.key));
+    const show = (x: Hit) => `    ${(x.r.g.date ?? '').padEnd(10)} ${(x.p.name ?? '?').padEnd(24)} ${line(x.p)} · eff ${efficiency(x.p)} (bar ${x.bar.eff}, pts bar ${x.bar.pts}) · game ${x.r.note}%`;
+    console.log(`\n  ${w.label}: ${added.length} more nights than with all the history`);
+    for (const x of added.sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) console.log(show(x));
+    console.log(`  ${w.label}: ${removed.length} fewer`);
+    for (const x of removed.sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) console.log(show(x));
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -582,6 +656,7 @@ async function main(): Promise<void> {
   personalPeaks(rows);
   seasonSummary(rows);
   threesNights(rows);
+  peakWindows(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
