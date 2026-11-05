@@ -6,21 +6,24 @@
 import { SCORING } from '../config/scoring.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 import type { Why } from '../types/public.ts';
-import { efficiency } from './scoring.ts';
+import { displayScore, efficiency } from './scoring.ts';
 
 // A quadruple-double: 10 or more in four of points, rebounds, assists, steals, blocks
 const quadrupleDouble = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
 
 export function whyOf(g: Game): Why | undefined {
   const w = SCORING.why;
-  // A duel: two players (or more) at nuclearDuel efficiency, or scoring nuclearDuelPoints, in the same
-  // game are all nuclear
-  const duel = g.players.filter((p) => efficiency(p) >= w.nuclearDuel).length >= 2;
-  const scoringDuel = g.players.filter((p) => p.pts >= w.nuclearDuelPoints).length >= 2;
+  // The spicy rock says "watch it": only in a competitive game (rated above the blowout cap). In a blowout,
+  // a historic night keeps its flame and its Crazy chip.
+  const competitive = displayScore(g) > SCORING.blowoutMax;
+  // A duel: two players (or more) in the same game, each at nuclearDuel efficiency or scoring
+  // nuclearDuelPoints (one can score, the other fill the box score): all of them are nuclear
+  const duelist = (p: PlayerLine) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints;
+  const duel = g.players.filter(duelist).length >= 2;
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
-    const nuclear = p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p)
-      || (duel && eff >= w.nuclearDuel) || (scoringDuel && p.pts >= w.nuclearDuelPoints);
+    const nuclear = competitive
+      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)));
     return { eff, pts: p.pts, nuclear };
   });
   // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by

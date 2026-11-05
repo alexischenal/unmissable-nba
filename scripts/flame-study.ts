@@ -225,9 +225,9 @@ function nuclearNights(rows: Row[]): void {
   }
 }
 
-// The spicy rock variants: should it need a competitive game (50%+)? Should a duel mix the two doors
-// (each player at nuclearDuel efficiency or nuclearDuelPoints points)? And the nights it would lose in
-// blowouts, told from the play-by-play: were they really decided early?
+// The spicy rock variants. Since November 5 it needs a competitive game (50%+) and a duel mixes the two
+// doors (each player at nuclearDuel efficiency or nuclearDuelPoints points). The nights the 50%+
+// condition drops, told from the play-by-play: were they really decided early?
 const quad = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
 const soloRock = (p: PlayerLine) => p.pts >= SCORING.why.nuclearPoints || efficiency(p) >= SCORING.why.nuclearEff || quad(p);
 const duelist = (p: PlayerLine) => efficiency(p) >= SCORING.why.nuclearDuel || p.pts >= SCORING.why.nuclearDuelPoints;
@@ -274,10 +274,9 @@ function blowoutStory(r: Row): string {
 function rockVariants(rows: Row[]): void {
   title('Spicy rock variants');
   const variants: [string, (r: Row) => boolean][] = [
-    ['current rule (any rating)', (r) => !!whyOf(r.g)?.nuclear],
-    ['current rule, 50%+ only', (r) => !!whyOf(r.g)?.nuclear && r.note >= 50],
-    ['mixed duel (any rating)', (r) => r.g.players.some(soloRock) || mixedDuel(r.g)],
-    ['mixed duel, 50%+ only', (r) => (r.g.players.some(soloRock) || mixedDuel(r.g)) && r.note >= 50],
+    ['rule in use (50%+ only)', (r) => !!whyOf(r.g)?.nuclear],
+    ['same doors, any rating', (r) => r.g.players.some(soloRock) || mixedDuel(r.g)],
+    ['before Nov 5 (any rating)', (r) => r.g.players.some(soloRock) || pureDuel(r.g)],
   ];
   const seasons = [...new Set(rows.map((r) => r.season))].sort();
   console.log(`  ${'variant'.padEnd(30)} ${seasons.map((s) => s.padStart(8)).join('')}   total   per season   share of games`);
@@ -296,7 +295,7 @@ function rockVariants(rows: Row[]): void {
   for (const r of added) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${who(r.g)}`);
 
   const lost = rows.filter((r) => (r.g.players.some(soloRock) || mixedDuel(r.g)) && r.note < 50).sort(byDate);
-  console.log(`\n  rock nights under 50%, the ones a 50%+ rule would drop (${lost.length}): were they decided early?`);
+  console.log(`\n  rock nights under 50%, the ones the 50%+ condition drops (${lost.length}): were they decided early?`);
   for (const r of lost) {
     console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${who(r.g)}`);
     console.log(`      ${blowoutStory(r)}`);
