@@ -443,7 +443,7 @@ function personalPeaks(rows: Row[]): void {
     console.log(`  ${v.label.padEnd(30)} ${per.map((n) => String(n).padStart(8)).join('')}   ${(h.length / targets.length).toFixed(1).padStart(10)}   ${String(count.size).padStart(7)}   ${most}`);
   }
 
-  for (const { v, h } of all.filter(({ v }) => v.label === 'top 1%, eff ≥ 50 / pts ≥ 45')) {
+  for (const { v, h } of all.filter(({ v }) => v.label === `top 1%, eff ≥ ${crazy} / pts ≥ 45`)) {
     console.log(`\n  ${v.label}: the ${h.length} nights`);
     for (const x of [...h].sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
       const k = peaks.get(x.r.season)!.get(x.p.id!)!;
