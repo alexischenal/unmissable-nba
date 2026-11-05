@@ -20,10 +20,13 @@ export function whyOf(g: Game): Why | undefined {
   // nuclearDuelPoints (one can score, the other fill the box score): all of them are nuclear
   const duelist = (p: PlayerLine) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints;
   const duel = g.players.filter(duelist).length >= 2;
+  // A big performance (a flame) capped by a buzzer beater that wins the game or forces overtime
+  const buzzer = (p: PlayerLine) => p.id !== undefined && p.id === g.late?.buzzerBeater
+    && (efficiency(p) >= w.bigNight || p.pts >= w.bigPoints);
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
     const nuclear = competitive
-      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)));
+      && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (duel && duelist(p)) || buzzer(p));
     return { eff, pts: p.pts, nuclear };
   });
   // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by

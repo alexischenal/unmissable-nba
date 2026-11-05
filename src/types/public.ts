@@ -9,6 +9,9 @@ export type PublicGame = {
   note?: number; // displayed rating, 0 to 100 — only once the game is over
   // No raw rating here (some files from October 20, 2026 had one): see scripts/nba/order.ts.
   why?: Why; // where the rating comes from, shown under the flame of a rated card
+  // Rated without its play-by-play (late at the NBA): rated again, once, when it arrives, until the next
+  // night starts. Not read by the site.
+  v1?: true;
 };
 
 // Never a name, a team or a number: only how many players had a big night.

@@ -78,3 +78,13 @@ test('why: a duel, two players each at the duel efficiency or the duel points, a
   assert.deepEqual(whyOf({ ...close, players: [scorer, player(50)] }), { nuclear: 2 });
   assert.deepEqual(whyOf({ ...close, players: [scorer] }), { big: 1 }); // alone: a big night (50 points ≥ 41)
 });
+
+test('why: a big night capped by a buzzer beater is nuclear', () => {
+  // Example: a big night at 37 of efficiency or 41 points
+  const shooter: PlayerLine = { ...player(38), id: 7 };
+  const late = { ...close.late!, buzzerBeater: 7 };
+  assert.deepEqual(whyOf({ ...close, late, players: [shooter, player(20)] }), { nuclear: 1 });
+  // The buzzer beater of somebody else, or without a big night: nothing more
+  assert.deepEqual(whyOf({ ...close, late: { ...late, buzzerBeater: 8 }, players: [shooter] }), { big: 1 });
+  assert.equal(whyOf({ ...close, late, players: [{ ...player(20), id: 7 }] }), undefined);
+});

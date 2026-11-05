@@ -141,10 +141,33 @@ export function computeClutch(timeline: Timeline, periods: number): Clutch {
   };
 }
 
+// A buzzer beater: the last basket of Q4 or of an overtime, logged at 0.0 (the ball went in after the clock
+// ran out), that wins the game or ties it to force overtime. Free throws (1 point, logged at 0.0 after a
+// foul at the buzzer) don't count. Returns the shooter (the NBA's personId), or undefined.
+export function buzzerBeater(timeline: Timeline, periods: number): number | undefined {
+  for (let period = periods; period >= 4; period--) {
+    let i = -1;
+    for (let j = 0; j < timeline.length; j++) if (timeline[j]![0] === period) i = j;
+    if (i < 0) continue;
+    const [, left, h, a, scorer] = timeline[i]!;
+    const [, , h0, a0] = i > 0 ? timeline[i - 1]! : [0, 0, 0, 0];
+    if (left > 0 || scorer === undefined || (h - h0) + (a - a0) < 2) continue;
+    const before = h > h0 ? h0 - a0 : a0 - h0; // the scoring team's margin before the basket
+    const after = h > h0 ? h - a : a - h;
+    if (before > 0) continue;
+    if ((period === periods && after > 0) || (period < periods && after === 0)) return scorer;
+  }
+  return undefined;
+}
+
 // What the rating v2 reads from the play-by-play (Game.late)
 export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
   const c = computeClutch(timeline, periods);
-  return { clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline) };
+  const shooter = buzzerBeater(timeline, periods);
+  return {
+    clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline),
+    ...(shooter !== undefined ? { buzzerBeater: shooter } : {}),
+  };
 }
 
 // When the game really ended (wall clock, ms): the last action's time in game order, the final buzzer.

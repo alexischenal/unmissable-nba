@@ -56,6 +56,7 @@ export type ScoringConfig = {
     // nuclearDuelPoints: all of them
     nuclearDuel: number;
     nuclearDuelPoints: number;
+    // …or a big night (bigNight / bigPoints) capped by a buzzer beater that wins or ties the game
   };
 };
 
