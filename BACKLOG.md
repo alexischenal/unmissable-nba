@@ -135,11 +135,23 @@ and milestones (context, not play), fights and ejections.
    Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy
    Curry night discovered too late. The rating tells which game is close; the spicy rock must tell **which
    player had the night of his life**. Now that it's teased in How it works, it has to be right.
-   - **The compass, for every decision on this**: *the flame says "somebody shone", the spicy rock says "you
-     won't see that again anytime soon".* The flame stays absolute (what happened: Jokić shines often, so
+   - **The compass, for every decision on this**: *the flame says "somebody shone", the spicy rock says "watch
+     it"* (November 5: not "a night for the history books"; the Wembanyama–Jokić duel of April 4 was a crazy
+     game, and that's what a rock is for). A historic night in a blowout keeps its flame and its glowing Crazy
+     chip: it isn't forgotten, so the rock may be kept for competitive games (being tested, see below). The flame stays absolute (what happened: Jokić shines often, so
      Denver often has one, and that's true); the spicy rock is relative (out of the ordinary **for that
      player**). Jokić gets many flames and few rocks: for him too, the exceptional is rare. Don't hunt the
      white whale: build around it.
+   - **Being tested (November 5, `flame-study`, section "Spicy rock variants")**: the rock only in 50%+
+     games; a mixed duel (two players, each through the efficiency door or the points door, replacing the
+     two duel rules: the points one never fired in five seasons); and, for every rock night under 50%, the
+     margin after each quarter, at 6:00 and 2:00, the loser's biggest lead, the lead changes and the stars'
+     Q4 points. The real risk is a game wrongly rated as a blowout: a historic night often makes the gap
+     itself in the fourth quarter. If such games show up, the hole is in the blowout definition (for every
+     game), not in the rock.
+   - **Five seasons downloaded (November 3)**: the study groups players by name, so "Jokic" and "Jokić"
+     (and Dončić) count as two players; group by `personId`, and count the games actually played, not the
+     team's games, before any personal top 1%.
    - **The gap today**: its doors are absolute (60 points, 65 efficiency, quadruple-double, duels), so they
      favor the players who fill the whole box score (Jokić: 4 of last season's 6) and miss a scorer's peak.
      Curry's whole career only lights it twice (62 and 60 points); his 57 points and 11 threes in Dallas

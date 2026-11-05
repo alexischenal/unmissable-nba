@@ -16,7 +16,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lateFrom, type Timeline } from './nba/clutch.ts';
+import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import { displayScore, efficiency } from '../src/lib/scoring.ts';
@@ -25,7 +25,7 @@ import { whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
-type Row = { g: CachedGame; season: string; note: number; effs: number[]; best: number; maxPts: number };
+type Row = { g: CachedGame; season: string; note: number; effs: number[]; best: number; maxPts: number; tl?: Timeline };
 
 // The flame at an efficiency threshold, with the points rule of the big nights (src/lib/why.ts)
 const litLine = (p: PlayerLine, at: number) => efficiency(p) >= at || p.pts >= SCORING.why.bigPoints;
@@ -225,6 +225,88 @@ function nuclearNights(rows: Row[]): void {
   }
 }
 
+// The spicy rock variants: should it need a competitive game (50%+)? Should a duel mix the two doors
+// (each player at nuclearDuel efficiency or nuclearDuelPoints points)? And the nights it would lose in
+// blowouts, told from the play-by-play: were they really decided early?
+const quad = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
+const soloRock = (p: PlayerLine) => p.pts >= SCORING.why.nuclearPoints || efficiency(p) >= SCORING.why.nuclearEff || quad(p);
+const duelist = (p: PlayerLine) => efficiency(p) >= SCORING.why.nuclearDuel || p.pts >= SCORING.why.nuclearDuelPoints;
+const mixedDuel = (g: Game) => g.players.filter(duelist).length >= 2;
+const pureDuel = (g: Game) => g.players.filter((p) => efficiency(p) >= SCORING.why.nuclearDuel).length >= 2
+  || g.players.filter((p) => p.pts >= SCORING.why.nuclearDuelPoints).length >= 2;
+
+// Home minus away when a given time is reached in Q4 (secondsLeft), from the timeline
+function marginInQ4(tl: Timeline, secondsLeft: number): number {
+  let m = 0;
+  for (const [period, s, h, a] of tl) {
+    if (period < 4 || (period === 4 && s > secondsLeft)) m = h - a;
+  }
+  return m;
+}
+
+// Points scored in Q4 and overtimes by a player, from the scorers of the timeline
+function q4Points(tl: Timeline, id: number | undefined): number | null {
+  if (id === undefined || !tl.some((e) => e[4] !== undefined)) return null;
+  let pts = 0, h0 = 0, a0 = 0;
+  for (const [period, , h, a, scorer] of tl) {
+    if (period >= 4 && scorer === id) pts += (h - h0) + (a - a0);
+    h0 = h; a0 = a;
+  }
+  return pts;
+}
+
+const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
+
+function blowoutStory(r: Row): string {
+  const g = r.g;
+  let h = 0, a = 0;
+  const quarters = g.periods.map((p, i) => { h += p.home; a += p.away; return `${i < 4 ? `Q${i + 1}` : `OT${i - 3}`} ${signed(h - a)}`; }).join(' ');
+  const out = [`${g.home} margin: ${quarters}`];
+  const f = h > a ? g.biggestLead.away : g.biggestLead.home;
+  out.push(`loser led by ${f}`);
+  if (r.tl) {
+    out.push(`at 6:00 ${signed(marginInQ4(r.tl, 360))} · at 2:00 ${signed(marginInQ4(r.tl, 120))}`);
+    out.push(`${swings(r.tl).filter((s) => s.kind === 'change').length} lead changes`);
+  }
+  return out.join(' · ');
+}
+
+function rockVariants(rows: Row[]): void {
+  title('Spicy rock variants');
+  const variants: [string, (r: Row) => boolean][] = [
+    ['current rule (any rating)', (r) => !!whyOf(r.g)?.nuclear],
+    ['current rule, 50%+ only', (r) => !!whyOf(r.g)?.nuclear && r.note >= 50],
+    ['mixed duel (any rating)', (r) => r.g.players.some(soloRock) || mixedDuel(r.g)],
+    ['mixed duel, 50%+ only', (r) => (r.g.players.some(soloRock) || mixedDuel(r.g)) && r.note >= 50],
+  ];
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  console.log(`  ${'variant'.padEnd(30)} ${seasons.map((s) => s.padStart(8)).join('')}   total   per season   share of games`);
+  for (const [label, test] of variants) {
+    const per = seasons.map((s) => rows.filter((r) => r.season === s && test(r)).length);
+    const total = per.reduce((x, y) => x + y, 0);
+    console.log(`  ${label.padEnd(30)} ${per.map((n) => String(n).padStart(8)).join('')}   ${String(total).padStart(5)}   ${(total / seasons.length).toFixed(1).padStart(10)}   ${((100 * total) / rows.length).toFixed(2)}%`);
+  }
+
+  const who = (g: Game) => g.players.filter((p) => soloRock(p) || duelist(p))
+    .map((p) => `${p.name ?? '?'} ${p.pts} pts eff ${efficiency(p)}${soloRock(p) ? '' : ' (duel)'}`).join(' · ');
+  const byDate = (a: Row, b: Row) => (a.g.date ?? '').localeCompare(b.g.date ?? '');
+
+  const added = rows.filter((r) => mixedDuel(r.g) && !pureDuel(r.g) && !r.g.players.some(soloRock)).sort(byDate);
+  console.log(`\n  games the mixed duel adds (${added.length}):`);
+  for (const r of added) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${who(r.g)}`);
+
+  const lost = rows.filter((r) => (r.g.players.some(soloRock) || mixedDuel(r.g)) && r.note < 50).sort(byDate);
+  console.log(`\n  rock nights under 50%, the ones a 50%+ rule would drop (${lost.length}): were they decided early?`);
+  for (const r of lost) {
+    console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} game ${String(r.note).padStart(3)}%   ${who(r.g)}`);
+    console.log(`      ${blowoutStory(r)}`);
+    const stars = r.g.players.filter((p) => soloRock(p) || duelist(p))
+      .map((p) => { const q4 = q4Points(r.tl ?? [], p.id); return q4 === null ? null : `${p.name ?? '?'} ${q4} pts in Q4/OT`; })
+      .filter(Boolean);
+    if (stars.length) console.log(`      ${stars.join(' · ')}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -249,12 +331,14 @@ async function main(): Promise<void> {
       const g0 = JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame;
       const pbp = path.join(pbpDir, f);
       let g = g0;
+      let tl: Timeline | undefined;
       if (existsSync(pbp)) {
-        g = { ...g0, late: lateFrom(JSON.parse(await readFile(pbp, 'utf8')) as Timeline, g0.periods.length) };
+        tl = JSON.parse(await readFile(pbp, 'utf8')) as Timeline;
+        g = { ...g0, late: lateFrom(tl, g0.periods.length) };
         v2++;
       }
       const effs = g.players.map(efficiency);
-      rows.push({ g, season, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)) });
+      rows.push({ g, season, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)), tl });
     }
   }
   const nights = new Map<string, Row[]>();
@@ -270,6 +354,7 @@ async function main(): Promise<void> {
   scoringNights(rows, at);
   nuclearReport(rows);
   nuclearNights(rows);
+  rockVariants(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
