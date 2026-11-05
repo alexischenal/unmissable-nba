@@ -509,6 +509,26 @@ function seasonSummary(rows: Row[]): void {
   console.log('  (cards counted once, by their hottest level; "rock" includes the personal door; a rock can open several doors)');
 }
 
+// Threes (November 5): a door for the nights efficiency doesn't see, the shooter's kind (Curry's).
+// How many lines at 10+, 11+, 12+, 13+ threes made; with the rules in use, which of them would already
+// be a rock (the personal door simulated as in the season summary is not counted here: whyOf only).
+function threesNights(rows: Row[]): void {
+  title('Threes made (a door for the shooters?)');
+  const lines = rows.flatMap((r) => r.g.players.filter((p) => p.fg3m !== undefined).map((p) => ({ p, r })));
+  const withThrees = new Set(lines.map((l) => l.r)).size;
+  console.log(`  ${withThrees} of ${rows.length} games have the threes made in their box score`);
+  for (const n of [10, 11, 12, 13]) {
+    const at = lines.filter((l) => l.p.fg3m! >= n);
+    const competitive = at.filter((l) => l.r.note > SCORING.blowoutMax);
+    const fresh = competitive.filter((l) => !whyOf(l.r.g)?.nuclear);
+    console.log(`  ${n}+ threes: ${String(at.length).padStart(3)} lines · in a 50%+ game ${String(competitive.length).padStart(3)} · not already a rock (absolute doors) ${String(fresh.length).padStart(3)}`);
+  }
+  console.log('\n  every night at 10+ threes:');
+  for (const l of lines.filter((x) => x.p.fg3m! >= 10).sort((a, b) => b.p.fg3m! - a.p.fg3m! || (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
+    console.log(`    ${(l.r.g.date ?? '').padEnd(10)} ${(l.p.name ?? '?').padEnd(24)} ${String(l.p.fg3m).padStart(2)} threes · ${line(l.p)} · eff ${efficiency(l.p)}   game ${String(l.r.note).padStart(3)}%${whyOf(l.r.g)?.nuclear ? ' (already a rock)' : ''}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -560,6 +580,7 @@ async function main(): Promise<void> {
   buzzerBeaters(rows);
   personalPeaks(rows);
   seasonSummary(rows);
+  threesNights(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
