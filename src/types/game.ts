@@ -34,5 +34,6 @@ export type Game = {
     clutchSeconds: number;  // within 5 points in the last 5 minutes of Q4 and of every overtime
     marginAt2: number;      // margin with 2:00 left in the 4th quarter
     weightedSwings: number; // lead changes + ties, weighted by when they happened
+    buzzerBeater?: number;  // the shooter (personId) of a buzzer beater that won the game or forced overtime
   };
 };

@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buzzerAt, computeClutch, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { buzzerAt, buzzerBeater, computeClutch, lateFrom, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -91,4 +91,20 @@ test('readPlayByPlay: the v2 data when complete, the reason when not', () => {
   const early = readPlayByPlay({ game: { gameId: 'x', actions: [act(1, 'PT11M00.00S', 0, 0)] } }, game);
   assert.equal(early.late, undefined);
   assert.match(early.problem ?? '', /not complete yet/);
+});
+
+test('buzzer beater: the last basket at 0.0 that wins, or ties to force overtime', () => {
+  // A 3 at 0.0 from 1 down: wins
+  assert.equal(buzzerBeater([[4, 20, 100, 101, 1], [4, 0, 103, 101, 7]], 4), 7);
+  // With 0.3 left: a game-winner, not a buzzer beater
+  assert.equal(buzzerBeater([[4, 20, 100, 101, 1], [4, 0.3, 103, 101, 7]], 4), undefined);
+  // Free throws at 0.0 after a foul at the buzzer: not a basket
+  assert.equal(buzzerBeater([[4, 20, 100, 100, 1], [4, 0, 101, 100, 7]], 4), undefined);
+  // Already ahead: a basket at the buzzer that changes nothing
+  assert.equal(buzzerBeater([[4, 20, 104, 100, 1], [4, 0, 106, 100, 7]], 4), undefined);
+  // Ties at the end of Q4, the game goes on: counted, even if overtime is won another way
+  assert.equal(buzzerBeater([[4, 20, 97, 100, 1], [4, 0, 100, 100, 8], [5, 3, 109, 108, 9], [5, 0, 110, 108, 9]], 5), 8);
+  // In lateFrom only when there is one
+  assert.equal(lateFrom([[4, 20, 100, 101, 1], [4, 0, 103, 101, 7]], 4).buzzerBeater, 7);
+  assert.equal('buzzerBeater' in lateFrom([[4, 20, 100, 101, 1], [4, 5, 103, 101, 7]], 4), false);
 });

@@ -49,7 +49,8 @@ function publishedState(date: string): Published {
   if (!existsSync(file)) return 'none';
   // Synchronous read: planRun is a plain function, and these files are tiny.
   const night = JSON.parse(readFileSync(file, 'utf8')) as NightJson;
-  return nightIsComplete(night) ? 'complete' : 'partial';
+  // A game rated without its play-by-play still has work to do: it's rated again when it arrives
+  return nightIsComplete(night) && !night.games.some((g) => g.v1) ? 'complete' : 'partial';
 }
 
 // "22 min after the buzzer": how long the site took to rate the game once it was really over.
@@ -89,6 +90,12 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
   const scheduled = gamesOnDate(schedule, date);
   console.log(`${date}: ${scheduled.length} game(s)`);
 
+  // A game rated without its play-by-play (v1) is rated again once it arrives, but only until the next
+  // night starts: after that, the night is over and nothing moves.
+  const next = nextNightWithGames(schedule, date);
+  const nextTipOffs = next ? gamesOnDate(schedule, next).map((g) => Date.parse(g.gameDateTimeUTC ?? '')).filter(Number.isFinite) : [];
+  const rerateUntil = nextTipOffs.length > 0 ? Math.min(...nextTipOffs) : Date.parse(`${date}T12:00:00Z`) + 2 * 24 * 60 * 60 * 1000;
+
   const entries: Entry[] = [];
   for (const g of scheduled) {
     const away = g.awayTeam.teamTricode;
@@ -97,9 +104,29 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     const base = { away, home, ...(g.gameDateTimeUTC ? { tipOff: g.gameDateTimeUTC } : {}) };
 
     const rated = alreadyRated.get(label);
-    if (rated) {
+    const kept = rated ? { ...base, note: rated.note, ...(rated.why ? { why: rated.why } : {}) } : null;
+    if (rated && kept && !rated.v1) {
       // Published once, never recalculated: the rating and its "why" stay as they were
-      entries.push({ ...base, note: rated.note, ...(rated.why ? { why: rated.why } : {}) });
+      entries.push(kept);
+      continue;
+    }
+    if (rated && kept && now >= rerateUntil) {
+      // Its play-by-play never came in time: the v1 rating stays for good
+      console.log(`${label}: next night started, v1 rating kept.`);
+      entries.push(kept);
+      continue;
+    }
+    if (rated && kept) {
+      // Rated with v1: is the play-by-play there now? Then rated again, once (rating, "why", place).
+      const again = await rateWithPlayByPlay(g.gameId, label);
+      if (again) {
+        logRated(again.game, again.buzzer, now);
+        const why = whyOf(again.game);
+        console.log(`${label}: play-by-play arrived, rated again (${rated.note} → ${displayScore(again.game)}).`);
+        entries.push({ ...base, note: displayScore(again.game), raw: round1(rawScore(again.game)), ...(why ? { why } : {}) });
+      } else {
+        entries.push({ ...kept, v1: true });
+      }
       continue;
     }
     if (base.tipOff && Date.parse(base.tipOff) > now) {
@@ -162,10 +189,29 @@ async function updateNight(schedule: RawSchedule, date: string, now: number): Pr
     }
     logRated(game, buzzer, now);
     const why = whyOf(game);
-    entries.push({ ...base, note: displayScore(game), raw: round1(rawScore(game)), ...(why ? { why } : {}) });
+    entries.push({
+      ...base, note: displayScore(game), raw: round1(rawScore(game)), ...(why ? { why } : {}), ...(game.late ? {} : { v1: true as const }),
+    });
   }
 
   return { version: 2, date, games: orderGames(previous, entries) };
+}
+
+// A finished game rated again with its play-by-play, or null if it's still not complete
+async function rateWithPlayByPlay(gameId: string, label: string): Promise<{ game: Game; buzzer: number | null } | null> {
+  try {
+    const box = await fetchBoxscore(gameId);
+    await pause(500);
+    const game = toGame(box);
+    const read = readPlayByPlay(await fetchPlayByPlay(gameId) as RawPlayByPlay, game);
+    await pause(500);
+    if (read.problem !== undefined) throw new Error(read.problem);
+    game.late = read.late;
+    return { game, buzzer: read.buzzer };
+  } catch (error) {
+    console.log(`${label}: rated with v1, still no complete play-by-play (${error instanceof Error ? error.message : error}).`);
+    return null;
+  }
 }
 
 async function fixtureNight(): Promise<NightJson> {

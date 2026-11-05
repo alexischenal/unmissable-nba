@@ -193,16 +193,16 @@ and milestones (context, not play), fights and ejections.
        for a week or two. No spoiler: it says a player went off, not who won.
      - We can't measure who comes how often (no cookies, by choice): GoatCounter only gives visits per day.
        So: think for both, and watch the visits on the mornings after a rock.
-   - **A buzzer-beater door?** 40 points **and** the shot that wins (or ties) the game at the buzzer: the very
-     definition of a legendary night. Two cautions:
-     - **Spoiler**: the rock never says why ("WTF???"), and the rules are secret, so it doesn't tell the ending
-       by itself. But if the rule ever becomes known, a rock on a 40-point night would hint at a last-second
-       finish. Keep it in the secret rules only.
-     - **Data**: the play-by-play timeline we keep only has the period, the clock and the score, not who
-       scored. We'd need the scorer of the last basket (the play-by-play has it: `personId`), so a change in
-       `scripts/nba/clutch.ts` and new downloads. Goes with algorithm evolution 1 (a game decided in the last
-       seconds), which needs the same reading.
-   - **Never hide a rock because the play-by-play was late: re-rate once it arrives.** Today a game without
+   - **Done (November 5): the buzzer-beater door.** A big performance (a flame) capped by a buzzer beater
+     (the ball goes in after the clock ran out, logged at 0.0 by the NBA; the last basket of Q4 or of an
+     overtime, that wins or ties to force overtime; free throws don't count) is a rock. Five seasons: 42
+     buzzer beaters, only one by a shooter with a flame (SGA, January 2026): about one rock every five years,
+     by choice (a game-winner with 1 s left would be 2 a season: a game-winner, not a buzzer beater). The
+     rules stay secret, so the rock doesn't tell the ending.
+   - **Done (November 5): never hide a rock because the play-by-play was late, re-rate once it arrives.**
+     A game rated with v1 carries `v1: true` in the public JSON (not read by the site) and is rated again
+     when its play-by-play is complete, until the next night's first tip-off; then the flag goes.
+     The original reasoning: Today a game without
      its play-by-play after 4 h is rated from the box score alone (v1), and nothing is ever recalculated: a
      door that needs the play-by-play (the buzzer-beater) would stay shut for good, and the v1 rating can be
      wrong. How it works already says the data is "sometimes published with a delay". Decision (November 3):
