@@ -25,11 +25,12 @@ export function whyOf(g: Game): Why | undefined {
   const buzzer = (p: PlayerLine) => p.id !== undefined && p.id === g.late?.buzzerBeater
     && (efficiency(p) >= w.bigNight || p.pts >= w.bigPoints);
   // A personal peak: in the player's own top 1% (src/config/peaks.ts) and above an absolute floor, on
-  // efficiency or on points (the same stat for both)
+  // efficiency or on points (the same stat for both). A player without a bar yet (a rookie, too few games):
+  // the floors alone.
   const peaks = PEAKS();
   const peak = (p: PlayerLine) => {
-    const bar = peaks && p.id !== undefined ? peaks.players.get(p.id) : undefined;
-    if (!peaks || !bar) return false;
+    if (!peaks || p.id === undefined) return false;
+    const bar = peaks.players.get(p.id) ?? { eff: peaks.eff, pts: peaks.pts };
     const eff = efficiency(p);
     return (eff >= peaks.eff && eff >= bar.eff) || (p.pts >= peaks.pts && p.pts >= bar.pts);
   };
