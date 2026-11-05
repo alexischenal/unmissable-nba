@@ -3,6 +3,12 @@
   "date": "2026-11-04",
   "games": [
     {
+      "away": "IND",
+      "home": "MEM",
+      "tipOff": "2026-11-05T01:00:00Z",
+      "note": 71
+    },
+    {
       "away": "MIL",
       "home": "BOS",
       "tipOff": "2026-11-05T00:30:00Z",
@@ -35,11 +41,6 @@
     {
       "away": "CLE",
       "home": "OKC",
-      "tipOff": "2026-11-05T01:00:00Z"
-    },
-    {
-      "away": "IND",
-      "home": "MEM",
       "tipOff": "2026-11-05T01:00:00Z"
     },
     {
