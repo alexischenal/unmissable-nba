@@ -40,6 +40,7 @@ if (SECTION) document.title = `${SECTION} — Unmissable`;
 // the next groups get an <h2> to separate them.
 const GROUPS: { state: GameState; heading: string | null; label: string }[] = [
   { state: 'rated', heading: null, label: 'Finished games, most recommended first' },
+  { state: 'waiting', heading: 'Waiting for more stats', label: 'Finished games, their rating is coming' },
   { state: 'live', heading: 'In progress', label: 'Games in progress' },
   { state: 'upcoming', heading: 'Coming up', label: 'Games not started yet' },
 ];

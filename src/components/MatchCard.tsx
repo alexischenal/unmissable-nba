@@ -1,7 +1,7 @@
 // src/components/MatchCard.tsx
 // One game: away team on the left, home team on the right, and in the middle:
 //   - upcoming → the tip-off time, in the visitor's own time zone and format;
-//   - live     → nothing in the middle;
+//   - live     → nothing in the middle (same for waiting: over, rating coming);
 //   - rated    → the rating, and a flame when a player had a big night (src/lib/why.ts).
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type Ref } from 'react';
@@ -103,6 +103,7 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
   const label =
     state === 'rated' ? `${rank}. ${teams}, rated ${game.note} out of 100`
     : state === 'live' ? `${teams}, in progress`
+    : state === 'waiting' ? `${teams}, finished, rating coming`
     : `${teams}, tip-off at ${game.tipOff ? TIME_FORMAT.format(new Date(game.tipOff)) : 'a time to be announced'}`;
 
   // Fixed order and symmetric styling: away on the left, home on the right,
@@ -112,8 +113,8 @@ export function MatchCard({ game, state, rank, featured }: MatchCardProps) {
       <article ref={cardRef} className={classes.filter(Boolean).join(' ')} aria-label={label} onClick={foldOnClick}>
         <TeamSide side="away" abbr={game.away} team={away} colors={colors.away} />
         <TeamSide side="home" abbr={game.home} team={home} colors={colors.home} />
-        {/* In progress: no block in the middle at all */}
-        {state !== 'live' && (
+        {/* In progress or waiting for its rating: no block in the middle at all */}
+        {state !== 'live' && state !== 'waiting' && (
           <div className="card__note" aria-hidden="true">
             {state === 'rated' && (
               <span className="card__note-value">
