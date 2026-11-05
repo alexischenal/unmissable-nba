@@ -50,14 +50,6 @@ body {
     @include section-heading;
   }
 
-  .games__dots {
-    width: 0.8em;
-    height: 0.16em;
-    margin-left: 0.14em;
-    vertical-align: baseline;
-    overflow: visible;
-  }
-
   .games__list {
     list-style: none;
     margin: 0;
