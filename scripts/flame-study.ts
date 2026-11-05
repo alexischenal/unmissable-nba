@@ -412,6 +412,10 @@ function personalPeaks(rows: Row[]): void {
     variants.push({ label: `top 1%, pts ≥ ${ptsFloor}`, bar: top(0.01), strict: false, effFloor: huge, ptsFloor });
     variants.push({ label: `top 2%, pts ≥ ${ptsFloor}`, bar: top(0.02), strict: false, effFloor: huge, ptsFloor });
   }
+  // A higher floor: crazy efficiency, or 50 points. Only the very big nights, when they're also his peak.
+  const crazy = SCORING.why.crazyNight;
+  variants.push({ label: `record, eff ≥ ${crazy} / pts ≥ 50`, bar: record, strict: true, effFloor: crazy, ptsFloor: 50 });
+  variants.push({ label: `top 1%, eff ≥ ${crazy} / pts ≥ 50`, bar: top(0.01), strict: false, effFloor: crazy, ptsFloor: 50 });
 
   const hits = (v: Variant): (Line & { via: string })[] => targets.flatMap((t) => bySeason.get(t)!.flatMap((l) => {
     const k = peaks.get(t)!.get(l.p.id!);
@@ -423,17 +427,17 @@ function personalPeaks(rows: Row[]): void {
   }));
 
   console.log(`  thresholds from the seasons before each target (${targets.join(', ')}), at least ${MIN_GAMES} games played; efficiency floor ${huge} (huge); game 50%+; not already a rock`);
-  console.log(`  ${'variant'.padEnd(26)} ${targets.map((t) => t.padStart(8)).join('')}   per season   players   most rocks`);
+  console.log(`  ${'variant'.padEnd(30)} ${targets.map((t) => t.padStart(8)).join('')}   per season   players   most rocks`);
   const all = variants.map((v) => ({ v, h: hits(v) }));
   for (const { v, h } of all) {
     const per = targets.map((t) => h.filter((x) => x.r.season === t).length);
     const count = new Map<number, number>();
     for (const x of h) count.set(x.p.id!, (count.get(x.p.id!) ?? 0) + 1);
     const most = [...count].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([id, n]) => `${names.get(id) ?? id} ${n}`).join(' · ');
-    console.log(`  ${v.label.padEnd(26)} ${per.map((n) => String(n).padStart(8)).join('')}   ${(h.length / targets.length).toFixed(1).padStart(10)}   ${String(count.size).padStart(7)}   ${most}`);
+    console.log(`  ${v.label.padEnd(30)} ${per.map((n) => String(n).padStart(8)).join('')}   ${(h.length / targets.length).toFixed(1).padStart(10)}   ${String(count.size).padStart(7)}   ${most}`);
   }
 
-  for (const { v, h } of all.filter(({ v }) => v.ptsFloor === 40 && (v.strict || v.label.startsWith('top 1%')))) {
+  for (const { v, h } of all.filter(({ v }) => v.ptsFloor === 50)) {
     console.log(`\n  ${v.label}: the ${h.length} nights`);
     for (const x of [...h].sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
       const k = peaks.get(x.r.season)!.get(x.p.id!)!;
