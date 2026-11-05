@@ -306,6 +306,65 @@ function rockVariants(rows: Row[]): void {
   }
 }
 
+// Buzzer beaters: the last basket of Q4 or of an overtime, made at the very end (the ball goes in after
+// the clock ran out), that wins the game or ties it to force overtime. Rule idea (November 5): a big
+// performance (a flame) plus a buzzer beater is a spicy rock. How does the NBA log those shots: exactly
+// 0.0, or a few tenths? So several windows. Free throws (1 point, logged at 0.0 after a foul at the
+// buzzer) are left out: a basket is 2 or 3 points.
+type Buzzer = { r: Row; period: number; left: number; pts: number; kind: 'win' | 'tie'; shooter?: PlayerLine };
+
+function buzzersOf(r: Row): Buzzer[] {
+  const tl = r.tl;
+  if (!tl || !tl.some((e) => e[4] !== undefined)) return [];
+  const out: Buzzer[] = [];
+  const last = r.g.periods.length;
+  for (let period = 4; period <= last; period++) {
+    const inPeriod = tl.filter((e) => e[0] === period);
+    const end = inPeriod.at(-1);
+    if (!end) continue;
+    const i = tl.indexOf(end);
+    const [, left, h, a, scorer] = end;
+    const [, , h0, a0] = i > 0 ? tl[i - 1]! : [0, 0, 0, 0];
+    const pts = (h - h0) + (a - a0);
+    if (pts < 2 || left > 3) continue;
+    const home = h > h0;
+    const before = home ? h0 - a0 : a0 - h0; // the scoring team's margin before the basket
+    const after = home ? h - a : a - h;
+    if (before > 0) continue; // already ahead: not a game-changing basket
+    const kind = period === last && after > 0 ? 'win' : period < last && after === 0 ? 'tie' : null;
+    if (!kind) continue;
+    out.push({ r, period, left, pts, kind, shooter: r.g.players.find((p) => p.id !== undefined && p.id === scorer) });
+  }
+  return out;
+}
+
+function buzzerBeaters(rows: Row[]): void {
+  title('Buzzer beaters (a big performance + a buzzer beater = a spicy rock?)');
+  const withScorers = rows.filter((r) => r.tl?.some((e) => e[4] !== undefined)).length;
+  console.log(`  ${withScorers} of ${rows.length} games have the scorers in their play-by-play`);
+  const all = rows.flatMap(buzzersOf);
+  const lit = (b: Buzzer) => b.shooter !== undefined && litLine(b.shooter, SCORING.why.bigNight);
+  const windows: [string, number][] = [['exactly 0.0', 0], ['0.5 s or less', 0.5], ['1 s or less', 1], ['3 s or less', 3]];
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  console.log(`  ${'time left'.padEnd(15)} ${'wins'.padStart(5)} ${'ties'.padStart(5)}   shooter with a flame   new rocks (not already one, game 50%+)   per season`);
+  for (const [label, max] of windows) {
+    const bs = all.filter((b) => b.left <= max);
+    const flame = bs.filter(lit);
+    const fresh = flame.filter((b) => !whyOf(b.r.g)?.nuclear && b.r.note > SCORING.blowoutMax);
+    console.log(`  ${label.padEnd(15)} ${String(bs.filter((b) => b.kind === 'win').length).padStart(5)} ${String(bs.filter((b) => b.kind === 'tie').length).padStart(5)}   ${String(flame.length).padStart(20)}   ${String(fresh.length).padStart(39)}   ${(fresh.length / seasons.length).toFixed(1).padStart(10)}`);
+  }
+  const unknown = all.filter((b) => !b.shooter).length;
+  if (unknown) console.log(`  (${unknown} shot(s) whose scorer isn't in the box score)`);
+
+  console.log('\n  every one at 3 s or less, closest to the buzzer first:');
+  for (const b of [...all].sort((x, y) => x.left - y.left || (x.r.g.date ?? '').localeCompare(y.r.g.date ?? ''))) {
+    const p = b.shooter;
+    const who = p ? `${(p.name ?? '?').padEnd(24)} ${String(p.pts).padStart(2)} pts eff ${String(efficiency(p)).padStart(2)}${lit(b) ? ' 🔥' : '   '}` : '?'.padEnd(43);
+    const where = b.period <= 4 ? 'Q4' : `OT${b.period - 4}`;
+    console.log(`    ${(b.r.g.date ?? '').padEnd(10)} ${`${b.r.g.away}@${b.r.g.home}`.padEnd(8)} ${where.padEnd(3)} ${b.left.toFixed(1).padStart(4)} s  ${b.pts}-pt ${b.kind === 'win' ? 'winner' : 'tie   '}  ${who}  game ${String(b.r.note).padStart(3)}%${whyOf(b.r.g)?.nuclear ? ' (already a rock)' : ''}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -354,6 +413,7 @@ async function main(): Promise<void> {
   nuclearReport(rows);
   nuclearNights(rows);
   rockVariants(rows);
+  buzzerBeaters(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
