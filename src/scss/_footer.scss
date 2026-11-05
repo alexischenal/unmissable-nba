@@ -6,7 +6,7 @@
   margin-top: auto;
   flex-wrap: wrap;
   gap: 16px 32px;
-  padding: 40px var(--stripe) 48px;
+  padding: 24px var(--stripe) 20px;
 
   .footer__link {
     @include underline-link;
