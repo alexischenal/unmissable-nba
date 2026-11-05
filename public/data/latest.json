@@ -12,6 +12,15 @@
       }
     },
     {
+      "away": "MIA",
+      "home": "LAC",
+      "tipOff": "2026-11-05T03:30:00Z",
+      "note": 86,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "UTA",
       "home": "NOP",
       "tipOff": "2026-11-05T01:00:00Z",
@@ -91,11 +100,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "MIA",
-      "home": "LAC",
-      "tipOff": "2026-11-05T03:30:00Z"
     }
   ]
 }
