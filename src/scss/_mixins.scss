@@ -56,7 +56,7 @@
 
 @mixin nuclear-pastille {
   background: radial-gradient(circle at var(--fire-x) var(--fire-y), #f2ffb8 0%, #9be04a var(--fire-core), #3f8f2a var(--fire-mid), #123a12 100%);
-  box-shadow: 0 0 5px 1px rgba(130, 225, 70, 0.5);
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.55), 0 0 8px 3px rgba(130, 225, 70, 0.45);
   animation-duration: 1.2s;
 }
 
