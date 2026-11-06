@@ -1,105 +1,16 @@
 {
   "version": 2,
-  "date": "2026-11-04",
+  "date": "2026-11-05",
   "games": [
     {
-      "away": "DAL",
-      "home": "SAS",
-      "tipOff": "2026-11-05T02:30:00Z",
-      "note": 100,
-      "why": {
-        "nuclear": 1
-      }
+      "away": "ORL",
+      "home": "PHX",
+      "tipOff": "2026-11-06T02:00:00Z"
     },
     {
       "away": "MIA",
-      "home": "LAC",
-      "tipOff": "2026-11-05T03:30:00Z",
-      "note": 86,
-      "why": {
-        "big": 1
-      }
-    },
-    {
-      "away": "UTA",
-      "home": "NOP",
-      "tipOff": "2026-11-05T01:00:00Z",
-      "note": 78
-    },
-    {
-      "away": "IND",
-      "home": "MEM",
-      "tipOff": "2026-11-05T01:00:00Z",
-      "note": 71
-    },
-    {
-      "away": "MIN",
-      "home": "HOU",
-      "tipOff": "2026-11-05T01:30:00Z",
-      "note": 70
-    },
-    {
-      "away": "MIL",
-      "home": "BOS",
-      "tipOff": "2026-11-05T00:30:00Z",
-      "note": 65
-    },
-    {
-      "away": "PHI",
-      "home": "DET",
-      "tipOff": "2026-11-05T00:00:00Z",
-      "note": 57
-    },
-    {
-      "away": "CHA",
-      "home": "BKN",
-      "tipOff": "2026-11-05T00:30:00Z",
-      "note": 52
-    },
-    {
-      "away": "TOR",
-      "home": "DEN",
-      "tipOff": "2026-11-05T02:00:00Z",
-      "note": 24,
-      "why": {
-        "huge": 1
-      }
-    },
-    {
-      "away": "LAL",
-      "home": "SAC",
-      "tipOff": "2026-11-05T03:00:00Z",
-      "note": 11,
-      "why": {
-        "big": 1
-      }
-    },
-    {
-      "away": "POR",
-      "home": "PHX",
-      "tipOff": "2026-11-05T02:00:00Z",
-      "note": 9
-    },
-    {
-      "away": "ATL",
-      "home": "WAS",
-      "tipOff": "2026-11-05T00:00:00Z",
-      "note": 8
-    },
-    {
-      "away": "CHI",
-      "home": "NYK",
-      "tipOff": "2026-11-05T00:30:00Z",
-      "note": 6
-    },
-    {
-      "away": "CLE",
-      "home": "OKC",
-      "tipOff": "2026-11-05T01:00:00Z",
-      "note": 4,
-      "why": {
-        "big": 1
-      }
+      "home": "GSW",
+      "tipOff": "2026-11-06T03:00:00Z"
     }
   ]
 }

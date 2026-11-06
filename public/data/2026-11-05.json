@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "date": "2026-11-05",
+  "games": [
+    {
+      "away": "ORL",
+      "home": "PHX",
+      "tipOff": "2026-11-06T02:00:00Z"
+    },
+    {
+      "away": "MIA",
+      "home": "GSW",
+      "tipOff": "2026-11-06T03:00:00Z"
+    }
+  ]
+}
