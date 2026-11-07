@@ -879,6 +879,43 @@ function newCompetitive(rows: Row[]): void {
   }
 }
 
+// The candidate (November 7): close to the end or 1 s of clutch → base disputedBase; else the start of the
+// fourth playable (peak 12:00→6:00 within 12) → base q3OnlyBase; the Q3 door goes. The games just above and
+// just under 50 with the playable door, to judge where they land.
+function candidateDefinition(rows: Row[]): void {
+  title('Candidate: close to the end or 1 s of clutch (base 50), playable start of the fourth (peak 12, base 40), no Q3 door');
+  const c = SCORING.disputed;
+  const toTheEnd = (g: Game) => closeFinalMargin(g) || loserBiggestLead(g) >= c.minLoserBiggestLead || closeByClutch(g);
+  const baseOf = (r: Row): number | null => {
+    if (toTheEnd(r.g) || (r.g.late && r.g.late.clutchSeconds > 0)) return SCORING.disputedBase;
+    if (r.tl && r.g.late && maxQ4Margin(r.tl, 360) <= 12) return SCORING.q3OnlyBase;
+    return null;
+  };
+  const rate = (r: Row) => {
+    const points = competitivenessPoints(r.g) + performancePoints(r.g);
+    const b = baseOf(r);
+    return Math.min(100, Math.round(b !== null ? b + points : Math.min(SCORING.blowoutMax, points)));
+  };
+  const n = rows.map(rate);
+  const idx = new Map(rows.map((r, i) => [r, i]));
+  const competitive = rows.filter((r) => baseOf(r) !== null);
+  console.log(`  today:     ${pct(rows.filter((r) => isDisputed(r.g)).length, rows.length)} competitive · ${pct(rows.filter((r) => r.note >= 50).length, rows.length)} at 50%+ · ${rows.filter((r) => r.note >= 100).length} at 100`);
+  console.log(`  candidate: ${pct(competitive.length, rows.length)} competitive · ${pct(n.filter((x) => x >= 50).length, rows.length)} at 50%+ · ${n.filter((x) => x >= 100).length} at 100`);
+  const moved = rows.filter((r, i) => n[i] !== r.note);
+  console.log(`  ${moved.length} games change rating: ${moved.filter((r) => n[idx.get(r)!]! > r.note).length} up, ${moved.filter((r) => n[idx.get(r)!]! < r.note).length} down`);
+  const playable = rows.filter((r) => baseOf(r) === SCORING.q3OnlyBase);
+  const above = playable.filter((r) => n[idx.get(r)!]! >= 50).sort((a, b) => n[idx.get(a)!]! - n[idx.get(b)!]!);
+  const under = playable.filter((r) => n[idx.get(r)!]! < 50).sort((a, b) => n[idx.get(b)!]! - n[idx.get(a)!]!);
+  console.log(`\n  playable start only (base 40): ${playable.length} games, ${above.length} at 50%+, ${under.length} under`);
+  console.log('  just above 50 (lowest first, first 15):');
+  for (const r of above.slice(0, 15)) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+  console.log('  just under 50 (highest first, first 15):');
+  for (const r of under.slice(0, 15)) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+  const lost = rows.filter((r) => isDisputed(r.g) && baseOf(r) === null);
+  console.log(`\n  ${lost.length} games stop being competitive (Q3 door only, decided before 6:00), first 10:`);
+  for (const r of lost.slice(0, 10)) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -938,6 +975,7 @@ async function main(): Promise<void> {
   sixMinutesDoor(rows);
   clutchAndEarlyQ4(rows);
   newCompetitive(rows);
+  candidateDefinition(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
