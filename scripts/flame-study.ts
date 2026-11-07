@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
-import { competitivenessPoints, disputedBaseFor, displayScore, efficiency, isDisputed } from '../src/lib/scoring.ts';
+import { competitivenessPoints, disputedBaseFor, displayScore, efficiency, isDisputed, marginAfterQ3, performancePoints } from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
 import { whyOf } from '../src/lib/why.ts';
 
@@ -663,6 +663,43 @@ function scoringInRating(rows: Row[]): void {
   }
 }
 
+// A game close after three quarters that a star puts away in the fourth (Giannis, 64 points, December
+// 2023: +7 after Q3, 26 points in Q4, rated a blowout). Today, only a margin of maxMarginAfterQ3 or less
+// after Q3 makes such a game competitive (base q3OnlyBase). Simulated: a wider Q3 margin, alone or with a
+// player scoring a lot in Q4/OT. Only the games rated blowouts today can move.
+function q3Door(rows: Row[]): void {
+  title('Close after Q3, put away in the fourth: a wider Q3 door?');
+  const q3 = SCORING.disputed.maxMarginAfterQ3;
+  const starQ4 = (r: Row) => Math.max(0, ...r.g.players.map((p) => q4Points(r.tl ?? [], p.id) ?? 0));
+  const rateAsQ3 = (r: Row) => Math.min(100, Math.round(SCORING.q3OnlyBase + competitivenessPoints(r.g) + performancePoints(r.g)));
+  type Variant = { label: string; door: (r: Row) => boolean };
+  const variants: Variant[] = [];
+  for (const m of [q3 + 1, q3 + 2, q3 + 3]) variants.push({ label: `Q3 within ${m}`, door: (r) => marginAfterQ3(r.g) <= m });
+  for (const m of [q3 + 2, q3 + 3, q3 + 5]) {
+    for (const pts of [15, 20]) variants.push({ label: `Q3 within ${m} + ${pts} pts in Q4`, door: (r) => marginAfterQ3(r.g) <= m && starQ4(r) >= pts });
+  }
+  const blowouts = rows.filter((r) => !isDisputed(r.g));
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  console.log(`  ${rows.length} games, ${blowouts.length} blowouts today (Q3 door today: within ${q3})`);
+  console.log(`  ${'variant'.padEnd(30)} moved  per season   at 50%+ after   avg new rating   50%+ overall`);
+  const base50 = rows.filter((r) => r.note >= 50).length;
+  for (const v of variants) {
+    const moved = blowouts.filter(v.door);
+    const now50 = moved.filter((r) => rateAsQ3(r) >= 50).length;
+    const avg = moved.length ? moved.reduce((a, r) => a + rateAsQ3(r), 0) / moved.length : 0;
+    console.log(`  ${v.label.padEnd(30)} ${String(moved.length).padStart(5)}  ${(moved.length / seasons.length).toFixed(1).padStart(10)}   ${String(now50).padStart(13)}   ${avg.toFixed(0).padStart(14)}   ${pct(base50 + now50, rows.length).padStart(12)}`);
+  }
+  for (const label of [`Q3 within ${q3 + 2}`, `Q3 within ${q3 + 3} + 20 pts in Q4`]) {
+    const v = variants.find((x) => x.label === label)!;
+    const moved = blowouts.filter(v.door).sort((a, b) => rateAsQ3(b) - rateAsQ3(a));
+    console.log(`\n  ${label}: the ${moved.length} games, best new rating first (first 25)`);
+    for (const r of moved.slice(0, 25)) {
+      const star = [...r.g.players].sort((a, b) => (q4Points(r.tl ?? [], b.id) ?? 0) - (q4Points(r.tl ?? [], a.id) ?? 0))[0]!;
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(rateAsQ3(r)).padStart(3)}   ${blowoutStory(r)}   ${star.name ?? '?'} ${q4Points(r.tl ?? [], star.id) ?? '?'} pts in Q4/OT (${star.pts})`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -718,6 +755,7 @@ async function main(): Promise<void> {
   peakWindows(rows);
   scoringByCloseness(rows);
   scoringInRating(rows);
+  q3Door(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
