@@ -119,3 +119,10 @@ test('why: a night of threes is nuclear (example: 11 threes)', () => {
   assert.deepEqual(whyOf({ ...close, players: [{ ...shooter, fg3m: 10 }] }), { big: 1 }); // 41 points: a flame
   assert.deepEqual(whyOf({ ...flat, players: [shooter] }), { big: 1 }); // a blowout: never a rock
 });
+
+test('why: huge and crazy by points too (example: 51 and 57 points)', () => {
+  const scorer = (pts: number): PlayerLine => ({ ...player(0), pts, fgm: Math.round(pts / 3), fga: 40, ftm: 0, fta: 0, tov: 4 });
+  assert.deepEqual(whyOf({ ...flat, players: [scorer(44)] }), { big: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [scorer(52)] }), { huge: 1 });
+  assert.deepEqual(whyOf({ ...flat, players: [scorer(57)] }), { crazy: 1 });
+});

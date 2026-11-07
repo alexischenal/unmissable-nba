@@ -132,6 +132,11 @@ and milestones (context, not play), fights and ejections.
      about half already rocks through the personal door; it adds about one rock every two years (Curry's
      48 points and 12 threes, December 2025).
 
+0. **Done (November 7): points in the rating and in the tiers.** After LAL (Dončić 53 points at 41 efficiency,
+   a close game rated 73): each player now counts in the rating with max(efficiency, points − a gap), and the
+   huge and crazy tiers can be reached by points too (like big). Simulated on seven seasons: about 3% of the
+   games move, a few points on average; the share of 50%+ unchanged, a handful more games at 100.
+
 0. **High priority — the spicy rock, the heart of the site: never miss a player's peak** (November 3).
    Where the site comes from: a morning, a Pelicans blowout watched first, then the other games… and a crazy
    Curry night discovered too late. The rating tells which game is close; the spicy rock must tell **which

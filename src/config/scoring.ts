@@ -33,6 +33,8 @@ export type ScoringConfig = {
   performance: {
     threshold: number; // efficiency from which a player counts
     divisor: number;   // larger = less weight
+    pointsGap: number; // a player counts with max(efficiency, points − pointsGap): a big scoring night counts
+                       // even when misses pull the efficiency down
   };
   // v2, with the play-by-play. Without it, the v1 fields above are used instead.
   clutch: {
@@ -47,7 +49,9 @@ export type ScoringConfig = {
     bigNight: number;       // efficiency for a "big night"
     bigPoints: number;      // …or this many points, whatever the efficiency (a scorer carrying his team)
     hugeNight: number;      // efficiency for a "huge night"
+    hugePoints: number;     // …or this many points
     crazyNight: number;     // efficiency for a "crazy night"
+    crazyPoints: number;    // …or this many points
     // Never announced: a historic night in a competitive game (the button turns radioactive).
     // Any of these, or a quadruple-double.
     nuclearPoints: number;  // points
@@ -71,10 +75,10 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   scenario: { weight: 8, fullAt: 18 },
   comeback: { weight: 6, fullAt: 12, bonusPerPoint: 0.8 },
   offense: { weight: 6, zeroAt: 200, fullAt: 250 },
-  performance: { threshold: 28, divisor: 25 },
+  performance: { threshold: 28, divisor: 25, pointsGap: 6 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
-  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, crazyNight: 56, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48, nuclearDuelPoints: 48, nuclearThrees: 11 },
+  why: { bigNight: 37, bigPoints: 41, hugeNight: 46, hugePoints: 51, crazyNight: 56, crazyPoints: 57, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48, nuclearDuelPoints: 48, nuclearThrees: 11 },
 };
 
 // The settings in use. Starts with the examples; the server script replaces them with the real ones.

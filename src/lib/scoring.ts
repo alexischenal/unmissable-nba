@@ -96,10 +96,11 @@ export const competitivenessDetails = (g: Game) => {
 export const competitivenessPoints = (g: Game) =>
   sum(Object.values(competitivenessDetails(g)).map((d) => d.points));
 
-// One player's points: nothing below the threshold, then the square of what's above it.
+// One player's points: nothing below the threshold, then the square of what's above it. On his efficiency,
+// or on his points minus a gap when that's higher: a big scoring night counts even with many misses.
 export const playerPoints = (p: PlayerLine) => {
-  const { threshold, divisor } = SCORING.performance;
-  return Math.max(0, efficiency(p) - threshold) ** 2 / divisor;
+  const { threshold, divisor, pointsGap } = SCORING.performance;
+  return Math.max(0, Math.max(efficiency(p), p.pts - pointsGap) - threshold) ** 2 / divisor;
 };
 
 export const performancePoints = (g: Game) => sum(g.players.map(playerPoints));
