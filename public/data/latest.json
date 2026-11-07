@@ -24,6 +24,12 @@
       }
     },
     {
+      "away": "OKC",
+      "home": "MEM",
+      "tipOff": "2026-11-07T01:00:00Z",
+      "note": 6
+    },
+    {
       "away": "PHI",
       "home": "CLE",
       "tipOff": "2026-11-07T00:30:00Z",
@@ -32,11 +38,6 @@
     {
       "away": "MIN",
       "home": "NOP",
-      "tipOff": "2026-11-07T01:00:00Z"
-    },
-    {
-      "away": "OKC",
-      "home": "MEM",
       "tipOff": "2026-11-07T01:00:00Z"
     },
     {
