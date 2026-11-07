@@ -14,7 +14,7 @@ export type ScoringConfig = {
     maxRegulationMargin: number; // margin at the end of regulation…
     maxMarginAt2: number;        // …only if within this margin with 2:00 left, or the loser got within 5 late
     maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter (v1 only: without the play-by-play)
-    maxPeakEarlyQ4: number;      // v2: the start of the fourth still playable, the margin never above this from 12:00 to 6:00
+    maxMarginAt6: number;        // v2: still playable with 6:00 left in the fourth (the margin then, at most)
     minLoserBiggestLead: number; // biggest lead of the losing team (comeback)
   };
   // Rating ranges
@@ -68,7 +68,7 @@ export type ScoringConfig = {
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
 export const EXAMPLE_SCORING: ScoringConfig = {
-  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, maxPeakEarlyQ4: 11, minLoserBiggestLead: 10 },
+  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, maxMarginAt6: 11, minLoserBiggestLead: 10 },
   disputedBase: 50,
   q3OnlyBase: 42,
   blowoutMax: 49,

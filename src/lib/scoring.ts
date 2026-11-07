@@ -54,11 +54,11 @@ const closeToTheEnd = (g: Game) =>
   closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g)
   || (g.late !== undefined && g.late.clutchSeconds > 0);
 
-// In reach for a while: v2, the start of the fourth still playable (the margin never above maxPeakEarlyQ4
-// from 12:00 to 6:00); v1 (no play-by-play), the margin after Q3.
+// In reach for a while: v2, still playable with 6:00 left in the fourth (a spectator who doesn't know the end
+// still believes in it); v1 (no play-by-play), the margin after Q3.
 const inReachForAWhile = (g: Game) =>
   g.late !== undefined
-    ? g.late.peakEarlyQ4 !== undefined && g.late.peakEarlyQ4 <= SCORING.disputed.maxPeakEarlyQ4
+    ? g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6
     : marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
 
 export const isDisputed = (g: Game) => closeToTheEnd(g) || inReachForAWhile(g);

@@ -37,18 +37,18 @@ test('v2: a blowout by the final margin, but tight at the end, is a close game f
   assert.equal(disputedBaseFor(oneSecond), 50);
 });
 
-test('v2: the start of the fourth still playable (example: never above 11 from 12:00 to 6:00) is competitive, lower base', () => {
-  const late = (peakEarlyQ4: number) => ({ ...detAtPhi, late: { clutchSeconds: 0, marginAt2: 15, weightedSwings: 0, peakEarlyQ4 } });
+test('v2: still playable with 6:00 left (example: within 11) is competitive, lower base', () => {
+  const late = (marginAt6: number) => ({ ...detAtPhi, late: { clutchSeconds: 0, marginAt2: 15, weightedSwings: 0, marginAt6 } });
   assert.equal(isDisputed(late(11)), true);
   assert.equal(disputedBaseFor(late(11)), 42); // example q3OnlyBase
   assert.equal(isDisputed(late(12)), false);
-  // v2 no longer looks at the margin after Q3: a game within 1 after Q3, out of reach by 6:00, is a blowout
+  // v2 no longer looks at the margin after Q3: a game within 1 after Q3, out of reach at 6:00, is a blowout
   const q3Close = {
     ...detAtPhi, biggestLead: { home: 21, away: 2 },
     periods: [{ home: 30, away: 30 }, { home: 25, away: 25 }, { home: 25, away: 24 }, { home: 35, away: 15 }],
   };
   assert.equal(isDisputed(q3Close), true); // v1: the margin after Q3
-  assert.equal(isDisputed({ ...q3Close, late: { clutchSeconds: 0, marginAt2: 18, weightedSwings: 0, peakEarlyQ4: 16 } }), false);
+  assert.equal(isDisputed({ ...q3Close, late: { clutchSeconds: 0, marginAt2: 18, weightedSwings: 0, marginAt6: 16 } }), false);
 });
 
 test('garbage time: a close final margin only counts if the game was within reach late', () => {

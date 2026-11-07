@@ -134,14 +134,14 @@ and milestones (context, not play), fights and ejections.
 
 0. **Done (November 7): a new definition of a blowout.** "A blowout is a game with no interest left." With the
    play-by-play: one second of clutch (the NBA's definition: within 5 in the last 5 minutes) makes a game
-   competitive from the full base; the margin after Q3 gives way to the start of the fourth (the margin never
-   above a limit from 12:00 to 6:00, lower base), so a game decided before 6:00 is a blowout even if it was close
-   after three quarters, and a game still in reach midway through the fourth isn't. v1 (no play-by-play) keeps the
-   Q3 door. Simulated on seven seasons: 57% → 59% competitive, 55% → 56% at 50%+, same games at 100; 470 games
-   move (329 up, 141 down). The spicy rock is allowed in any competitive game, whatever its base. Known edge: a
-   brief spike over the limit before 6:00 shuts the door (TOR @ MEM, February 2021). Rejected: a peak limit of 13
-   or 14 (wire-to-wire games with no lead change would start at 50), the average margin (lets games out of reach
-   at 6:00 in), one base of 50 for all (same reason). `scripts/close-rule-sim.ts` predates it: its check will
+   competitive from the full base; the margin after Q3 gives way to the margin with 6:00 left (lower base): a
+   spectator who doesn't know the end still believes in it, so a game still within reach then isn't a blowout,
+   and a game decided before 6:00 is one even if it was close after three quarters. v1 (no play-by-play) keeps the
+   Q3 door. Simulated on seven seasons: 57% → 64% competitive, 55% → 59% at 50%+, 106 → 109 games at 100; Embiid's
+   70 and Lillard's 60 come back from blowouts. The spicy rock is allowed in any competitive game, whatever its
+   base. Accepted on purpose: a wire-to-wire game still within reach at 6:00 starts at the lower base (it stays
+   under 50 without suspense). Rejected: the peak margin from 12:00 to 6:00 (a brief spike shut real comebacks
+   out), the average margin, one base of 50 for all (wire-to-wire games would reach 50). `scripts/close-rule-sim.ts` predates it: its check will
    show mismatches.
 
 0. **Done (November 7): points in the rating and in the tiers.** After LAL (Dončić 53 points at 41 efficiency,
