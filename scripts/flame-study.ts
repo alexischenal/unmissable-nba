@@ -19,7 +19,10 @@ import { fileURLToPath } from 'node:url';
 import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
-import { competitivenessPoints, disputedBaseFor, displayScore, efficiency, isDisputed, marginAfterQ3, performancePoints } from '../src/lib/scoring.ts';
+import {
+  closeByClutch, closeFinalMargin, competitivenessPoints, disputedBaseFor, displayScore, efficiency, isDisputed, loserBiggestLead,
+  marginAfterQ3, performancePoints,
+} from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
 import { whyOf } from '../src/lib/why.ts';
 
@@ -804,6 +807,66 @@ function clutchAndEarlyQ4(rows: Row[]): void {
   }
 }
 
+// The average margin over a stretch of the fourth (from 12:00 down to secondsLeft), weighted by time
+function avgEarlyQ4Margin(tl: Timeline, downTo: number): number {
+  let margin = 0;
+  for (const [period, , h, a] of tl) if (period < 4) margin = h - a;
+  let t = 720, sum = 0;
+  for (const [period, left, h, a] of tl) {
+    if (period !== 4) continue;
+    if (left < downTo) break;
+    sum += Math.abs(margin) * (t - left);
+    margin = h - a;
+    t = left;
+  }
+  sum += Math.abs(margin) * (t - downTo);
+  return sum / (720 - downTo);
+}
+
+// The whole new definition of a competitive game (November 7), base disputedBase for all (no Q3 door, no
+// base q3OnlyBase): close to the end as today, or 1 s of clutch (NBA's definition: within 5 in the last 5
+// minutes), or the first half of the fourth still playable. Three measures of "playable".
+function newCompetitive(rows: Row[]): void {
+  title('A new definition of a competitive game: close to the end, 1 s of clutch, or a playable start of the fourth');
+  const c = SCORING.disputed;
+  const toTheEnd = (g: Game) => closeFinalMargin(g) || loserBiggestLead(g) >= c.minLoserBiggestLead || closeByClutch(g);
+  type V = { label: string; playable: (r: Row) => boolean };
+  const variants: V[] = [
+    { label: 'peak 12:00→6:00 within 10', playable: (r) => maxQ4Margin(r.tl!, 360) <= 10 },
+    { label: 'peak 12:00→6:00 within 12', playable: (r) => maxQ4Margin(r.tl!, 360) <= 12 },
+    { label: 'average 12:00→6:00 within 10', playable: (r) => avgEarlyQ4Margin(r.tl!, 360) <= 10 },
+  ];
+  const disputedNew = (r: Row, v: V) => toTheEnd(r.g) || (r.tl !== undefined && r.g.late !== undefined && (r.g.late.clutchSeconds > 0 || v.playable(r)));
+  const rate = (r: Row, d: boolean) => {
+    const points = competitivenessPoints(r.g) + performancePoints(r.g);
+    return Math.min(100, Math.round(d ? SCORING.disputedBase + points : Math.min(SCORING.blowoutMax, points)));
+  };
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  console.log(`  today: ${pct(rows.filter((r) => isDisputed(r.g)).length, rows.length)} competitive · ${pct(rows.filter((r) => r.note >= 50).length, rows.length)} at 50%+ · ${rows.filter((r) => r.note >= 100).length} at 100`);
+  console.log(`  ${'playable start of the fourth'.padEnd(30)} competitive   50%+   at 100   become competitive (per season)   stop being competitive   base 40 → 50`);
+  const results = variants.map((v) => {
+    const d = rows.map((r) => disputedNew(r, v));
+    const n = rows.map((r, i) => rate(r, d[i]!));
+    const gained = rows.filter((r, i) => d[i] && !isDisputed(r.g));
+    const lost = rows.filter((r, i) => !d[i] && isDisputed(r.g));
+    const raised = rows.filter((r, i) => d[i] && isDisputed(r.g) && disputedBaseFor(r.g) < SCORING.disputedBase);
+    console.log(`  ${v.label.padEnd(30)} ${pct(d.filter(Boolean).length, rows.length).padStart(11)}   ${pct(n.filter((x) => x >= 50).length, rows.length).padStart(4)}   ${String(n.filter((x) => x >= 100).length).padStart(6)}   ${String(gained.length).padStart(16)} (${(gained.length / seasons.length).toFixed(1)})   ${String(lost.length).padStart(22)}   ${String(raised.length).padStart(12)}`);
+    return { v, n, gained, lost };
+  });
+  const idx = new Map(rows.map((r, i) => [r, i]));
+  for (const { v, n, gained, lost } of results) {
+    console.log(`\n  ${v.label}: the ${lost.length} games that stop being competitive (they only had the Q3 door)`);
+    for (const r of lost.slice(0, 15)) {
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · avg ${avgEarlyQ4Margin(r.tl!, 360).toFixed(1)} · ${blowoutStory(r)}`);
+    }
+    const best = [...gained].sort((a, b) => n[idx.get(b)!]! - n[idx.get(a)!]!);
+    console.log(`  ${v.label}: the ${gained.length} games that become competitive, best first (first 15)`);
+    for (const r of best.slice(0, 15)) {
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   clutch ${r.g.late!.clutchSeconds} s · peak ${maxQ4Margin(r.tl!, 360)} · avg ${avgEarlyQ4Margin(r.tl!, 360).toFixed(1)} · ${blowoutStory(r)}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -862,6 +925,7 @@ async function main(): Promise<void> {
   q3Door(rows);
   sixMinutesDoor(rows);
   clutchAndEarlyQ4(rows);
+  newCompetitive(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
