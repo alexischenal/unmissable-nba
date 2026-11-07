@@ -48,14 +48,22 @@ export const closeFinalMargin = (g: Game) => {
   return g.late === undefined || g.late.marginAt2 <= c.maxMarginAt2 || g.late.clutchSeconds > 0;
 };
 
-// Close at the end, or a big comeback: the game stayed alive until the end.
+// Close at the end, or a big comeback: the game stayed alive until the end. With the play-by-play, one second
+// of clutch (the NBA's definition: within 5 in the last 5 minutes) is enough.
 const closeToTheEnd = (g: Game) =>
-  closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g);
+  closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g)
+  || (g.late !== undefined && g.late.clutchSeconds > 0);
 
-export const isDisputed = (g: Game) =>
-  closeToTheEnd(g) || marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
+// In reach for a while: v2, still playable with 6:00 left in the fourth (a spectator who doesn't know the end
+// still believes in it); v1 (no play-by-play), the margin after Q3.
+const inReachForAWhile = (g: Game) =>
+  g.late !== undefined
+    ? g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6
+    : marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
 
-// Where a competitive game starts: lower when it was only close after Q3, then decided in the fourth.
+export const isDisputed = (g: Game) => closeToTheEnd(g) || inReachForAWhile(g);
+
+// Where a competitive game starts: lower when it was only in reach for a while, then decided before the end.
 export const disputedBaseFor = (g: Game) =>
   closeToTheEnd(g) ? SCORING.disputedBase : SCORING.q3OnlyBase;
 

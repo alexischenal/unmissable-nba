@@ -160,12 +160,21 @@ export function buzzerBeater(timeline: Timeline, periods: number): number | unde
   return undefined;
 }
 
+// The margin with 6:00 left in the 4th quarter: was the game still playable? (the last score before 6:00)
+export function marginAt6(timeline: Timeline): number {
+  let margin = 0;
+  for (const [period, left, h, a] of timeline) {
+    if (period < 4 || (period === 4 && left > 360)) margin = h - a;
+  }
+  return Math.abs(margin);
+}
+
 // What the rating v2 reads from the play-by-play (Game.late)
 export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
   const c = computeClutch(timeline, periods);
   const shooter = buzzerBeater(timeline, periods);
   return {
-    clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline),
+    clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline), marginAt6: marginAt6(timeline),
     ...(shooter !== undefined ? { buzzerBeater: shooter } : {}),
   };
 }
