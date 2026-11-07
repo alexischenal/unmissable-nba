@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buzzerAt, buzzerBeater, computeClutch, lateFrom, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { buzzerAt, buzzerBeater, computeClutch, lateFrom, peakEarlyQ4, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -107,4 +107,10 @@ test('buzzer beater: the last basket at 0.0 that wins, or ties to force overtime
   // In lateFrom only when there is one
   assert.equal(lateFrom([[4, 20, 100, 101, 1], [4, 0, 103, 101, 7]], 4).buzzerBeater, 7);
   assert.equal('buzzerBeater' in lateFrom([[4, 20, 100, 101, 1], [4, 5, 103, 101, 7]], 4), false);
+});
+
+test('the start of the fourth: the largest margin from the margin after Q3 down to 6:00', () => {
+  const t: Timeline = [[3, 0, 70, 64], [4, 600, 80, 68], [4, 400, 82, 77], [4, 300, 100, 77]];
+  assert.equal(peakEarlyQ4(t), 12); // 6 after Q3, 12 at 10:00, 5 at 6:40; the 23 at 5:00 is too late
+  assert.equal(lateFrom(t, 4).peakEarlyQ4, 12);
 });

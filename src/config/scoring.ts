@@ -13,13 +13,14 @@ export type ScoringConfig = {
   disputed: {
     maxRegulationMargin: number; // margin at the end of regulation…
     maxMarginAt2: number;        // …only if within this margin with 2:00 left, or the loser got within 5 late
-    maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter
+    maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter (v1 only: without the play-by-play)
+    maxPeakEarlyQ4: number;      // v2: the start of the fourth still playable, the margin never above this from 12:00 to 6:00
     minLoserBiggestLead: number; // biggest lead of the losing team (comeback)
   };
   // Rating ranges
   disputedBase: number; // where a competitive game starts (uncapped, display capped at 100)
-  // Where a game starts when it's competitive ONLY through the margin after Q3:
-  // tight for three quarters, decided in the fourth. Lower than disputedBase.
+  // Where a game starts when it's competitive ONLY through the start of the fourth (v2) or the margin after Q3
+  // (v1): in reach for a while, decided before the end. Lower than disputedBase.
   q3OnlyBase: number;
   blowoutMax: number;   // a blowout stays a blowout, even if someone scores 80
   // Step 2: competitiveness and entertainment
@@ -67,7 +68,7 @@ export type ScoringConfig = {
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
 export const EXAMPLE_SCORING: ScoringConfig = {
-  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, minLoserBiggestLead: 10 },
+  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, maxPeakEarlyQ4: 11, minLoserBiggestLead: 10 },
   disputedBase: 50,
   q3OnlyBase: 42,
   blowoutMax: 49,

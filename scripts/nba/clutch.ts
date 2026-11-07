@@ -160,12 +160,25 @@ export function buzzerBeater(timeline: Timeline, periods: number): number | unde
   return undefined;
 }
 
+// The largest margin from the start of the fourth (the margin after Q3) down to 6:00 left: was the start of
+// the fourth still playable?
+export function peakEarlyQ4(timeline: Timeline): number {
+  let margin = 0;
+  for (const [period, , h, a] of timeline) if (period < 4) margin = h - a;
+  let peak = Math.abs(margin);
+  for (const [period, left, h, a] of timeline) {
+    if (period !== 4 || left < 360) continue;
+    peak = Math.max(peak, Math.abs(h - a));
+  }
+  return peak;
+}
+
 // What the rating v2 reads from the play-by-play (Game.late)
 export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
   const c = computeClutch(timeline, periods);
   const shooter = buzzerBeater(timeline, periods);
   return {
-    clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline),
+    clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline), peakEarlyQ4: peakEarlyQ4(timeline),
     ...(shooter !== undefined ? { buzzerBeater: shooter } : {}),
   };
 }

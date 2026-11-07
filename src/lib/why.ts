@@ -7,16 +7,16 @@ import { PEAKS } from '../config/peaks.ts';
 import { SCORING } from '../config/scoring.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 import type { Why } from '../types/public.ts';
-import { displayScore, efficiency } from './scoring.ts';
+import { efficiency, isDisputed } from './scoring.ts';
 
 // A quadruple-double: 10 or more in four of points, rebounds, assists, steals, blocks
 const quadrupleDouble = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
 
 export function whyOf(g: Game): Why | undefined {
   const w = SCORING.why;
-  // The spicy rock says "watch it": only in a competitive game (rated above the blowout cap). In a blowout,
-  // a historic night keeps its flame and its Crazy chip.
-  const competitive = displayScore(g) > SCORING.blowoutMax;
+  // The spicy rock says "watch it": only in a competitive game (not a blowout, whatever its base). In a
+  // blowout, a historic night keeps its flame and its Crazy chip.
+  const competitive = isDisputed(g);
   // A duel: two players (or more) in the same game, each at nuclearDuel efficiency or scoring
   // nuclearDuelPoints (one can score, the other fill the box score): all of them are nuclear
   const duelist = (p: PlayerLine) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints;
