@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
-import { displayScore, efficiency, isDisputed } from '../src/lib/scoring.ts';
+import { competitivenessPoints, disputedBaseFor, displayScore, efficiency, isDisputed } from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
 import { whyOf } from '../src/lib/why.ts';
 
@@ -624,6 +624,45 @@ function scoringByCloseness(rows: Row[]): void {
   }
 }
 
+// Points in the rating (November 7, Dončić's 53 points at 41 efficiency, LAL rated 73): the rating only
+// reads efficiency. Simulated: each player's value = max(efficiency, points − k), for a few k. And a huge
+// tier by points (50+ points, like the big tier's 40-point rule).
+function scoringInRating(rows: Row[]): void {
+  title('Points in the rating: max(efficiency, points − k)');
+  const { threshold, divisor } = SCORING.performance;
+  const ratingWith = (g: Game, k: number) => {
+    const perf = g.players.reduce((sum, p) => sum + Math.max(0, Math.max(efficiency(p), p.pts - k) - threshold) ** 2 / divisor, 0);
+    const points = competitivenessPoints(g) + perf;
+    const raw = isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
+    return Math.min(100, Math.round(raw));
+  };
+  const today = rows.map((r) => r.note);
+  console.log('  variant              50%+    at 100   games that move   avg change of those   max change');
+  console.log(`  ${'today (efficiency)'.padEnd(18)} ${pct(today.filter((n) => n >= 50).length, rows.length).padStart(6)}   ${String(today.filter((n) => n >= 100).length).padStart(6)}`);
+  for (const k of [10, 5, 0]) {
+    const r2 = rows.map((r) => ratingWith(r.g, k));
+    const moved = rows.map((r, i) => ({ r, d: r2[i]! - r.note, n: r2[i]! })).filter((x) => x.d !== 0);
+    const avgD = moved.length ? moved.reduce((a, x) => a + x.d, 0) / moved.length : 0;
+    console.log(`  ${`points − ${k}`.padEnd(18)} ${pct(r2.filter((n) => n >= 50).length, rows.length).padStart(6)}   ${String(r2.filter((n) => n >= 100).length).padStart(6)}   ${String(moved.length).padStart(15)}   ${avgD.toFixed(1).padStart(19)}   ${String(Math.max(0, ...moved.map((x) => x.d))).padStart(10)}`);
+    if (k === 5) {
+      console.log('    the 20 games that move most with points − 5:');
+      for (const x of moved.sort((a, b) => b.d - a.d).slice(0, 20)) {
+        const star = [...x.r.g.players].sort((a, b) => (b.pts - efficiency(b)) - (a.pts - efficiency(a)))[0]!;
+        console.log(`      ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(x.r.note).padStart(3)} → ${String(x.n).padStart(3)}   ${(star.name ?? '?').padEnd(24)} ${line(star)} · eff ${efficiency(star)}`);
+      }
+    }
+  }
+
+  title('A huge tier by points too (50+ points)');
+  const lines = rows.flatMap((r) => r.g.players.map((p) => ({ r, p, e: efficiency(p) })));
+  const up = lines.filter((l) => l.p.pts >= 50 && l.e < SCORING.why.hugeNight && !whyOf(l.r.g)?.nuclear);
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  console.log(`  50+ points under the huge efficiency (${SCORING.why.hugeNight}), not a rock: ${up.length} lines (${seasons.map((s) => `${s} ${up.filter((l) => l.r.season === s).length}`).join(' · ')}): big today, huge with the rule`);
+  for (const l of up.sort((a, b) => (a.r.g.date ?? '').localeCompare(b.r.g.date ?? ''))) {
+    console.log(`    ${(l.r.g.date ?? '').padEnd(10)} ${(l.p.name ?? '?').padEnd(24)} ${line(l.p)} · eff ${l.e} · game ${l.r.note}%`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -678,6 +717,7 @@ async function main(): Promise<void> {
   threesNights(rows);
   peakWindows(rows);
   scoringByCloseness(rows);
+  scoringInRating(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
