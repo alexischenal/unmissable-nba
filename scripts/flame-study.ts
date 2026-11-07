@@ -916,6 +916,45 @@ function candidateDefinition(rows: Row[]): void {
   for (const r of lost.slice(0, 10)) console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
 }
 
+// The playable start of the fourth, two measures side by side (November 7): the peak from 12:00 to 6:00
+// within 12, or the margin at 6:00 within 12 ("at 6:00, 12 points is still playable"). The second contains
+// the first; the games it adds are those that went above 12 before 6:00 and came back.
+function peakOrSnapshot(rows: Row[]): void {
+  title('Playable start of the fourth: peak 12:00→6:00 within 12, or margin at 6:00 within 12');
+  const c = SCORING.disputed;
+  const toTheEnd = (g: Game) => closeFinalMargin(g) || loserBiggestLead(g) >= c.minLoserBiggestLead || closeByClutch(g)
+    || (g.late !== undefined && g.late.clutchSeconds > 0);
+  const variants: [string, (r: Row) => boolean][] = [
+    ['peak 12:00→6:00 within 12', (r) => maxQ4Margin(r.tl!, 360) <= 12],
+    ['margin at 6:00 within 12', (r) => Math.abs(marginInQ4(r.tl!, 360)) <= 12],
+  ];
+  const results = variants.map(([label, playable]) => {
+    const base = (r: Row) => (toTheEnd(r.g) ? SCORING.disputedBase : r.tl && r.g.late && playable(r) ? SCORING.q3OnlyBase : null);
+    const n = rows.map((r) => {
+      const points = competitivenessPoints(r.g) + performancePoints(r.g);
+      const b = base(r);
+      return Math.min(100, Math.round(b !== null ? b + points : Math.min(SCORING.blowoutMax, points)));
+    });
+    const competitive = rows.filter((r) => base(r) !== null).length;
+    console.log(`  ${label.padEnd(28)} ${pct(competitive, rows.length)} competitive · ${pct(n.filter((x) => x >= 50).length, rows.length)} at 50%+ · ${n.filter((x) => x >= 100).length} at 100`);
+    return { label, base, n };
+  });
+  console.log(`  ${'today'.padEnd(28)} ${pct(rows.filter((r) => isDisputed(r.g)).length, rows.length)} competitive · ${pct(rows.filter((r) => r.note >= 50).length, rows.length)} at 50%+ · ${rows.filter((r) => r.note >= 100).length} at 100`);
+  const [peak, snap] = results as [typeof results[0], typeof results[0]];
+  const idx = new Map(rows.map((r, i) => [r, i]));
+  const added = rows.filter((r) => snap.base(r) !== null && peak.base(r) === null).sort((a, b) => snap.n[idx.get(b)!]! - snap.n[idx.get(a)!]!);
+  const above = added.filter((r) => snap.n[idx.get(r)!]! >= 50).length;
+  console.log(`\n  the margin at 6:00 adds ${added.length} games (${(added.length / new Set(rows.map((r) => r.season)).size).toFixed(1)} per season), ${above} of them at 50%+: above 12 before 6:00, back within 12 at 6:00`);
+  console.log('  best first (first 20):');
+  for (const r of added.slice(0, 20)) {
+    console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(snap.n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+  }
+  console.log('  lowest first (first 10):');
+  for (const r of added.slice(-10).reverse()) {
+    console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(snap.n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -976,6 +1015,7 @@ async function main(): Promise<void> {
   clutchAndEarlyQ4(rows);
   newCompetitive(rows);
   candidateDefinition(rows);
+  peakOrSnapshot(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
