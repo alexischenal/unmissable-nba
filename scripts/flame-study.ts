@@ -834,6 +834,8 @@ function newCompetitive(rows: Row[]): void {
   const variants: V[] = [
     { label: 'peak 12:00→6:00 within 10', playable: (r) => maxQ4Margin(r.tl!, 360) <= 10 },
     { label: 'peak 12:00→6:00 within 12', playable: (r) => maxQ4Margin(r.tl!, 360) <= 12 },
+    { label: 'peak 12:00→6:00 within 13', playable: (r) => maxQ4Margin(r.tl!, 360) <= 13 },
+    { label: 'peak 12:00→6:00 within 14', playable: (r) => maxQ4Margin(r.tl!, 360) <= 14 },
     { label: 'average 12:00→6:00 within 10', playable: (r) => avgEarlyQ4Margin(r.tl!, 360) <= 10 },
   ];
   const disputedNew = (r: Row, v: V) => toTheEnd(r.g) || (r.tl !== undefined && r.g.late !== undefined && (r.g.late.clutchSeconds > 0 || v.playable(r)));
@@ -854,7 +856,17 @@ function newCompetitive(rows: Row[]): void {
     return { v, n, gained, lost };
   });
   const idx = new Map(rows.map((r, i) => [r, i]));
-  for (const { v, n, gained, lost } of results) {
+  // What each extra point adds, peak 12 → 13 → 14 (the games gained at that point only)
+  for (const [from, to] of [[12, 13], [13, 14]] as const) {
+    const added = rows.filter((r) => !isDisputed(r.g) && r.tl && r.g.late && r.g.late.clutchSeconds === 0
+      && !(closeFinalMargin(r.g) || loserBiggestLead(r.g) >= c.minLoserBiggestLead || closeByClutch(r.g))
+      && maxQ4Margin(r.tl, 360) > from && maxQ4Margin(r.tl, 360) <= to);
+    console.log(`\n  peak ${to} instead of ${from}: ${added.length} more games become competitive (first 15)`);
+    for (const r of added.slice(0, 15)) {
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(rate(r, true)).padStart(3)}   avg ${avgEarlyQ4Margin(r.tl!, 360).toFixed(1)} · ${blowoutStory(r)}`);
+    }
+  }
+  for (const { v, n, gained, lost } of results.filter(({ v }) => !/within 1[34]$/.test(v.label))) {
     console.log(`\n  ${v.label}: the ${lost.length} games that stop being competitive (they only had the Q3 door)`);
     for (const r of lost.slice(0, 15)) {
       console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(n[idx.get(r)!]).padStart(3)}   peak ${maxQ4Margin(r.tl!, 360)} · avg ${avgEarlyQ4Margin(r.tl!, 360).toFixed(1)} · ${blowoutStory(r)}`);
