@@ -15,6 +15,12 @@
       "note": 63
     },
     {
+      "away": "MIN",
+      "home": "NOP",
+      "tipOff": "2026-11-07T01:00:00Z",
+      "note": 63
+    },
+    {
       "away": "UTA",
       "home": "DAL",
       "tipOff": "2026-11-07T01:00:00Z",
@@ -40,11 +46,6 @@
       "home": "CLE",
       "tipOff": "2026-11-07T00:30:00Z",
       "note": 2
-    },
-    {
-      "away": "MIN",
-      "home": "NOP",
-      "tipOff": "2026-11-07T01:00:00Z"
     },
     {
       "away": "POR",
