@@ -700,11 +700,26 @@ function q3Door(rows: Row[]): void {
   }
 }
 
+// The average margin over the fourth quarter, weighted by time: how much of it was still in reach
+function avgQ4Margin(tl: Timeline): number {
+  let margin = 0;
+  for (const [period, , h, a] of tl) if (period < 4) margin = h - a;
+  let t = 720, sum = 0;
+  for (const [period, left, h, a] of tl) {
+    if (period !== 4) continue;
+    sum += Math.abs(margin) * (t - left);
+    margin = h - a;
+    t = left;
+  }
+  sum += Math.abs(margin) * t;
+  return sum / 720;
+}
+
 // Still in reach midway through the fourth (November 7): "a blowout is a game with no interest left; 10
 // points down in the fourth, there's still some". Simulated: the game is competitive (base q3OnlyBase)
 // when the margin with 6:00 left in the fourth was small enough. Only today's blowouts can move.
 function sixMinutesDoor(rows: Row[]): void {
-  title('Still in reach with 6:00 left: a new door?');
+  title('Still in reach in the fourth: a new door? (margin at 6:00, average margin over the fourth)');
   const rateAsQ3 = (r: Row) => Math.min(100, Math.round(SCORING.q3OnlyBase + competitivenessPoints(r.g) + performancePoints(r.g)));
   const blowouts = rows.filter((r) => !isDisputed(r.g) && r.tl);
   const seasons = [...new Set(rows.map((r) => r.season))].sort();
@@ -715,6 +730,20 @@ function sixMinutesDoor(rows: Row[]): void {
     const now50 = moved.filter((r) => rateAsQ3(r) >= 50).length;
     const avg = moved.length ? moved.reduce((a, r) => a + rateAsQ3(r), 0) / moved.length : 0;
     console.log(`  ${`within ${m}`.padEnd(16)} ${String(moved.length).padStart(5)}  ${(moved.length / seasons.length).toFixed(1).padStart(10)}   ${String(now50).padStart(13)}   ${avg.toFixed(0).padStart(14)}   ${pct(base50 + now50, rows.length).padStart(12)}`);
+  }
+  console.log(`  ${'avg Q4 margin'.padEnd(16)} moved  per season   at 50%+ after   avg new rating   50%+ overall`);
+  for (const m of [6, 8, 10]) {
+    const moved = blowouts.filter((r) => avgQ4Margin(r.tl!) <= m);
+    const now50 = moved.filter((r) => rateAsQ3(r) >= 50).length;
+    const avg = moved.length ? moved.reduce((a, r) => a + rateAsQ3(r), 0) / moved.length : 0;
+    console.log(`  ${`within ${m}`.padEnd(16)} ${String(moved.length).padStart(5)}  ${(moved.length / seasons.length).toFixed(1).padStart(10)}   ${String(now50).padStart(13)}   ${avg.toFixed(0).padStart(14)}   ${pct(base50 + now50, rows.length).padStart(12)}`);
+  }
+  for (const m of [8]) {
+    const moved = blowouts.filter((r) => avgQ4Margin(r.tl!) <= m).sort((a, b) => rateAsQ3(b) - rateAsQ3(a));
+    console.log(`\n  average Q4 margin within ${m}: the ${moved.length} games, best new rating first (first 25)`);
+    for (const r of moved.slice(0, 25)) {
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(rateAsQ3(r)).padStart(3)}   avg Q4 ${avgQ4Margin(r.tl!).toFixed(1)} · ${blowoutStory(r)}`);
+    }
   }
   for (const m of [8, 10]) {
     const moved = blowouts.filter((r) => Math.abs(marginInQ4(r.tl!, 360)) <= m).sort((a, b) => rateAsQ3(b) - rateAsQ3(a));
