@@ -20,7 +20,8 @@
     {
       "away": "PHI",
       "home": "CLE",
-      "tipOff": "2026-11-07T00:30:00Z"
+      "tipOff": "2026-11-07T00:30:00Z",
+      "note": 2
     },
     {
       "away": "MIN",
