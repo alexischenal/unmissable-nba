@@ -754,6 +754,56 @@ function sixMinutesDoor(rows: Row[]): void {
   }
 }
 
+// The largest margin over a stretch of the fourth (from the start of the quarter down to secondsLeft)
+function maxQ4Margin(tl: Timeline, downTo: number): number {
+  let margin = 0;
+  for (const [period, , h, a] of tl) if (period < 4) margin = h - a;
+  let max = Math.abs(margin);
+  for (const [period, left, h, a] of tl) {
+    if (period !== 4 || left < downTo) continue;
+    margin = h - a;
+    max = Math.max(max, Math.abs(margin));
+  }
+  return max;
+}
+
+// November 7, the user's proposal: (1) one second of clutch (the loser within 5 in the last 5 minutes) is
+// enough: not a blowout (base disputedBase); (2) the first half of the fourth stayed within about 10:
+// not a blowout (base q3OnlyBase). Only today's blowouts can move.
+function clutchAndEarlyQ4(rows: Row[]): void {
+  title('Not a blowout: 1 s of clutch, or the first half of the fourth within about 10');
+  const rate = (r: Row, base: number) => Math.min(100, Math.round(base + competitivenessPoints(r.g) + performancePoints(r.g)));
+  const blowouts = rows.filter((r) => !isDisputed(r.g) && r.tl && r.g.late);
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const base50 = rows.filter((r) => r.note >= 50).length;
+  type V = { label: string; base: (r: Row) => number | null };
+  const clutch = (r: Row) => r.g.late!.clutchSeconds > 0;
+  const early = (m: number) => (r: Row) => maxQ4Margin(r.tl!, 360) <= m;
+  const variants: V[] = [
+    { label: '1 s of clutch', base: (r) => (clutch(r) ? SCORING.disputedBase : null) },
+    ...[10, 11, 12].map((m) => ({ label: `12:00→6:00 within ${m}`, base: (r: Row) => (early(m)(r) ? SCORING.q3OnlyBase : null) })),
+    ...[10, 12].map((m) => ({
+      label: `clutch, or 12:00→6:00 within ${m}`,
+      base: (r: Row) => (clutch(r) ? SCORING.disputedBase : early(m)(r) ? SCORING.q3OnlyBase : null),
+    })),
+  ];
+  console.log(`  ${'variant'.padEnd(34)} moved  per season   at 50%+ after   avg new rating   50%+ overall`);
+  for (const v of variants) {
+    const moved = blowouts.filter((r) => v.base(r) !== null);
+    const now = moved.map((r) => rate(r, v.base(r)!));
+    const now50 = now.filter((n) => n >= 50).length;
+    const avg = now.length ? now.reduce((a, b) => a + b, 0) / now.length : 0;
+    console.log(`  ${v.label.padEnd(34)} ${String(moved.length).padStart(5)}  ${(moved.length / seasons.length).toFixed(1).padStart(10)}   ${String(now50).padStart(13)}   ${avg.toFixed(0).padStart(14)}   ${pct(base50 + now50, rows.length).padStart(12)}`);
+  }
+  for (const v of [variants[0]!, variants[1]!]) {
+    const moved = blowouts.filter((r) => v.base(r) !== null).sort((a, b) => rate(b, v.base(b)!) - rate(a, v.base(a)!));
+    console.log(`\n  ${v.label}: the ${moved.length} games, best new rating first (first 25)`);
+    for (const r of moved.slice(0, 25)) {
+      console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(rate(r, v.base(r)!)).padStart(3)}   clutch ${r.g.late!.clutchSeconds} s · Q4 max to 6:00 ${maxQ4Margin(r.tl!, 360)} · ${blowoutStory(r)}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -811,6 +861,7 @@ async function main(): Promise<void> {
   scoringInRating(rows);
   q3Door(rows);
   sixMinutesDoor(rows);
+  clutchAndEarlyQ4(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
