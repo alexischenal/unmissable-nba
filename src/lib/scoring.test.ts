@@ -2,7 +2,9 @@
 // With the example settings (EXAMPLE_SCORING): never the real ones.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { closeByClutch, closeFinalMargin, competitivenessDetails, disputedBaseFor, isDisputed, rawScore } from './scoring.ts';
+import { closeByClutch, closeFinalMargin, competitivenessDetails, disputedBaseFor, efficiency, isDisputed, playerPoints, rawScore } from './scoring.ts';
+import { SCORING } from '../config/scoring.ts';
+import type { PlayerLine } from '../types/game.ts';
 import { sasAtDen } from '../../fixtures/2026-04-04-sas-den.ts';
 import { detAtPhi } from '../../fixtures/2026-04-04-det-phi.ts';
 
@@ -53,4 +55,14 @@ test('comeback: linear up to fullAt, then a bonus per extra point, uncapped', ()
   assert.equal(pts(6), 3);                            // example: weight 6, full at 12
   assert.equal(pts(12), 6);
   assert.equal(Math.round(pts(29) * 10) / 10, 19.6); // 6 + 17 × 0.8
+});
+
+test('performance: a big scoring night counts on its points minus the gap (example: 6) when that is higher', () => {
+  // 53 points at 41 efficiency: counts as 47 (53 − 6), not 41
+  const chucker: PlayerLine = { team: 'home', pts: 53, reb: 4, ast: 4, stl: 0, blk: 0, fgm: 17, fga: 33, ftm: 14, fta: 16, tov: 4 };
+  const { threshold, divisor } = SCORING.performance;
+  assert.equal(playerPoints(chucker), (53 - 6 - threshold) ** 2 / divisor);
+  // An efficient night: efficiency wins, nothing changes
+  const allround: PlayerLine = { team: 'home', pts: 30, reb: 15, ast: 12, stl: 2, blk: 1, fgm: 12, fga: 18, ftm: 6, fta: 7, tov: 2 };
+  assert.equal(playerPoints(allround), (efficiency(allround) - threshold) ** 2 / divisor);
 });

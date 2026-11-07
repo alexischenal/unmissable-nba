@@ -41,14 +41,17 @@ export function whyOf(g: Game): Why | undefined {
         || (duel && duelist(p)) || buzzer(p) || peak(p));
     return { eff, pts: p.pts, nuclear };
   });
-  // Four tiers, each player in one only. Nuclear first (never announced), then by efficiency; big also by
-  // points: a scorer who had to take every shot still had a big night, even if his misses pull his
+  // Four tiers, each player in one only (his highest). Nuclear first (never announced), then by efficiency
+  // or by points: a scorer who had to take every shot still had a big night, even if his misses pull his
   // efficiency down.
   const nuclear = lines.filter((l) => l.nuclear).length;
   const rest = lines.filter((l) => !l.nuclear);
-  const crazy = rest.filter(({ eff }) => eff >= w.crazyNight).length;
-  const huge = rest.filter(({ eff }) => eff >= w.hugeNight && eff < w.crazyNight).length;
-  const big = rest.filter(({ eff, pts }) => eff < w.hugeNight && (eff >= w.bigNight || pts >= w.bigPoints)).length;
+  const isCrazy = ({ eff, pts }: { eff: number; pts: number }) => eff >= w.crazyNight || pts >= w.crazyPoints;
+  const isHuge = ({ eff, pts }: { eff: number; pts: number }) => eff >= w.hugeNight || pts >= w.hugePoints;
+  const isBig = ({ eff, pts }: { eff: number; pts: number }) => eff >= w.bigNight || pts >= w.bigPoints;
+  const crazy = rest.filter(isCrazy).length;
+  const huge = rest.filter((l) => !isCrazy(l) && isHuge(l)).length;
+  const big = rest.filter((l) => !isCrazy(l) && !isHuge(l) && isBig(l)).length;
   const why: Why = {
     ...(nuclear ? { nuclear } : {}),
     ...(crazy ? { crazy } : {}),
