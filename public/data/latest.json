@@ -27,6 +27,12 @@
       "note": 8
     },
     {
+      "away": "SAS",
+      "home": "SAC",
+      "tipOff": "2026-11-07T03:00:00Z",
+      "note": 8
+    },
+    {
       "away": "BOS",
       "home": "CHA",
       "tipOff": "2026-11-07T00:00:00Z",
@@ -50,11 +56,6 @@
     {
       "away": "POR",
       "home": "LAL",
-      "tipOff": "2026-11-07T03:00:00Z"
-    },
-    {
-      "away": "SAS",
-      "home": "SAC",
       "tipOff": "2026-11-07T03:00:00Z"
     }
   ]
