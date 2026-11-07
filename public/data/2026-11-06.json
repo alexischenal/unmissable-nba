@@ -3,6 +3,15 @@
   "date": "2026-11-06",
   "games": [
     {
+      "away": "POR",
+      "home": "LAL",
+      "tipOff": "2026-11-07T03:00:00Z",
+      "note": 73,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "WAS",
       "home": "ATL",
       "tipOff": "2026-11-07T00:00:00Z",
@@ -52,11 +61,6 @@
       "home": "CLE",
       "tipOff": "2026-11-07T00:30:00Z",
       "note": 2
-    },
-    {
-      "away": "POR",
-      "home": "LAL",
-      "tipOff": "2026-11-07T03:00:00Z"
     }
   ]
 }
