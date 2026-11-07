@@ -14,13 +14,13 @@ export type ScoringConfig = {
     maxRegulationMargin: number; // margin at the end of regulation…
     maxMarginAt2: number;        // …only if within this margin with 2:00 left, or the loser got within 5 late
     maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter (v1 only: without the play-by-play)
-    maxMarginAt6: number;        // v2: still playable with 6:00 left in the fourth (the margin then, at most)
+    maxMarginAt6: number;        // v2: a close game if still within this with 6:00 left in the fourth
     minLoserBiggestLead: number; // biggest lead of the losing team (comeback)
   };
   // Rating ranges
   disputedBase: number; // where a competitive game starts (uncapped, display capped at 100)
-  // Where a game starts when it's competitive ONLY through the start of the fourth (v2) or the margin after Q3
-  // (v1): in reach for a while, decided before the end. Lower than disputedBase.
+  // v1 only (no play-by-play): where a game starts when it's competitive only through the margin after Q3.
+  // Lower than disputedBase.
   q3OnlyBase: number;
   blowoutMax: number;   // a blowout stays a blowout, even if someone scores 80
   // Step 2: competitiveness and entertainment

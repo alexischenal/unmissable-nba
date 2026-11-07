@@ -37,10 +37,10 @@ test('v2: a blowout by the final margin, but tight at the end, is a close game f
   assert.equal(disputedBaseFor(oneSecond), 50);
 });
 
-test('v2: still playable with 6:00 left (example: within 11) is competitive, lower base', () => {
+test('v2: still within reach with 6:00 left (example: within 11) is a close game, full base', () => {
   const late = (marginAt6: number) => ({ ...detAtPhi, late: { clutchSeconds: 0, marginAt2: 15, weightedSwings: 0, marginAt6 } });
   assert.equal(isDisputed(late(11)), true);
-  assert.equal(disputedBaseFor(late(11)), 42); // example q3OnlyBase
+  assert.equal(disputedBaseFor(late(11)), 50);
   assert.equal(isDisputed(late(12)), false);
   // v2 no longer looks at the margin after Q3: a game within 1 after Q3, out of reach at 6:00, is a blowout
   const q3Close = {

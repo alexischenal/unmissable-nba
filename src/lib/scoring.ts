@@ -48,24 +48,20 @@ export const closeFinalMargin = (g: Game) => {
   return g.late === undefined || g.late.marginAt2 <= c.maxMarginAt2 || g.late.clutchSeconds > 0;
 };
 
-// Close at the end, or a big comeback: the game stayed alive until the end. With the play-by-play, one second
-// of clutch (the NBA's definition: within 5 in the last 5 minutes) is enough.
-const closeToTheEnd = (g: Game) =>
+// A close game, from the full base. With the play-by-play: close at the end, a big comeback, one second of clutch
+// (the NBA's definition: within 5 in the last 5 minutes), or still within reach with 6:00 left in the fourth:
+// whatever happened before, the trailing team and the spectator still believe in it.
+const closeGame = (g: Game) =>
   closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g)
-  || (g.late !== undefined && g.late.clutchSeconds > 0);
+  || (g.late !== undefined && (g.late.clutchSeconds > 0
+    || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
 
-// In reach for a while: v2, still playable with 6:00 left in the fourth (a spectator who doesn't know the end
-// still believes in it); v1 (no play-by-play), the margin after Q3.
-const inReachForAWhile = (g: Game) =>
-  g.late !== undefined
-    ? g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6
-    : marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
+// v1 only (no play-by-play, so no clutch nor margin at 6:00): close after three quarters, lower base.
+const q3Only = (g: Game) => g.late === undefined && marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
 
-export const isDisputed = (g: Game) => closeToTheEnd(g) || inReachForAWhile(g);
+export const isDisputed = (g: Game) => closeGame(g) || q3Only(g);
 
-// Where a competitive game starts: lower when it was only in reach for a while, then decided before the end.
-export const disputedBaseFor = (g: Game) =>
-  closeToTheEnd(g) ? SCORING.disputedBase : SCORING.q3OnlyBase;
+export const disputedBaseFor = (g: Game) => (closeGame(g) ? SCORING.disputedBase : SCORING.q3OnlyBase);
 
 // --- Step 2: refine -------------------------------------------------------------
 
