@@ -3,15 +3,16 @@
   "date": "2026-11-07",
   "games": [
     {
+      "away": "BKN",
+      "home": "ATL",
+      "tipOff": "2026-11-08T00:30:00Z",
+      "note": 75
+    },
+    {
       "away": "DEN",
       "home": "IND",
       "tipOff": "2026-11-07T22:00:00Z",
       "note": 54
-    },
-    {
-      "away": "BKN",
-      "home": "ATL",
-      "tipOff": "2026-11-08T00:30:00Z"
     },
     {
       "away": "NYK",
