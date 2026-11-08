@@ -666,6 +666,90 @@ function scoringInRating(rows: Row[]): void {
   }
 }
 
+// Shooting in the rating (November 8): today each player is worth max(efficiency, points − pointsGap),
+// however he scored them. With the true shooting, TS = pts / (2 × (FGA + 0.44 × FTA)) (league average
+// around 57-58%), the gap could depend on the shooting: no gap or a bonus for an efficient night, a
+// bigger gap for a player who chucks. Each variant is a ladder of (TS floor → points added), first match
+// wins; the last step applies below every floor.
+const trueShooting = (p: PlayerLine) => {
+  const tsa = 2 * (p.fga + 0.44 * p.fta);
+  return tsa > 0 ? p.pts / tsa : 0;
+};
+type Ladder = { label: string; steps: [number, number][]; below: number };
+function shootingInRating(rows: Row[]): void {
+  title('Shooting in the rating: points − gap, the gap set by the true shooting');
+  const { threshold, divisor, pointsGap } = SCORING.performance;
+  const valueWith = (p: PlayerLine, l: Ladder) => {
+    const ts = trueShooting(p);
+    const add = l.steps.find(([floor]) => ts >= floor)?.[1] ?? l.below;
+    return Math.max(0, Math.max(efficiency(p), p.pts + add) - threshold) ** 2 / divisor;
+  };
+  const todayValue = (p: PlayerLine) => Math.max(0, Math.max(efficiency(p), p.pts - pointsGap) - threshold) ** 2 / divisor;
+  const ratingWith = (g: Game, value: (p: PlayerLine) => number) => {
+    const points = competitivenessPoints(g) + g.players.reduce((s, p) => s + value(p), 0);
+    const raw = isDisputed(g) ? disputedBaseFor(g) + points : Math.min(SCORING.blowoutMax, points);
+    return Math.min(100, Math.round(raw));
+  };
+
+  const scorers = rows.flatMap((r) => r.g.players.filter((p) => p.pts >= 35).map((p) => ({ r, p, ts: trueShooting(p) })));
+  const sortedTs = scorers.map((x) => x.ts).sort((a, b) => a - b);
+  const tsPct = (x: number) => `${(100 * x).toFixed(0)}%`;
+  console.log(`  ${scorers.length} nights at 35+ points · TS: 10% ${tsPct(quantile(sortedTs, 0.1))} · 25% ${tsPct(quantile(sortedTs, 0.25))} · median ${tsPct(quantile(sortedTs, 0.5))} · 75% ${tsPct(quantile(sortedTs, 0.75))} · 90% ${tsPct(quantile(sortedTs, 0.9))}`);
+  const bands = [0, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, Infinity];
+  console.log(`  by TS band: ${bands.slice(0, -1).map((b, i) => `${b === 0 ? '<' : ''}${tsPct(b === 0 ? bands[1]! : b)}${b === 0 ? '' : bands[i + 1] === Infinity ? '+' : `–${tsPct(bands[i + 1]!)}`} ${scorers.filter((x) => x.ts >= b && x.ts < bands[i + 1]!).length}`).join(' · ')}`);
+  console.log(`  (the gap only matters when points − gap beats the efficiency: ${scorers.filter((x) => x.p.pts - pointsGap > efficiency(x.p)).length} of these nights today)`);
+
+  const g = -pointsGap;
+  const ladders: Ladder[] = [
+    { label: 'TS 58%+ → no gap', steps: [[0.58, 0]], below: g },
+    { label: 'TS 60%+ → no gap', steps: [[0.6, 0]], below: g },
+    { label: 'TS 62%+ → no gap', steps: [[0.62, 0]], below: g },
+    { label: 'TS 65%+ → no gap', steps: [[0.65, 0]], below: g },
+    { label: 'TS 60%+ → +5', steps: [[0.6, 5]], below: g },
+    { label: 'TS 65%+ → +5', steps: [[0.65, 5]], below: g },
+    { label: '65%+ +5 · 60%+ 0', steps: [[0.65, 5], [0.6, 0]], below: g },
+    { label: '<50% → −10', steps: [[0.5, g]], below: -10 },
+    { label: '<50% −10 · <45% −15', steps: [[0.5, g], [0.45, -10]], below: -15 },
+    { label: 'ladder A', steps: [[0.6, 0], [0.5, g]], below: -10 },
+    { label: 'ladder B', steps: [[0.65, 5], [0.6, 0], [0.5, g]], below: -10 },
+    { label: 'ladder C', steps: [[0.65, 5], [0.6, 0], [0.5, g], [0.45, -10]], below: -15 },
+  ];
+  console.log('    ladder A: 60%+ 0 · 50–60% −5 · <50% −10');
+  console.log('    ladder B: 65%+ +5 · 60–65% 0 · 50–60% −5 · <50% −10');
+  console.log('    ladder C: 65%+ +5 · 60–65% 0 · 50–60% −5 · 45–50% −10 · <45% −15');
+
+  const today = rows.map((r) => r.note);
+  console.log('\n  variant                    50%+   at 100   up   down   avg up   avg down   max up   max down');
+  console.log(`  ${`today (points − ${pointsGap})`.padEnd(24)} ${pct(today.filter((n) => n >= 50).length, rows.length).padStart(6)}   ${String(today.filter((n) => n >= 100).length).padStart(6)}`);
+  const results = ladders.map((l) => {
+    const n = rows.map((r) => ratingWith(r.g, (p) => valueWith(p, l)));
+    const d = rows.map((r, i) => n[i]! - r.note);
+    const up = d.filter((x) => x > 0);
+    const down = d.filter((x) => x < 0);
+    const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+    console.log(`  ${l.label.padEnd(24)} ${pct(n.filter((x) => x >= 50).length, rows.length).padStart(6)}   ${String(n.filter((x) => x >= 100).length).padStart(6)}   ${String(up.length).padStart(4)}   ${String(down.length).padStart(4)}   ${avg(up).toFixed(1).padStart(6)}   ${avg(down).toFixed(1).padStart(8)}   ${String(Math.max(0, ...up)).padStart(6)}   ${String(Math.min(0, ...down)).padStart(8)}`);
+    return { l, n };
+  });
+
+  // The player whose value changes most, not the top scorer: that's the line behind the move
+  const mover = (r: Row, l: Ladder) => [...r.g.players].sort((a, b) => Math.abs(valueWith(b, l) - todayValue(b)) - Math.abs(valueWith(a, l) - todayValue(a)))[0]!;
+  const show = (x: { r: Row; n: number }, l: Ladder) => {
+    const p = mover(x.r, l);
+    console.log(`      ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(x.r.note).padStart(3)} → ${String(x.n).padStart(3)}   ${(p.name ?? '?').padEnd(24)} ${line(p)} · eff ${efficiency(p)} · TS ${tsPct(trueShooting(p))}`);
+  };
+  for (const label of ['TS 60%+ → no gap', 'ladder B', 'ladder C']) {
+    const { l, n } = results.find((x) => x.l.label === label)!;
+    const moved = rows.map((r, i) => ({ r, n: n[i]!, d: n[i]! - r.note })).filter((x) => x.d !== 0);
+    console.log(`\n  ${label}: the 15 biggest rises`);
+    for (const x of moved.filter((x) => x.d > 0).sort((a, b) => b.d - a.d).slice(0, 15)) show(x, l);
+    const falls = moved.filter((x) => x.d < 0).sort((a, b) => a.d - b.d);
+    if (falls.length) {
+      console.log(`  ${label}: the 15 biggest falls`);
+      for (const x of falls.slice(0, 15)) show(x, l);
+    }
+  }
+}
+
 // A game close after three quarters that a star puts away in the fourth (Giannis, 64 points, December
 // 2023: +7 after Q3, 26 points in Q4, rated a blowout). Today, only a margin of maxMarginAfterQ3 or less
 // after Q3 makes such a game competitive (base q3OnlyBase). Simulated: a wider Q3 margin, alone or with a
@@ -1010,6 +1094,7 @@ async function main(): Promise<void> {
   peakWindows(rows);
   scoringByCloseness(rows);
   scoringInRating(rows);
+  shootingInRating(rows);
   q3Door(rows);
   sixMinutesDoor(rows);
   clutchAndEarlyQ4(rows);
