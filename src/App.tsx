@@ -124,7 +124,7 @@ export function App() {
             <Menu items={menuItems} />
             <Brand className="header__brand">
               <a className="header__home" href={HOME_URL}>Unmissable</a>
-              {/* The text pages say where you are next to the brand, not on the right */}
+              {/* The text pages say where you are next to the brand, not under it */}
               {SECTION && <span className="header__section">{SECTION}</span>}
             </Brand>
           </div>

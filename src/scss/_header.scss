@@ -16,14 +16,13 @@ $burger-gap: $gap-ratio * 1em;
   z-index: 10;
   background-color: $black;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   padding: 20px var(--stripe);
   margin-bottom: -1px;
 
   @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 6px;
     padding: 16px var(--stripe);
   }
@@ -155,8 +154,16 @@ $burger-gap: $gap-ratio * 1em;
     color: $white;
   }
 
-  @media (max-width: $breakpoint-mobile) {
-    .header__current {
+  .header__current {
+    margin-left: calc(#{$brand-size} * #{$burger-width-ratio + $gap-ratio});
+    font-size: 16px;
+
+    @media (max-width: $breakpoint-tablet) {
+      margin-left: calc(21px + #{$brand-size-tablet} * #{$gap-ratio});
+      font-size: 13px;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
       margin-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
     }
   }
