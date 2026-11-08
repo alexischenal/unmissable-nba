@@ -10,6 +10,7 @@
 //   4. (November 8) A safety net: the loser's best chance after 6:00 in the fourth, against the bar the
 //      6:00 door already accepts (down 12 with 6:00 left). The games the net would catch, the film of their
 //      last six minutes, and the reverse check (competitive games today that stay under the bar).
+//   5. The net at 10% with three versions of the comeback door (kept, removed, kept if alive in Q4).
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -164,21 +165,26 @@ const pct1 = (x: number) => `${(100 * x).toFixed(1)}%`;
 // The loser's best chance from 6:00 in the fourth to the end of regulation: at 6:00, then right after every
 // score (between two scores the chance only drops as the clock runs). Plus the film: the winner's lead and
 // the loser's chance after every score.
+const marginAt = (tl: Timeline, left0: number) => {
+  let m = 0;
+  for (const [period, left, h, a] of tl) if (period < 4 || (period === 4 && left > left0)) m = h - a;
+  return m;
+};
 type Net = { best: number; at: number; lead6: number; film: string[] };
-function netOf(r: Row, mu: number, sigma: number): Net {
+function netOf(r: Row, mu: number, sigma: number, from = 360): Net {
   const sign = r.homeWon ? 1 : -1;
   const loserWp = (margin: number, left: number) => {
     const p = wpHome(margin, left / GAME, mu, sigma);
     return r.homeWon ? 1 - p : p;
   };
   let margin = 0;
-  for (const [period, left, h, a] of r.tl) if (period < 4 || (period === 4 && left > 360)) margin = h - a;
-  const lead6 = sign * margin;
-  let best = loserWp(margin, 360);
-  let at = 360;
+  for (const [period, left, h, a] of r.tl) if (period < 4 || (period === 4 && left > from)) margin = h - a;
+  const lead6 = sign * marginAt(r.tl, 360);
+  let best = loserWp(margin, from);
+  let at = from;
   const film: string[] = [];
   for (const [period, left, h, a] of r.tl) {
-    if (period !== 4 || left > 360) continue;
+    if (period !== 4 || left > from) continue;
     const wp = loserWp(h - a, left);
     film.push(`${clock(left)} ${sign * (h - a)} (${(100 * wp).toFixed(0)}%)`);
     if (wp > best) { best = wp; at = left; }
@@ -229,6 +235,55 @@ function safetyNet(rows: Row[], mu: number, sigma: number): void {
   ].filter(Boolean).join(', ');
   for (const { r, n } of under.sort((a, b) => a.n.best - b.n.best).slice(0, 20)) {
     console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} rated ${String(r.note).padStart(3)}   best ${pct1(n.best)} at ${clock(n.at)} · lead at 6:00 ${n.lead6} · in by: ${doors(r.g)} · ${story(r)}`);
+  }
+}
+
+// November 8: the safety net at 10%, with three versions of the comeback door (the loser led by
+// minLoserBiggestLead or more): kept as today, removed, or kept only when the loser still had the bar's
+// chance at some point in the fourth (from 12:00). Only regulation and overtime games with the play-by-play.
+function netAndComeback(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 5. The net at 10% and the comeback door ===');
+  const tau6 = 360 / GAME;
+  const bar = Math.min(wpHome(-12, tau6, mu, sigma), 1 - wpHome(12, tau6, mu, sigma));
+  const after6 = rows.map((r) => netOf(r, mu, sigma).best);
+  const inQ4 = rows.map((r) => netOf(r, mu, sigma, 720).best);
+  const otherDoors = (g: Row['g']) => closeFinalMargin(g) || closeByClutch(g)
+    || (g.late !== undefined && (g.late.clutchSeconds > 0 || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
+  const led = (g: Row['g']) => loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead;
+  const rate = (r: Row, close: boolean) => {
+    const pts = competitivenessPoints(r.g) + performancePoints(r.g);
+    return Math.min(100, Math.round(close ? SCORING.disputedBase + pts : Math.min(SCORING.blowoutMax, pts)));
+  };
+  const variants: { label: string; close: (r: Row, i: number) => boolean }[] = [
+    { label: 'today', close: (r) => isDisputed(r.g) },
+    { label: 'net 10%', close: (r, i) => isDisputed(r.g) || after6[i]! >= 0.1 },
+    { label: 'net 10%, no comeback door', close: (r, i) => otherDoors(r.g) || after6[i]! >= 0.1 },
+    { label: `net 10%, comeback alive in Q4 (${(100 * bar).toFixed(1)}%)`, close: (r, i) => otherDoors(r.g) || after6[i]! >= 0.1 || (led(r.g) && inQ4[i]! >= bar) },
+  ];
+  const base = rows.map((r) => isDisputed(r.g));
+  const fmtLine = (r: Row, i: number, before: number, after: number) => `    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(before).padStart(3)} → ${String(after).padStart(3)}   loser led by ${String(loserBiggestLead(r.g)).padStart(2)} · lead at 6:00 ${String(Math.abs(marginAt(r.tl, 360))).padStart(2)} · loser's best: Q4 ${(100 * inQ4[i]!).toFixed(1)}%, after 6:00 ${(100 * after6[i]!).toFixed(1)}% · ${story(r)}`;
+  const seasons = new Set(rows.map((r) => r.season)).size;
+  console.log('  variant                                       close   50%+   in   out   (per season)');
+  const results = variants.map((v) => {
+    const close = rows.map((r, i) => v.close(r, i));
+    const notes = rows.map((r, i) => rate(r, close[i]!));
+    const ins = rows.map((_, i) => i).filter((i) => close[i] && !base[i]);
+    const outs = rows.map((_, i) => i).filter((i) => !close[i] && base[i]);
+    console.log(`  ${v.label.padEnd(44)} ${`${((100 * close.filter(Boolean).length) / rows.length).toFixed(1)}%`.padStart(6)} ${`${((100 * notes.filter((n) => n >= 50).length) / rows.length).toFixed(1)}%`.padStart(6)} ${String(ins.length).padStart(4)} ${String(outs.length).padStart(5)}   (${(ins.length / seasons).toFixed(1)} in, ${(outs.length / seasons).toFixed(1)} out)`);
+    return { label: v.label, ins, outs, notes };
+  });
+  const today = rows.map((r) => r.note);
+  for (const v of results.slice(1)) {
+    console.log(`\n  ${v.label}: in (${v.ins.length})`);
+    for (const i of [...v.ins].sort((a, b) => after6[b]! - after6[a]!)) console.log(fmtLine(rows[i]!, i, today[i]!, v.notes[i]!));
+    if (v.outs.length === 0) continue;
+    const sorted = [...v.outs].sort((a, b) => inQ4[b]! - inQ4[a]!);
+    console.log(`  ${v.label}: out (${v.outs.length}), the most alive in Q4 first (first 25), then the least (last 10)`);
+    for (const i of sorted.slice(0, 25)) console.log(fmtLine(rows[i]!, i, today[i]!, v.notes[i]!));
+    if (sorted.length > 25) {
+      console.log('    …');
+      for (const i of sorted.slice(-10)) console.log(fmtLine(rows[i]!, i, today[i]!, v.notes[i]!));
+    }
   }
 }
 
@@ -305,6 +360,7 @@ async function main(): Promise<void> {
   for (const i of idx.filter((i) => rS[i]! < n * 0.2 && rA[i]! > n * 0.5).sort((a, b) => rS[a]! - rS[b]!).slice(0, 15)) console.log(line(i));
 
   safetyNet(rows, mu, sigma);
+  netAndComeback(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
