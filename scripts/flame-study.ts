@@ -1039,6 +1039,45 @@ function peakOrSnapshot(rows: Row[]): void {
   }
 }
 
+// November 8: a game put away at 6:00 (more than maxMarginAt6) where the loser comes back late, without
+// ever getting within 5 (no clutch second): rated a blowout today. For each closest margin from 6 to 10,
+// the blowouts of today where the loser got that close after 6:00, and when.
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+function lateRun(rows: Row[]): void {
+  title('Late runs: blowouts where the loser got within 6 to 10 after 6:00');
+  const blowouts = rows.filter((r) => r.tl && !isDisputed(r.g));
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const runs = blowouts.map((r) => {
+    const tl = r.tl!;
+    const last = tl[tl.length - 1]!;
+    const sign = last[2] > last[3] ? 1 : -1;
+    let closest = Math.abs(marginInQ4(tl, 360));
+    let at = 360;
+    for (const [period, left, h, a] of tl) {
+      if (period !== 4 || left > 360) continue;
+      const m = sign * (h - a);
+      if (m < closest) { closest = m; at = left; }
+    }
+    return { r, closest, at };
+  });
+  console.log(`  ${blowouts.length} blowouts today (with the play-by-play), ${seasons.length} seasons`);
+  console.log('  closest   games   per season   reached at 2:00 or before   rated with base 50');
+  for (let n = 6; n <= 10; n++) {
+    const hit = runs.filter((x) => x.closest <= n);
+    const early = hit.filter((x) => x.at >= 120).length;
+    const notes = hit.map((x) => Math.min(100, Math.round(disputedBaseFor({ ...x.r.g, late: { ...x.r.g.late!, marginAt6: 0 } }) + competitivenessPoints(x.r.g) + performancePoints(x.r.g))));
+    const avg = notes.length ? notes.reduce((a, b) => a + b, 0) / notes.length : 0;
+    console.log(`  ≤ ${String(n).padEnd(6)} ${String(hit.length).padStart(5)}   ${(hit.length / seasons.length).toFixed(1).padStart(10)}   ${`${early} (${pct(early, hit.length)})`.padStart(25)}   ${`avg ${avg.toFixed(0)}`.padStart(18)}`);
+  }
+  for (let n = 6; n <= 10; n++) {
+    const exact = runs.filter((x) => x.closest === n).sort((a, b) => b.at - a.at);
+    console.log(`\n  closest exactly ${n} (${exact.length}), earliest first (first 12):`);
+    for (const x of exact.slice(0, 12)) {
+      console.log(`    ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(x.r.note).padStart(3)}%   within ${n} at ${clock(x.at)} · ${blowoutStory(x.r)}`);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -1101,6 +1140,7 @@ async function main(): Promise<void> {
   newCompetitive(rows);
   candidateDefinition(rows);
   peakOrSnapshot(rows);
+  lateRun(rows);
   const playerArg = args.indexOf('--player');
   if (playerArg >= 0 && args[playerArg + 1]) playerNights(rows, args[playerArg + 1]!, at);
 }
