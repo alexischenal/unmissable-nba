@@ -145,6 +145,15 @@ and milestones (context, not play), fights and ejections.
    the 6:00 door (decided against: the promise). `scripts/close-rule-sim.ts` predates it: its check shows
    mismatches.
 
+0. **Done (November 8): the shooting in the points gap.** A big night scored cleanly (true shooting, free
+   throws included, at a setting or more) counts with all its points, without the gap. Simulated on seven
+   seasons (`flame-study` section "Shooting in the rating"): the big scorers shoot well (median TS around 70%
+   on the 35+ point nights, 90% of them at 60%+), so the floor sits high enough that an ordinary night keeps
+   the gap; about 10% of the games move, a couple of points on average, the share of 50%+ unchanged.
+   Rejected: a bonus above the points (the 100s almost doubled; it invents points), a bigger gap for the
+   chuckers (2 games in seven seasons: the efficiency already counts the misses), field goal and 3-point
+   percentages (two arbitrary floors, unfair to the big men, 3-point attempts not stored).
+
 0. **Done (November 7): points in the rating and in the tiers.** After LAL (Dončić 53 points at 41 efficiency,
    a close game rated 73): each player now counts in the rating with max(efficiency, points − a gap), and the
    huge and crazy tiers can be reached by points too (like big). Simulated on seven seasons: about 3% of the
