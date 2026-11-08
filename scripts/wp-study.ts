@@ -11,6 +11,7 @@
 //      6:00 door already accepts (down 12 with 6:00 left). The games the net would catch, the film of their
 //      last six minutes, and the reverse check (competitive games today that stay under the bar).
 //   5. The net at 10% with three versions of the comeback door (kept, removed, kept if alive in Q4).
+//   6. The comeback door replaced by the doubt in the fourth (the loser's best chance before 6:00 ≥ X%).
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -287,6 +288,69 @@ function netAndComeback(rows: Row[], mu: number, sigma: number): void {
   }
 }
 
+// November 8: the comeback door replaced by a statistical one, the doubt in the fourth: the loser had at
+// least X% at some point of the fourth before 6:00 (at 12:00, then right after every score). After 6:00,
+// the 12-point door and the 10% net. The comeback (the loser's lead) only gives bonus points.
+function bestBefore6(r: Row, mu: number, sigma: number): number {
+  const loserWp = (margin: number, left: number) => {
+    const p = wpHome(margin, left / GAME, mu, sigma);
+    return r.homeWon ? 1 - p : p;
+  };
+  let best = loserWp(marginAt(r.tl, 720), 720);
+  for (const [period, left, h, a] of r.tl) {
+    if (period === 4 && left > 360) best = Math.max(best, loserWp(h - a, left));
+  }
+  return best;
+}
+
+function doubtInQ4(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 6. The doubt in the fourth instead of the comeback door ===');
+  for (const x of [0.2, 0.25, 0.33, 0.4]) {
+    const deficits = [720, 540, 420].map((left) => {
+      let m = 0;
+      while (Math.min(wpHome(-(m + 1), left / GAME, mu, sigma), 1 - wpHome(m + 1, left / GAME, mu, sigma)) >= x) m++;
+      return `${clock(left)} down ${m}`;
+    });
+    console.log(`  ${Math.round(100 * x)}%: ${deficits.join(' · ')} (or less)`);
+  }
+  const before6 = rows.map((r) => bestBefore6(r, mu, sigma));
+  const after6 = rows.map((r) => netOf(r, mu, sigma).best);
+  const otherDoors = (g: Row['g']) => closeFinalMargin(g) || closeByClutch(g)
+    || (g.late !== undefined && (g.late.clutchSeconds > 0 || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
+  const rate = (r: Row, close: boolean) => {
+    const pts = competitivenessPoints(r.g) + performancePoints(r.g);
+    return Math.min(100, Math.round(close ? SCORING.disputedBase + pts : Math.min(SCORING.blowoutMax, pts)));
+  };
+  const seasons = new Set(rows.map((r) => r.season)).size;
+  const base = rows.map((r) => isDisputed(r.g));
+  const q3 = (r: Row) => { const s = marginAt(r.tl, 720); return r.homeWon ? s : -s; };
+  const fmt = (i: number, after: number) => {
+    const r = rows[i]!;
+    return `    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(after).padStart(3)}   loser's best before 6:00 ${(100 * before6[i]!).toFixed(0).padStart(2)}% · after 6:00 ${(100 * after6[i]!).toFixed(0).padStart(2)}% · winner after Q3 ${String(q3(r)).padStart(3)}, at 6:00 ${String(Math.abs(marginAt(r.tl, 360))).padStart(2)} · loser led by ${String(loserBiggestLead(r.g)).padStart(2)} · ${story(r)}`;
+  };
+  console.log(`\n  ${'variant'.padEnd(36)} close   50%+    in   out   (per season)`);
+  console.log(`  ${'today'.padEnd(36)} ${`${((100 * base.filter(Boolean).length) / rows.length).toFixed(1)}%`.padStart(5)} ${`${((100 * rows.filter((r) => r.note >= 50).length) / rows.length).toFixed(1)}%`.padStart(6)}`);
+  const results = [0.2, 0.25, 0.33, 0.4].map((x) => {
+    const close = rows.map((r, i) => otherDoors(r.g) || after6[i]! >= 0.1 || before6[i]! >= x);
+    const notes = rows.map((r, i) => rate(r, close[i]!));
+    const ins = rows.map((_, i) => i).filter((i) => close[i] && !base[i]);
+    const outs = rows.map((_, i) => i).filter((i) => !close[i] && base[i]);
+    const label = `net 10% + doubt in Q4 ${Math.round(100 * x)}%`;
+    console.log(`  ${label.padEnd(36)} ${`${((100 * close.filter(Boolean).length) / rows.length).toFixed(1)}%`.padStart(5)} ${`${((100 * notes.filter((n) => n >= 50).length) / rows.length).toFixed(1)}%`.padStart(6)} ${String(ins.length).padStart(5)} ${String(outs.length).padStart(5)}   (${(ins.length / seasons).toFixed(1)} in, ${(outs.length / seasons).toFixed(1)} out)`);
+    return { label, ins, outs, notes };
+  });
+  for (const v of results) {
+    const ins = [...v.ins].sort((a, b) => before6[a]! - before6[b]!);
+    console.log(`\n  ${v.label}: in (${ins.length}), the weakest doubt first (first 20), then the strongest (last 5)`);
+    for (const i of ins.slice(0, 20)) console.log(fmt(i, v.notes[i]!));
+    if (ins.length > 20) { console.log('    …'); for (const i of ins.slice(-5)) console.log(fmt(i, v.notes[i]!)); }
+    const outs = [...v.outs].sort((a, b) => before6[b]! - before6[a]!);
+    console.log(`  ${v.label}: out (${outs.length}), the most doubt first (first 20), then the least (last 5)`);
+    for (const i of outs.slice(0, 20)) console.log(fmt(i, v.notes[i]!));
+    if (outs.length > 20) { console.log('    …'); for (const i of outs.slice(-5)) console.log(fmt(i, v.notes[i]!)); }
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -361,6 +425,7 @@ async function main(): Promise<void> {
 
   safetyNet(rows, mu, sigma);
   netAndComeback(rows, mu, sigma);
+  doubtInQ4(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
