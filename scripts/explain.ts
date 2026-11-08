@@ -23,7 +23,7 @@ import { SCORING } from '../src/config/scoring.ts';
 import { whyLabels, whyOf } from '../src/lib/why.ts';
 import {
   closeByClutch, closeFinalMargin, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
-  loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore,
+  loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore, trueShooting,
   regulationMargin,
 } from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
@@ -81,14 +81,14 @@ function explain(g: Game, notes: Notes = {}): void {
   console.log(`  offense   ${pct(compet.offense.share)}  ${n1(compet.offense.points).padStart(5)} / ${s.offense.weight}    ${n1(pointsPer48(g))} pts per 48 min (zero at ${s.offense.zeroAt}, full at ${s.offense.fullAt})`);
   console.log(`  total            ${n1(competitivenessPoints(g)).padStart(5)}`);
 
-  console.log(`Step 2 — performances (efficiency above ${s.performance.threshold}, squared, ÷ ${s.performance.divisor})`);
+  console.log(`Step 2 — performances (max(efficiency, points − ${s.performance.pointsGap}, or all the points from ${Math.round(100 * s.performance.efficientTs)}% true shooting) above ${s.performance.threshold}, squared, ÷ ${s.performance.divisor})`);
   const stars = g.players
     .map((p) => ({ p, eff: efficiency(p), pts: playerPoints(p) }))
     .sort((a, b) => b.eff - a.eff);
   const counted = stars.filter((x) => x.pts > 0);
   for (const { p, eff, pts } of counted) {
     const team = p.team === 'home' ? g.home : g.away;
-    console.log(`  ${(p.name ?? '?').padEnd(24)} ${team}  eff ${String(eff).padStart(3)}  → ${n1(pts).padStart(5)}   (${p.pts} pts ${p.reb} reb ${p.ast} ast)`);
+    console.log(`  ${(p.name ?? '?').padEnd(24)} ${team}  eff ${String(eff).padStart(3)}  → ${n1(pts).padStart(5)}   (${p.pts} pts ${p.reb} reb ${p.ast} ast · ${p.fgm}/${p.fga} FG ${p.ftm}/${p.fta} FT · TS ${Math.round(100 * trueShooting(p))}%${trueShooting(p) >= s.performance.efficientTs ? ', no gap' : ''})`);
   }
   if (counted.length === 0) {
     const best = stars[0];
