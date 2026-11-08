@@ -4,7 +4,7 @@
 .card {
   --card-h: 200px;
   --note-w: 104px;
-  --note-h: 100px;
+  --note-h: 78px;
   --note-size: 52px;
   --name-size: 22cqi;
   --name-max: 30px;
@@ -33,7 +33,7 @@
     --location-size: 14px;
     --name-font: 42px;
     --note-w: 92px;
-    --note-h: 88px;
+    --note-h: 69px;
     --note-size: 46px;
   }
 
@@ -43,7 +43,7 @@
     --location-size: 13px;
     --name-font: 35px;
     --note-w: 80px;
-    --note-h: 78px;
+    --note-h: 60px;
     --note-size: 40px;
   }
 
@@ -55,7 +55,7 @@
     --name-max: 28px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 60px;
-    --note-h: 58px;
+    --note-h: 45px;
     --note-size: 28px;
   }
 
@@ -419,7 +419,7 @@
 .card--featured {
   --card-h: 350px;
   --note-w: 144px;
-  --note-h: 136px;
+  --note-h: 108px;
   --note-size: 72px;
   --name-size: 26cqi;
   --name-max: 38px;
@@ -437,7 +437,7 @@
     --location-size: 18px;
     --name-font: 52px;
     --note-w: 128px;
-    --note-h: 120px;
+    --note-h: 96px;
     --note-size: 64px;
   }
 
@@ -446,7 +446,7 @@
     --location-size: 16px;
     --name-font: 44px;
     --note-w: 112px;
-    --note-h: 108px;
+    --note-h: 84px;
     --note-size: 56px;
   }
 
@@ -457,7 +457,7 @@
     --name-max: 32px;
     --name-font: min(var(--name-max), var(--name-size));
     --note-w: 72px;
-    --note-h: 68px;
+    --note-h: 54px;
     --note-size: 34px;
   }
 }
