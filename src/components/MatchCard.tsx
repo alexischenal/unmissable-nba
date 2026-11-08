@@ -18,8 +18,9 @@ const SOFT_BREAKS: Record<string, string> = {
   Timberwolves: 'Timber\u200Bwolves',
 };
 
-// The browser's locale and time zone: "21:00" in Paris, "3:00 PM" in New York.
-const TIME_FORMAT = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+// The browser's locale and time zone: "21:00" in Paris, "3:00 PM" in New York. Always Latin digits:
+// the site is in English, and the display font has no others (Cairo would get "١٠:٣٠").
+const TIME_FORMAT = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', numberingSystem: 'latn' });
 
 function teamFor(abbr: string): Team {
   return TEAMS[abbr] ?? { ...FALLBACK_TEAM, name: abbr };
