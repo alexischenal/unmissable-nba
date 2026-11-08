@@ -100,11 +100,19 @@ export const competitivenessDetails = (g: Game) => {
 export const competitivenessPoints = (g: Game) =>
   sum(Object.values(competitivenessDetails(g)).map((d) => d.points));
 
+// True shooting: points per scoring attempt, free throws included (league average around 57-58%)
+export const trueShooting = (p: PlayerLine) => {
+  const attempts = 2 * (p.fga + 0.44 * p.fta);
+  return attempts > 0 ? p.pts / attempts : 0;
+};
+
 // One player's points: nothing below the threshold, then the square of what's above it. On his efficiency,
-// or on his points minus a gap when that's higher: a big scoring night counts even with many misses.
+// or on his points minus a gap when that's higher: a big scoring night counts even with many misses. Scored
+// cleanly (true shooting at efficientTs or more), no gap: the points count in full.
 export const playerPoints = (p: PlayerLine) => {
-  const { threshold, divisor, pointsGap } = SCORING.performance;
-  return Math.max(0, Math.max(efficiency(p), p.pts - pointsGap) - threshold) ** 2 / divisor;
+  const { threshold, divisor, pointsGap, efficientTs } = SCORING.performance;
+  const gap = trueShooting(p) >= efficientTs ? 0 : pointsGap;
+  return Math.max(0, Math.max(efficiency(p), p.pts - gap) - threshold) ** 2 / divisor;
 };
 
 export const performancePoints = (g: Game) => sum(g.players.map(playerPoints));

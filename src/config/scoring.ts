@@ -36,6 +36,7 @@ export type ScoringConfig = {
     divisor: number;   // larger = less weight
     pointsGap: number; // a player counts with max(efficiency, points − pointsGap): a big scoring night counts
                        // even when misses pull the efficiency down
+    efficientTs: number; // from this true shooting (0–1), no gap: a big night scored cleanly counts in full
   };
   // v2, with the play-by-play. Without it, the v1 fields above are used instead.
   clutch: {
@@ -76,7 +77,7 @@ export const EXAMPLE_SCORING: ScoringConfig = {
   scenario: { weight: 8, fullAt: 18 },
   comeback: { weight: 6, fullAt: 12, bonusPerPoint: 0.8 },
   offense: { weight: 6, zeroAt: 200, fullAt: 250 },
-  performance: { threshold: 28, divisor: 25, pointsGap: 6 },
+  performance: { threshold: 28, divisor: 25, pointsGap: 6, efficientTs: 0.68 },
   clutch: { fullAt: 240, closeSeconds: 150, closeMarginAt2: 4 },
   swings: { fullAt: 24, q1: 0.4, q2: 0.7, q3: 1, q4: 1.3, late: 2.2 },
   why: { bigNight: 37, bigPoints: 41, hugeNight: 46, hugePoints: 51, crazyNight: 56, crazyPoints: 57, nuclearPoints: 58, nuclearEff: 68, nuclearDuel: 48, nuclearDuelPoints: 48, nuclearThrees: 11 },
