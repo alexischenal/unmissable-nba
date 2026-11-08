@@ -48,6 +48,11 @@ body {
 .games {
   .games__heading {
     @include section-heading;
+
+    @media (max-width: $breakpoint-mobile) {
+      padding: 28px var(--stripe) 12px;
+      font-size: 20px;
+    }
   }
 
   .games__list {
