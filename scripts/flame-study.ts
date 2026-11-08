@@ -1076,6 +1076,33 @@ function lateRun(rows: Row[]): void {
       console.log(`    ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(x.r.note).padStart(3)}%   within ${n} at ${clock(x.at)} · ${blowoutStory(x.r)}`);
     }
   }
+
+  // The whole film of the last 6 minutes for the games within 6: the winner's lead after every score,
+  // and how long the loser stayed within 6 and within 8 (to tell a real run from a single possession)
+  const film = runs.filter((x) => x.closest <= 6).sort((a, b) => b.at - a.at);
+  console.log(`\n  the film of the last 6:00, games within 6 (${film.length}): the winner's lead after every score`);
+  for (const x of film) {
+    const tl = x.r.tl!;
+    const last = tl[tl.length - 1]!;
+    const sign = last[2] > last[3] ? 1 : -1;
+    const q4 = tl.filter(([period, left]) => period === 4 && left <= 360);
+    let lead = sign * marginInQ4(tl, 360);
+    let from = 360;
+    let within6 = 0;
+    let within8 = 0;
+    const steps: string[] = [];
+    for (const [, left, h, a] of q4) {
+      if (lead <= 6) within6 += from - left;
+      if (lead <= 8) within8 += from - left;
+      lead = sign * (h - a);
+      from = left;
+      steps.push(`${clock(left)} ${lead}`);
+    }
+    if (lead <= 6) within6 += from;
+    if (lead <= 8) within8 += from;
+    console.log(`\n    ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(x.r.note).padStart(3)}%   lead at 6:00 ${sign * marginInQ4(tl, 360)} · final ${lead} · within 6 for ${clock(within6)} · within 8 for ${clock(within8)}`);
+    for (let i = 0; i < steps.length; i += 12) console.log(`      ${steps.slice(i, i + 12).join(' · ')}`);
+  }
 }
 
 async function main(): Promise<void> {
