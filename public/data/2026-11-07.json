@@ -36,15 +36,16 @@
       "note": 8
     },
     {
+      "away": "SAS",
+      "home": "POR",
+      "tipOff": "2026-11-08T03:00:00Z",
+      "note": 4
+    },
+    {
       "away": "WAS",
       "home": "OKC",
       "tipOff": "2026-11-08T01:00:00Z",
       "note": 1
-    },
-    {
-      "away": "SAS",
-      "home": "POR",
-      "tipOff": "2026-11-08T03:00:00Z"
     }
   ]
 }
