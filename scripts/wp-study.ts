@@ -7,6 +7,9 @@
 //      more), doubt in the fourth (seconds with the home win probability between 20 and 80%), the comeback
 //      (the lowest probability the winner had).
 //   3. Compared with the current rating: correlation, and the biggest disagreements.
+//   4. (November 8) A safety net: the loser's best chance after 6:00 in the fourth, against the bar the
+//      6:00 door already accepts (down 12 with 6:00 left). The games the net would catch, the film of their
+//      last six minutes, and the reverse check (competitive games today that stay under the bar).
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -19,7 +22,10 @@ import { fileURLToPath } from 'node:url';
 import { lateFrom, type Timeline } from './nba/clutch.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
-import { competitivenessPoints, disputedBaseFor, displayScore, finalScore, isDisputed } from '../src/lib/scoring.ts';
+import {
+  closeByClutch, closeFinalMargin, competitivenessPoints, disputedBaseFor, displayScore, finalScore, isDisputed, loserBiggestLead,
+  performancePoints,
+} from '../src/lib/scoring.ts';
 import type { Game } from '../src/types/game.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -152,6 +158,80 @@ function story(r: Row): string {
   return `${g.home} ${q}`;
 }
 
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const pct1 = (x: number) => `${(100 * x).toFixed(1)}%`;
+
+// The loser's best chance from 6:00 in the fourth to the end of regulation: at 6:00, then right after every
+// score (between two scores the chance only drops as the clock runs). Plus the film: the winner's lead and
+// the loser's chance after every score.
+type Net = { best: number; at: number; lead6: number; film: string[] };
+function netOf(r: Row, mu: number, sigma: number): Net {
+  const sign = r.homeWon ? 1 : -1;
+  const loserWp = (margin: number, left: number) => {
+    const p = wpHome(margin, left / GAME, mu, sigma);
+    return r.homeWon ? 1 - p : p;
+  };
+  let margin = 0;
+  for (const [period, left, h, a] of r.tl) if (period < 4 || (period === 4 && left > 360)) margin = h - a;
+  const lead6 = sign * margin;
+  let best = loserWp(margin, 360);
+  let at = 360;
+  const film: string[] = [];
+  for (const [period, left, h, a] of r.tl) {
+    if (period !== 4 || left > 360) continue;
+    const wp = loserWp(h - a, left);
+    film.push(`${clock(left)} ${sign * (h - a)} (${(100 * wp).toFixed(0)}%)`);
+    if (wp > best) { best = wp; at = left; }
+  }
+  return { best, at, lead6, film };
+}
+
+function safetyNet(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 4. A safety net: the loser still had a real chance after 6:00 ===');
+  const tau6 = 360 / GAME;
+  const bar = Math.min(wpHome(-12, tau6, mu, sigma), 1 - wpHome(12, tau6, mu, sigma));
+  console.log(`  the bar: down 12 with 6:00 left, the least alive game the 6:00 door accepts = ${pct1(bar)} for the loser`);
+  console.log(`  (home team down 12: ${pct1(wpHome(-12, tau6, mu, sigma))} · away team down 12: ${pct1(1 - wpHome(12, tau6, mu, sigma))})`);
+  console.log('  the same bar later: the biggest deficit still at it, by time left');
+  for (const left of [300, 240, 180, 120, 90, 60, 30, 10]) {
+    let m = 0;
+    while (Math.min(wpHome(-(m + 1), left / GAME, mu, sigma), 1 - wpHome(m + 1, left / GAME, mu, sigma)) >= bar) m++;
+    console.log(`    ${clock(left).padStart(5)} left: down ${m} or less`);
+  }
+
+  const seasons = [...new Set(rows.map((r) => r.season))].length;
+  const nets = rows.map((r) => netOf(r, mu, sigma));
+  const blow = rows.map((r, i) => ({ r, n: nets[i]! })).filter((x) => !isDisputed(x.r.g));
+  console.log(`\n  ${blow.length} blowouts today · caught by the net, by bar:`);
+  for (const x of [bar, 0.05, 0.1, 0.15, 0.2]) {
+    const c = blow.filter((b) => b.n.best >= x).length;
+    console.log(`    ${(x === bar ? `${pct1(x)} (the bar)` : pct1(x)).padEnd(16)} ${String(c).padStart(4)} games · ${(c / seasons).toFixed(1)} per season`);
+  }
+
+  const caught = blow.filter((b) => b.n.best >= bar).sort((a, b) => b.n.best - a.n.best);
+  console.log(`\n  caught at the bar (${caught.length}), best chance first: rated today → with base 50, the loser's best chance and when, the film (winner's lead, loser's chance)`);
+  for (const { r, n } of caught) {
+    const with50 = Math.min(100, Math.round(SCORING.disputedBase + competitivenessPoints(r.g) + performancePoints(r.g)));
+    console.log(`\n    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} ${String(r.note).padStart(3)} → ${String(with50).padStart(3)}   best ${pct1(n.best)} at ${clock(n.at)} · lead at 6:00 ${n.lead6} · ${story(r)}`);
+    for (let i = 0; i < n.film.length; i += 10) console.log(`      ${n.film.slice(i, i + 10).join(' · ')}`);
+  }
+
+  // The reverse check: competitive today, but never at the bar after 6:00. Which door let them in?
+  const comp = rows.map((r, i) => ({ r, n: nets[i]! })).filter((x) => isDisputed(x.r.g) && x.r.g.periods.length === 4);
+  const under = comp.filter((x) => x.n.best < bar);
+  console.log(`\n  reverse check: ${comp.length} competitive games today (no overtime), ${under.length} (${((100 * under.length) / comp.length).toFixed(1)}%) never at the bar after 6:00`);
+  const doors = (g: Row['g']) => [
+    closeFinalMargin(g) && 'close final margin',
+    loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead && `loser led by ${loserBiggestLead(g)}`,
+    closeByClutch(g) && 'close by clutch',
+    (g.late?.clutchSeconds ?? 0) > 0 && `clutch ${g.late!.clutchSeconds} s`,
+    g.late?.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6 && `${g.late.marginAt6} at 6:00`,
+  ].filter(Boolean).join(', ');
+  for (const { r, n } of under.sort((a, b) => a.n.best - b.n.best).slice(0, 20)) {
+    console.log(`    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} rated ${String(r.note).padStart(3)}   best ${pct1(n.best)} at ${clock(n.at)} · lead at 6:00 ${n.lead6} · in by: ${doors(r.g)} · ${story(r)}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -223,6 +303,8 @@ async function main(): Promise<void> {
   for (const i of idx.filter((i) => rA[i]! < n * 0.2 && rS[i]! > n * 0.5).sort((a, b) => rA[a]! - rA[b]!).slice(0, 15)) console.log(line(i));
   console.log('\n  a big story today, but a calm curve (story in the top 20%, agitation in the bottom half):');
   for (const i of idx.filter((i) => rS[i]! < n * 0.2 && rA[i]! > n * 0.5).sort((a, b) => rS[a]! - rS[b]!).slice(0, 15)) console.log(line(i));
+
+  safetyNet(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
