@@ -145,6 +145,25 @@ and milestones (context, not play), fights and ejections.
    the 6:00 door (decided against: the promise). `scripts/close-rule-sim.ts` predates it: its check shows
    mismatches.
 
+0. **Later (November 8): a statistical definition of a close game, or a safety net.** The win probability
+   model (`wp-study`, Stern 1994, fitted on seven seasons) as the judge of "the loser could still believe".
+   Kept as is: the 12-point door at 6:00 (the user likes it) and the comeback as bonus points.
+   - **The safety net after 6:00** (section 4/5): the loser had at least a 1-in-10 chance at some point after
+     6:00 (in points: down 7 at 5:00, 6 at 3:00). About 2 games per season, all landing in the low 50s. The
+     bar of the 6:00 door itself (down 12 at 6:00, about 3.4%) is too loose as a net: the net keeps the best
+     moment out of dozens, the door looks at one (34 games per season, mostly noise).
+   - **The comeback door is the weak spot** (reverse check): about 15 games per season rated close only
+     because the loser once led by 13+, some of them dead at 6:00 (down 20 to 30, rated 60 to 88): the
+     DET @ PHI mistake the other way around. Removing it is too harsh (104 games, some tight through three
+     quarters); keeping it only when the loser still had 3.4% in the fourth drops 22 clear blowouts.
+   - **The doubt in the fourth instead of the comeback door** (section 6, preferred): the loser had at least
+     X% at some point of the fourth before 6:00. Same shape, same verdict (today a lead of 13 in the first
+     quarter decides). At 33% (about one possession): the share of close games unchanged (64%), about 15 in
+     and 13 out per season. 20-25% lets in games down 7 after Q3 and 15 at 6:00.
+   - To do before deciding: check the spicy rocks that the games out would lose (a rock needs a close
+     game); a sentence for How it works; the model in the site's code (μ, σ and the thresholds in the
+     secret, refitted each season with `wp-study`).
+
 0. **Done (November 8): the shooting in the points gap.** A big night scored cleanly (true shooting, free
    throws included, at a setting or more) counts with all its points, without the gap. Simulated on seven
    seasons (`flame-study` section "Shooting in the rating"): the big scorers shoot well (median TS around 70%
