@@ -3,15 +3,19 @@
   "date": "2026-11-08",
   "games": [
     {
+      "away": "LAL",
+      "home": "DET",
+      "tipOff": "2026-11-08T23:00:00Z",
+      "note": 71,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "PHI",
       "home": "CHI",
       "tipOff": "2026-11-08T20:30:00Z",
       "note": 68
-    },
-    {
-      "away": "LAL",
-      "home": "DET",
-      "tipOff": "2026-11-08T23:00:00Z"
     },
     {
       "away": "UTA",
