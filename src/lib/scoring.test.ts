@@ -93,3 +93,39 @@ test('performance: scored cleanly (true shooting at efficientTs or more, example
   assert.equal(playerPoints(sniper), (50 - threshold) ** 2 / divisor);
   assert.equal(trueShooting({ ...sniper, pts: 0, fga: 0, fta: 0 }), 0);
 });
+
+test('v2 with the loser\'s chances: the doubt in the fourth and the late run open the door', () => {
+  // Out of reach at 6:00 (example: more than 11), no clutch, a 13-point final
+  const g = (before6: number, after6: number, extra: object = {}) => ({
+    ...detAtPhi, biggestLead: { home: 20, away: 3 },
+    periods: [{ home: 30, away: 28 }, { home: 25, away: 25 }, { home: 25, away: 25 }, { home: 30, away: 19 }],
+    late: { clutchSeconds: 0, marginAt2: 15, weightedSwings: 0, marginAt6: 16, loserChanceBefore6: before6, loserChanceAfter6: after6, ...extra },
+  });
+  assert.equal(isDisputed(g(0.2, 0.01)), false);
+  assert.equal(isDisputed(g(0.35, 0.01)), true);  // example doubtChance: a one-possession game before 6:00
+  assert.equal(disputedBaseFor(g(0.35, 0.01)), 50);
+  assert.equal(isDisputed(g(0.2, 0.12)), true);   // example lateChance: a real run after 6:00
+});
+
+test('v2 with the loser\'s chances: the early lead no longer opens the door', () => {
+  // The loser led by 18 in the first half, then never had a chance in the fourth
+  const g = (late: object) => ({
+    ...detAtPhi, biggestLead: { home: 25, away: 18 },
+    periods: [{ home: 20, away: 35 }, { home: 35, away: 22 }, { home: 30, away: 20 }, { home: 25, away: 20 }],
+    late: { clutchSeconds: 0, marginAt2: 22, weightedSwings: 0, marginAt6: 24, ...late },
+  });
+  assert.equal(isDisputed(g({ loserChanceBefore6: 0.02, loserChanceAfter6: 0 })), false);
+  assert.equal(isDisputed(g({})), true); // a game rated before the chances existed: the comeback door, as before
+});
+
+test('v2: every door needs a loser who believed in it (garbage time)', () => {
+  // Down 20 at 6:00, back to 8 at the buzzer, 10 at 2:00: the final margin door opens, the loser never had a chance
+  const g = (after6: number) => ({
+    ...detAtPhi, biggestLead: { home: 24, away: 2 },
+    periods: [{ home: 30, away: 25 }, { home: 30, away: 22 }, { home: 30, away: 25 }, { home: 20, away: 30 }],
+    late: { clutchSeconds: 0, marginAt2: 10, weightedSwings: 0, marginAt6: 20, loserChanceBefore6: 0.03, loserChanceAfter6: after6 },
+  });
+  assert.equal(closeFinalMargin(g(0.004)), true);
+  assert.equal(isDisputed(g(0.004)), false);
+  assert.equal(isDisputed(g(0.08)), true); // a real chance after 6:00 (above the 6:00 door's bar, about 5%): close
+});

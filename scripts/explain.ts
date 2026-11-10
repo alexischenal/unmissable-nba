@@ -22,7 +22,7 @@ import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import { whyLabels, whyOf } from '../src/lib/why.ts';
 import {
-  closeByClutch, closeFinalMargin, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
+  aliveBar, closeByClutch, closeFinalMargin, competitivenessDetails, competitivenessPoints, disputedBaseFor, displayScore, efficiency, finalScore, isDisputed,
   loserBiggestLead, marginAfterQ3, overtimes, performancePoints, playerPoints, pointsPer48, rawScore, trueShooting,
   regulationMargin,
 } from '../src/lib/scoring.ts';
@@ -58,11 +58,24 @@ function explain(g: Game, notes: Notes = {}): void {
   const garbage = g.late && regulationMargin(g) <= c.maxRegulationMargin && !closeFinalMargin(g)
     ? `, but garbage time: ${g.late.marginAt2} at 2:00 (≤ ${c.maxMarginAt2}) and never within 5 late` : '';
   console.log(`  ${check(closeFinalMargin(g))}  margin end of regulation  ${regulationMargin(g)} (≤ ${c.maxRegulationMargin})${garbage}`);
-  console.log(`  ${check(marginAfterQ3(g) <= c.maxMarginAfterQ3)}  margin after Q3           ${marginAfterQ3(g)} (≤ ${c.maxMarginAfterQ3})`);
-  console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead})`);
-  if (g.late) {
+  if (!g.late) {
+    console.log(`  ${check(marginAfterQ3(g) <= c.maxMarginAfterQ3)}  margin after Q3           ${marginAfterQ3(g)} (≤ ${c.maxMarginAfterQ3}, lower base)`);
+    console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead})`);
+  } else {
     const k = SCORING.clutch;
-    console.log(`  ${check(closeByClutch(g))}  tight finish              clutch ${g.late.clutchSeconds} s (≥ ${k.closeSeconds}) or margin at 2:00 ${g.late.marginAt2} (≤ ${k.closeMarginAt2})`);
+    const l = g.late;
+    console.log(`  ${check(closeByClutch(g))}  tight finish              clutch ${l.clutchSeconds} s (≥ ${k.closeSeconds}) or margin at 2:00 ${l.marginAt2} (≤ ${k.closeMarginAt2})`);
+    console.log(`  ${check(l.clutchSeconds > 0)}  one second of clutch      ${l.clutchSeconds} s within 5 in the last 5 minutes`);
+    console.log(`  ${check(l.marginAt6 !== undefined && l.marginAt6 <= c.maxMarginAt6)}  margin at 6:00            ${l.marginAt6 ?? '?'} (≤ ${c.maxMarginAt6})`);
+    if (l.loserChanceBefore6 !== undefined && l.loserChanceAfter6 !== undefined) {
+      const bar = aliveBar();
+      console.log(`  ${check(l.loserChanceBefore6 >= c.doubtChance)}  doubt in Q4 before 6:00   loser's best chance ${pct(l.loserChanceBefore6)} (≥ ${pct(c.doubtChance)})`);
+      console.log(`  ${check(l.loserChanceAfter6 >= c.lateChance)}  late run after 6:00       loser's best chance ${pct(l.loserChanceAfter6)} (≥ ${pct(c.lateChance)})`);
+      const believed = l.loserChanceAfter6 >= bar || l.loserChanceBefore6 >= c.doubtChance;
+      console.log(`  ${believed ? 'ok ' : 'NO '}  the loser believed in it  after 6:00 ${(100 * l.loserChanceAfter6).toFixed(1)}% (≥ ${(100 * bar).toFixed(1)}%, the 6:00 door's bar) or before ${pct(l.loserChanceBefore6)} (≥ ${pct(c.doubtChance)})${believed ? '' : ': every door shut'}`);
+    } else {
+      console.log(`  ${check(loserBiggestLead(g) >= c.minLoserBiggestLead)}  loser's biggest lead      ${loserBiggestLead(g)} (≥ ${c.minLoserBiggestLead}, no chances computed)`);
+    }
   }
 
   console.log('Step 2 — competitiveness');

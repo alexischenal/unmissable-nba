@@ -3,6 +3,7 @@
 
 import { SCORING } from '../config/scoring.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
+import { trailingChance } from './winProbability.ts';
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
@@ -48,13 +49,34 @@ export const closeFinalMargin = (g: Game) => {
   return g.late === undefined || g.late.marginAt2 <= c.maxMarginAt2 || g.late.clutchSeconds > 0;
 };
 
-// A close game, from the full base. With the play-by-play: close at the end, a big comeback, one second of clutch
-// (the NBA's definition: within 5 in the last 5 minutes), or still within reach with 6:00 left in the fourth:
-// whatever happened before, the trailing team and the spectator still believe in it.
+// The losing team's chance, down maxMarginAt6 with 6:00 left: the bar of the 6:00 door, in probability
+export const aliveBar = () => trailingChance(SCORING.disputed.maxMarginAt6, 360, SCORING.winProbability);
+
+// v2: did the losing team really believe in it at some point of the fourth? At least the 6:00 door's chance
+// after 6:00, or the doubt before. Checked on every door: garbage time can make a final margin look close.
+const loserBelieved = (late: NonNullable<Game['late']>) =>
+  late.loserChanceAfter6 === undefined || late.loserChanceBefore6 === undefined
+  || late.loserChanceAfter6 >= aliveBar() || late.loserChanceBefore6 >= SCORING.disputed.doubtChance;
+
+// v2, the doors with the play-by-play: close at the end, a tight finish, one second of clutch (the NBA's
+// definition: within 5 in the last 5 minutes), within reach with 6:00 left, a real chance late (a run
+// after 6:00), or real doubt in the fourth before 6:00. The loser's early lead only gives comeback points.
+const closeLate = (g: Game, late: NonNullable<Game['late']>) => {
+  const d = SCORING.disputed;
+  const chances = late.loserChanceBefore6 !== undefined && late.loserChanceAfter6 !== undefined;
+  const door = closeFinalMargin(g) || closeByClutch(g) || late.clutchSeconds > 0
+    || (late.marginAt6 !== undefined && late.marginAt6 <= d.maxMarginAt6)
+    || (chances && (late.loserChanceAfter6! >= d.lateChance || late.loserChanceBefore6! >= d.doubtChance))
+    // Without the chances (a game rated before November 10): the comeback door, as before
+    || (!chances && loserBiggestLead(g) >= d.minLoserBiggestLead);
+  return door && loserBelieved(late);
+};
+
+// A close game, from the full base. v1 (no play-by-play): close at the end or a big comeback.
 const closeGame = (g: Game) =>
-  closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead || closeByClutch(g)
-  || (g.late !== undefined && (g.late.clutchSeconds > 0
-    || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
+  g.late !== undefined
+    ? closeLate(g, g.late)
+    : closeFinalMargin(g) || loserBiggestLead(g) >= SCORING.disputed.minLoserBiggestLead;
 
 // v1 only (no play-by-play, so no clutch nor margin at 6:00): close after three quarters, lower base.
 const q3Only = (g: Game) => g.late === undefined && marginAfterQ3(g) <= SCORING.disputed.maxMarginAfterQ3;
