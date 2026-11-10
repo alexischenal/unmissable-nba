@@ -16,6 +16,7 @@
 //      blowout would add without the close-game condition.
 //   8. The reverse check with that definition: close games where the loser never had a real chance, by door.
 //   9. The calibration in the fourth quarter (the doors' range): predicted vs actual, and a deficit × time grid.
+//  10. The order among the close games: the rating and its ingredients against the model, weights, disagreements.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -31,7 +32,7 @@ import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  closeByClutch, closeFinalMargin, competitivenessPoints, efficiency, disputedBaseFor, displayScore, finalScore, isDisputed, loserBiggestLead,
+  closeByClutch, closeFinalMargin, competitivenessDetails, competitivenessPoints, efficiency, disputedBaseFor, displayScore, finalScore, isDisputed, loserBiggestLead,
   performancePoints,
 } from '../src/lib/scoring.ts';
 import type { Game, PlayerLine } from '../src/types/game.ts';
@@ -567,6 +568,87 @@ function lateCalibration(rows: Row[], mu: number, sigma: number): void {
   }
 }
 
+// November 10: the order among the close games (the user compared every 60+ game of two weeks through recaps,
+// articles and Reddit threads). Only the close games: the story part of the rating (base + competitiveness),
+// each ingredient, and the full rating against the model's measures: the excitement index (the plain sum of
+// the probability moves, the classic one), the agitation (late moves weigh more), the doubt in Q4, the last
+// two minutes. Then the weights the excitement index would give the four ingredients (least squares on the
+// shares, ranks), and the biggest disagreements both ways.
+function closeOrder(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 10. The order among the close games ===');
+  const close = rows.filter((r) => isDisputed(r.g));
+  const ei = close.map((r) => {
+    let prev = wpHome(0, 1, mu, sigma), sum0 = 0;
+    for (const st of states(r.tl).slice(1)) {
+      const p = wpHome(st.margin, tauOf(st.period, st.left), mu, sigma);
+      sum0 += Math.abs(p - prev);
+      prev = p;
+    }
+    return sum0;
+  });
+  const curves = close.map((r) => curve(r, mu, sigma));
+  const storyPts = close.map((r) => competitivenessPoints(r.g));
+  const notes = close.map((r) => r.note);
+  const parts = ['suspense', 'scenario', 'comeback', 'offense'] as const;
+  const shares = close.map((r) => competitivenessDetails(r.g));
+  console.log(`  ${close.length} close games (${((100 * close.length) / rows.length).toFixed(0)}%), rank correlations:`);
+  const measures: [string, number[]][] = [
+    ['excitement index (plain)', ei], ['agitation (late weighs more)', curves.map((c) => c.agitation)],
+    ['doubt in Q4/OT', curves.map((c) => c.doubtQ4)], ['last two minutes', curves.map((c) => c.lastTwo)],
+  ];
+  console.log(`    ${''.padEnd(30)} ${'story'.padStart(7)} ${'rating'.padStart(7)} ${parts.map((k) => k.padStart(9)).join('')}`);
+  for (const [label, xs] of measures) {
+    const rho = (a: number[], c: number[]) => { const v = spearman(a, c); return Number.isFinite(v) ? v.toFixed(2) : '-'; };
+    console.log(`    ${label.padEnd(30)} ${rho(xs, storyPts).padStart(7)} ${rho(xs, notes).padStart(7)} ${parts.map((k) => rho(xs, shares.map((d) => d[k].share)).padStart(9)).join('')}`);
+  }
+
+  // Least squares on ranks (0–1): excitement rank ≈ a + Σ b_k × share_k; the b_k scaled to the current total weight
+  const rank01 = (xs: number[]) => { const o = xs.map((x, i) => [x, i] as const).sort((a, b) => a[0] - b[0]); const r = new Array<number>(xs.length); o.forEach(([, i], k) => { r[i] = k / (xs.length - 1); }); return r; };
+  const y = rank01(ei);
+  // Only the ingredients that vary (a constant one makes the system singular)
+  const varies = parts.map((k) => new Set(shares.map((d) => d[k].share)).size > 1);
+  const X = shares.map((d) => [1, ...parts.filter((_, i) => varies[i]).map((k) => d[k].share)]);
+  const n = X[0]!.length;
+  const A = Array.from({ length: n }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (j < n ? X.reduce((t, x) => t + x[i]! * x[j]!, 0) : X.reduce((t, x, k) => t + x[i]! * y[k]!, 0))));
+  for (let c = 0; c < n; c++) {
+    let piv = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r]![c]!) > Math.abs(A[piv]![c]!)) piv = r;
+    [A[c], A[piv]] = [A[piv]!, A[c]!];
+    for (let r = 0; r < n; r++) if (r !== c) { const f = A[r]![c]! / A[c]![c]!; for (let j = c; j <= n; j++) A[r]![j] = A[r]![j]! - f * A[c]![j]!; }
+  }
+  const b = A.map((row, i) => row[n]! / row[i]!);
+  const current = { suspense: SCORING.suspense.weight, scenario: SCORING.scenario.weight, comeback: SCORING.comeback.weight, offense: SCORING.offense.weight };
+  const total = parts.reduce((t, k) => t + current[k], 0);
+  let col = 0;
+  const raw = parts.map((_, i) => (varies[i] ? Math.max(0, b[++col]!) : 0));
+  const fitted = raw.map((v) => (total * v) / (raw.reduce((t, x) => t + x, 0) || 1));
+  console.log(`\n  the weights the excitement index would give (least squares on ranks, scaled to the current total ${total}):`);
+  console.log(`    ${parts.map((k, i) => `${k} ${current[k]} → ${fitted[i]!.toFixed(1)}`).join(' · ')}`);
+  const refit = shares.map((d) => parts.reduce((t, k, i) => t + fitted[i]! * d[k].share, 0));
+  const currentStory = shares.map((d) => parts.reduce((t, k) => t + current[k] * d[k].share, 0));
+  console.log(`    rank correlation with the excitement index: the current weights ${spearman(ei, currentStory).toFixed(2)} → these ${spearman(ei, refit).toFixed(2)} (without the comeback bonus beyond fullAt)`);
+
+  // Bands of the rating: does a higher rating mean a more exciting game?
+  console.log('\n  by rating band: median excitement index (and doubt in Q4, seconds)');
+  const med = (xs: number[]) => { const t = [...xs].sort((a, c) => a - c); return t.length ? t[Math.floor((t.length - 1) / 2)]! : 0; };
+  for (const [lo, hi] of [[50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]] as const) {
+    const idx = close.map((_, i) => i).filter((i) => notes[i]! >= lo && notes[i]! <= hi);
+    if (!idx.length) continue;
+    console.log(`    ${`${lo}–${hi}`.padEnd(8)} ${String(idx.length).padStart(5)} games · excitement ${med(idx.map((i) => ei[i]!)).toFixed(2)} · doubt ${med(idx.map((i) => curves[i]!.doubtQ4)).toFixed(0)} s`);
+  }
+
+  // The disagreements, on the story part (performances left out: the model doesn't see them)
+  const rE = rank01(ei), rS = rank01(storyPts);
+  const show = (i: number) => {
+    const r = close[i]!, d = shares[i]!;
+    return `    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} rated ${String(r.note).padStart(3)} · story ${storyPts[i]!.toFixed(0).padStart(2)} (${parts.map((k) => `${k.slice(0, 4)} ${(100 * d[k].share).toFixed(0)}%`).join(', ')}) · excitement ${ei[i]!.toFixed(2)}, doubt ${curves[i]!.doubtQ4.toFixed(0)} s · ${story(r)}`;
+  };
+  const idx = close.map((_, i) => i);
+  console.log('\n  exciting by the model, a modest story (excitement in the top 20%, story in the bottom 40%):');
+  for (const i of idx.filter((i) => rE[i]! > 0.8 && rS[i]! < 0.4).sort((a, c) => rE[c]! - rE[a]!).slice(0, 15)) console.log(show(i));
+  console.log('  a big story, calm by the model (story in the top 20%, excitement in the bottom 40%):');
+  for (const i of idx.filter((i) => rS[i]! > 0.8 && rE[i]! < 0.4).sort((a, c) => rS[c]! - rS[a]!).slice(0, 15)) console.log(show(i));
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -649,6 +731,7 @@ async function main(): Promise<void> {
   rocksWithDoubt(rows, mu, sigma);
   reverseWithDoubt(rows, mu, sigma);
   lateCalibration(rows, mu, sigma);
+  closeOrder(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
