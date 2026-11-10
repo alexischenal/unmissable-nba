@@ -37,6 +37,15 @@
       "note": 58
     },
     {
+      "away": "SAS",
+      "home": "PHX",
+      "tipOff": "2026-11-10T02:00:00Z",
+      "note": 32,
+      "why": {
+        "crazy": 1
+      }
+    },
+    {
       "away": "WAS",
       "home": "DET",
       "tipOff": "2026-11-10T00:00:00Z",
@@ -50,11 +59,6 @@
       "home": "CHA",
       "tipOff": "2026-11-10T00:00:00Z",
       "note": 9
-    },
-    {
-      "away": "SAS",
-      "home": "PHX",
-      "tipOff": "2026-11-10T02:00:00Z"
     },
     {
       "away": "NOP",
