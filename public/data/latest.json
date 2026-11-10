@@ -12,15 +12,19 @@
       }
     },
     {
+      "away": "WAS",
+      "home": "DET",
+      "tipOff": "2026-11-10T00:00:00Z",
+      "note": 25,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "CLE",
       "home": "CHA",
       "tipOff": "2026-11-10T00:00:00Z",
       "note": 9
-    },
-    {
-      "away": "WAS",
-      "home": "DET",
-      "tipOff": "2026-11-10T00:00:00Z"
     },
     {
       "away": "MEM",
