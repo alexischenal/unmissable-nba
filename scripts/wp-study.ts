@@ -400,7 +400,7 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
 
   // November 10: did the player make the blowout, or pad a decided game? His points scored while the game
   // was still open (the final loser at 10%+ before the basket), and whether his team won.
-  console.log('\n  the rocks in blowouts: did the player make the blowout? (points scored while the loser still had 10%+)');
+  console.log('\n  the rocks in blowouts: did the player make the blowout? (points in the first three quarters, points scored while the loser still had 10%+)');
   const hasScorers = blowoutRocks.some((r) => r.tl.some((e) => e[4] !== undefined));
   if (!hasScorers) { console.log('  no scorer in these timelines (downloaded before November 2026)'); return; }
   const rockPlayers = (g: Row['g']) => {
@@ -409,7 +409,7 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
     const w = SCORING.why;
     return g.players.filter((p) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints); // a duel
   };
-  type Maker = { r: Row; p: PlayerLine; won: boolean; open: number; total: number; decidedAt: string };
+  type Maker = { r: Row; p: PlayerLine; won: boolean; open: number; total: number; q13: number; decidedAt: string };
   const makers: Maker[] = [];
   for (const r of blowoutRocks) {
     const loserChance = (margin: number, period: number, left: number) => {
@@ -424,28 +424,35 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
       prev = { period, left, h, a };
     }
     for (const p of rockPlayers(r.g)) {
-      let open = 0, total = 0;
+      let open = 0, total = 0, q13 = 0;
       let before = { period: 1, left: 720, h: 0, a: 0 };
       for (const [period, left, h, a, scorer] of r.tl) {
         const pts = p.team === 'home' ? h - before.h : a - before.a;
         if (scorer !== undefined && scorer === p.id && pts > 0) {
           total += pts;
+          if (period <= 3) q13 += pts;
           if (loserChance(before.h - before.a, before.period, before.left) >= 0.1) open += pts;
         }
         before = { period, left, h, a };
       }
-      makers.push({ r, p, won: (p.team === 'home') === r.homeWon, open, total, decidedAt: decided });
+      makers.push({ r, p, won: (p.team === 'home') === r.homeWon, open, total, q13, decidedAt: decided });
     }
   }
-  for (const m of [...makers].sort((a, b) => b.open - a.open)) {
+  for (const m of [...makers].sort((a, b) => b.q13 - a.q13)) {
     const g = m.r.g;
-    console.log(`    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(m.r.note).padStart(3)} · ${(m.p.name ?? '?').padEnd(24)} ${String(m.p.pts).padStart(2)} pts (${m.total} in the play-by-play), eff ${String(efficiency(m.p)).padStart(2)} · ${m.won ? 'won ' : 'LOST'} · ${String(m.open).padStart(2)} pts while open · decided after ${m.decidedAt} · ${story(m.r)}`);
+    console.log(`    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(m.r.note).padStart(3)} · ${(m.p.name ?? '?').padEnd(24)} ${String(m.p.pts).padStart(2)} pts (${m.total} in the play-by-play), eff ${String(efficiency(m.p)).padStart(2)} · ${m.won ? 'won ' : 'LOST'} · ${String(m.q13).padStart(2)} pts in Q1-Q3 · ${String(m.open).padStart(2)} pts while open · decided after ${m.decidedAt} · ${story(m.r)}`);
   }
   const seasons2 = new Set(rows.map((r) => r.season)).size;
   console.log('\n  rule "a rock in a blowout if the player won and scored at least X points while the game was open":');
   for (const x of [20, 25, 30, 35, 40]) {
     const games = new Set(makers.filter((m) => m.won && m.open >= x).map((m) => m.r));
     console.log(`    X = ${x}: +${games.size} rocks (${(games.size / seasons2).toFixed(1)} per season)`);
+  }
+  console.log('\n  rule "a rock in a blowout if the player won and scored at least X points in the first three quarters":');
+  for (const x of [30, 35, 40, 45, 50]) {
+    const ms = makers.filter((m) => m.won && m.q13 >= x);
+    const games = new Set(ms.map((m) => m.r));
+    console.log(`    X = ${x}: +${games.size} rocks (${(games.size / seasons2).toFixed(1)} per season): ${ms.map((m) => `${m.p.name ?? '?'} ${m.q13}/${m.p.pts}`).join(', ')}`);
   }
 }
 
