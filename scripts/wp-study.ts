@@ -15,6 +15,7 @@
 //   7. The spicy rocks lost and won with the doubt in the fourth at 33% and the 10% net, and the rocks a
 //      blowout would add without the close-game condition.
 //   8. The reverse check with that definition: close games where the loser never had a real chance, by door.
+//   9. The calibration in the fourth quarter (the doors' range): predicted vs actual, and a deficit × time grid.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -517,6 +518,55 @@ function reverseWithDoubt(rows: Row[], mu: number, sigma: number): void {
   }
 }
 
+// November 10: the calibration where the doors use the model, the fourth quarter: the trailing team's
+// predicted chance (after every score, ties left out) against how often it actually won, before and after
+// 6:00, in the low range of the thresholds (doubt 33%, late run 10%, the bar 3.4%). Then a grid of
+// deficits × time left: predicted vs actual, with the number of states (a state = after a score).
+function lateCalibration(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 9. Calibration in the fourth quarter, where the doors use the model ===');
+  type S = { left: number; deficit: number; p: number; won: boolean };
+  const all: S[] = [];
+  for (const r of rows) {
+    for (const [period, left, h, a] of r.tl) {
+      if (period !== 4 || left <= 0) continue;
+      const m = h - a;
+      if (m === 0) continue;
+      const homeTrails = m < 0;
+      const ph = wpHome(m, left / GAME, mu, sigma);
+      all.push({ left, deficit: Math.abs(m), p: homeTrails ? ph : 1 - ph, won: homeTrails === r.homeWon });
+    }
+  }
+  const edges = [0, 0.01, 0.02, 0.035, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.33, 0.4, 0.5];
+  for (const [label, keep] of [['12:00 to 6:00 (the doubt)', (x: S) => x.left > 360], ['6:00 to the end (the late run, the bar)', (x: S) => x.left <= 360]] as const) {
+    const xs = all.filter(keep);
+    console.log(`\n  ${label}: ${xs.length} states, the trailing team's chance`);
+    console.log('    predicted      states    mean predicted    actually won    gap');
+    for (let i = 0; i < edges.length - 1; i++) {
+      const b = xs.filter((x) => x.p >= edges[i]! && x.p < edges[i + 1]!);
+      if (!b.length) continue;
+      const pred = b.reduce((t, x) => t + x.p, 0) / b.length;
+      const act = b.filter((x) => x.won).length / b.length;
+      const se = Math.sqrt(Math.max(pred * (1 - pred), 1e-9) / b.length);
+      console.log(`    ${`${(100 * edges[i]!).toFixed(1)}–${(100 * edges[i + 1]!).toFixed(1)}%`.padEnd(13)} ${String(b.length).padStart(7)}    ${`${(100 * pred).toFixed(1)}%`.padStart(14)}    ${`${(100 * act).toFixed(1)}%`.padStart(12)}    ${`${(act - pred >= 0 ? '+' : '')}${(100 * (act - pred)).toFixed(1)}`.padStart(5)}${Math.abs(act - pred) > 2 * se ? ' *' : ''}`);
+    }
+  }
+  console.log('    (* = gap beyond 2 standard errors of the bin)');
+
+  console.log('\n  deficit × time left: predicted / actually won (states), within 30 s of each time');
+  const times = [720, 540, 360, 300, 240, 180, 120, 60];
+  console.log(`    down  ${times.map((t) => clock(t).padStart(17)).join('')}`);
+  for (let d = 2; d <= 16; d++) {
+    const cells = times.map((t) => {
+      const b = all.filter((x) => x.deficit === d && Math.abs(x.left - t) <= 30);
+      if (b.length < 20) return ''.padStart(17);
+      const pred = b.reduce((s2, x) => s2 + x.p, 0) / b.length;
+      const act = b.filter((x) => x.won).length / b.length;
+      return `${(100 * pred).toFixed(0)}/${(100 * act).toFixed(0)}% (${b.length})`.padStart(17);
+    });
+    console.log(`    ${String(d).padStart(4)}  ${cells.join('')}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -598,6 +648,7 @@ async function main(): Promise<void> {
   doubtInQ4(rows, mu, sigma);
   rocksWithDoubt(rows, mu, sigma);
   reverseWithDoubt(rows, mu, sigma);
+  lateCalibration(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
