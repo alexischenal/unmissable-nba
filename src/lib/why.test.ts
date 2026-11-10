@@ -126,3 +126,15 @@ test('why: huge and crazy by points too (example: 51 and 57 points)', () => {
   assert.deepEqual(whyOf({ ...flat, players: [scorer(52)] }), { huge: 1 });
   assert.deepEqual(whyOf({ ...flat, players: [scorer(57)] }), { crazy: 1 });
 });
+
+test('why: a player who made the blowout (first three quarters) lights the spicy rock, even in a blowout', () => {
+  // detAtPhi: the visitors (Detroit) win by 23. A blowout (flat), the star with a personId
+  const star: PlayerLine = { ...player(30), id: 77 };
+  const g = (firstThree: { id: number; pts: number; eff: number }[], team: 'home' | 'away' = 'away'): Game =>
+    ({ ...flat, players: [{ ...star, team }], late: { ...flat.late!, firstThree } });
+  assert.equal(whyOf(g([{ id: 77, pts: 52, eff: 40 }]))?.nuclear, 1);   // example blowoutPoints: 52
+  assert.equal(whyOf(g([{ id: 77, pts: 30, eff: 52 }]))?.nuclear, 1);   // example blowoutEff: 52
+  assert.equal(whyOf(g([{ id: 77, pts: 51, eff: 51 }]))?.nuclear, undefined);
+  assert.equal(whyOf(g([{ id: 77, pts: 60, eff: 60 }], 'home'))?.nuclear, undefined); // his team lost
+  assert.equal(whyOf(g([]))?.nuclear, undefined);                      // no first three quarters read
+});

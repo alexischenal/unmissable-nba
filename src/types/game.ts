@@ -39,5 +39,7 @@ export type Game = {
     // The losing team's best chance to win (0–1, src/lib/winProbability.ts) in the fourth quarter:
     loserChanceBefore6?: number; // from 12:00 to 6:00 (at 12:00, then after every score)
     loserChanceAfter6?: number;  // from 6:00 to the end of regulation (at 6:00, then after every score)
+    // Each player's points and efficiency over the first three quarters (from the full play-by-play)
+    firstThree?: { id: number; pts: number; eff: number }[];
   };
 };

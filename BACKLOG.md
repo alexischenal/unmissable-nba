@@ -145,6 +145,24 @@ and milestones (context, not play), fights and ejections.
    the 6:00 door (decided against: the promise). `scripts/close-rule-sim.ts` predates it: its check shows
    mismatches.
 
+0. **Done (November 10): the spicy rock for a player who made the blowout.** The rock needs a close game
+   ("watch it"), but a player who crushes a game in three quarters makes the blowout himself: the show is
+   him (Harden, 60 points in three quarters vs Atlanta, December 2019, the fourth on the bench). Now, in any
+   game: a player who won and had, over the first three quarters, `why.blowoutPoints` points or
+   `why.blowoutEff` efficiency lights the rock. From the full play-by-play (`Game.late.firstThree`; a
+   format it can't read never blocks the rating).
+   - Simulated on seven seasons (`wp-study` section 7, with `season-stats --period-stats`, which keeps each
+     player's line per period, checked at 100% against the box scores): at 50 / 50, 14 rocks in blowouts,
+     2 per season (20.6 → about 22.6): Adebayo's 83, Harden's 60, Jokić, Irving, Leonard, Lillard, Booker ×2
+     by points; Tatum, VanVleet, Keegan Murray, Ingram, Davis, Towns by efficiency (all sat once it was
+     over). Without the close-game rule: +7.6 per season, mostly personal peaks in dead games (rejected).
+   - Rejected on the way: the points scored while the game was open (the earlier a player puts the game
+     away, the fewer count: Harden's 60 counted 13); points alone (misses the triple-double kind).
+   - Left out on purpose: Giannis's 64 (December 2023): 38 points in three quarters, he put away a game
+     still open in the fourth. That's the "close after Q3, decided in the fourth" question, not this rule.
+   - Downloads from home: one request every 3 to 4 s and a stop at the first 403 (November 10: 2 requests
+     per second got the address blocked by the NBA, League Pass included, "VPN" screen).
+
 0. **Done (November 10): a close game, judged by the loser's chances.** The win probability model
    (`src/lib/winProbability.ts`, Stern 1994: the margin as a random walk with a home edge, fitted on seven
    seasons with `wp-study`, well calibrated) as the judge of "the loser could still believe in it".
