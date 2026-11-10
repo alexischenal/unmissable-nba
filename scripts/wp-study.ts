@@ -13,6 +13,7 @@
 //   5. The net at 10% with three versions of the comeback door (kept, removed, kept if alive in Q4).
 //   6. The comeback door replaced by the doubt in the fourth (the loser's best chance before 6:00 ≥ X%).
 //   7. The spicy rocks lost and won with the doubt in the fourth at 33% and the 10% net.
+//   8. The reverse check with that definition: close games where the loser never had a real chance, by door.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -389,6 +390,51 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   for (const r of won) console.log(show(r));
 }
 
+// November 10: the reverse check with the new definition. Every door of a close game, and the games that
+// get in although the loser never had a real chance (under the 6:00 door's bar after 6:00, under 33%
+// before): which door lets them in, with the film of their last six minutes.
+function reverseWithDoubt(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 8. Reverse check with the new definition (doubt 33%, net 10%) ===');
+  const tau6 = 360 / GAME;
+  const bar = Math.min(wpHome(-12, tau6, mu, sigma), 1 - wpHome(12, tau6, mu, sigma));
+  const seasons = new Set(rows.map((r) => r.season)).size;
+  type Doors = { final: boolean; clutch: boolean; at6: boolean; net: boolean; doubt: boolean };
+  const doorsOf = (r: Row, after: number, before: number): Doors => {
+    const g = r.g;
+    return {
+      final: closeFinalMargin(g),
+      clutch: closeByClutch(g) || (g.late?.clutchSeconds ?? 0) > 0,
+      at6: g.late?.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6,
+      net: after >= 0.1,
+      doubt: before >= 0.33,
+    };
+  };
+  const all = rows.map((r) => {
+    const n = netOf(r, mu, sigma);
+    const before = bestBefore6(r, mu, sigma);
+    return { r, n, before, d: doorsOf(r, n.best, before) };
+  }).filter((x) => x.r.g.periods.length === 4);
+  const close = all.filter((x) => Object.values(x.d).some(Boolean));
+  console.log(`  ${close.length} close games without overtime (${((100 * close.length) / all.length).toFixed(1)}%)`);
+  console.log('  games let in by each door alone (no other door):');
+  for (const k of ['final', 'clutch', 'at6', 'net', 'doubt'] as const) {
+    const only = close.filter((x) => x.d[k] && Object.entries(x.d).every(([j, v]) => j === k || !v));
+    console.log(`    ${k.padEnd(7)} ${String(close.filter((x) => x.d[k]).length).padStart(5)} open · ${String(only.length).padStart(4)} alone (${(only.length / seasons).toFixed(1)} per season)`);
+  }
+  const dead = close.filter((x) => x.n.best < bar && x.before < 0.33);
+  console.log(`\n  close although the loser never had a real chance (under ${(100 * bar).toFixed(1)}% after 6:00, under 33% before): ${dead.length} (${(dead.length / seasons).toFixed(1)} per season)`);
+  const label = (d: Doors) => Object.entries(d).filter(([, v]) => v).map(([k]) => k).join('+');
+  const byDoor = new Map<string, number>();
+  for (const x of dead) byDoor.set(label(x.d), (byDoor.get(label(x.d)) ?? 0) + 1);
+  console.log(`  by door: ${[...byDoor].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(' · ')}`);
+  console.log('  the least alive first (first 30), with the film of the last 6:00 (winner\'s lead, loser\'s chance):');
+  for (const x of [...dead].sort((a, b) => a.n.best - b.n.best).slice(0, 30)) {
+    const g = x.r.g;
+    console.log(`\n    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(x.r.note).padStart(3)} · in by ${label(x.d)} · best ${(100 * x.n.best).toFixed(1)}% after 6:00, ${(100 * x.before).toFixed(0)}% before · lead at 6:00 ${x.n.lead6}, at 2:00 ${g.late?.marginAt2 ?? '?'} · clutch ${g.late?.clutchSeconds ?? 0} s · ${story(x.r)}`);
+    for (let i = 0; i < x.n.film.length; i += 10) console.log(`      ${x.n.film.slice(i, i + 10).join(' · ')}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -466,6 +512,7 @@ async function main(): Promise<void> {
   netAndComeback(rows, mu, sigma);
   doubtInQ4(rows, mu, sigma);
   rocksWithDoubt(rows, mu, sigma);
+  reverseWithDoubt(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
