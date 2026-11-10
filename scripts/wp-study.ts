@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { lateFrom, type Timeline } from './nba/clutch.ts';
+import { lineOver, type PeriodStats } from './nba/periodStats.ts';
 import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
@@ -37,7 +38,7 @@ import { whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
-type Row = { g: CachedGame; tl: Timeline; season: string; note: number; story: number; homeWon: boolean };
+type Row = { g: CachedGame; tl: Timeline; season: string; note: number; story: number; homeWon: boolean; ps?: PeriodStats };
 
 const GAME = 2880; // 48 minutes, in seconds
 
@@ -409,7 +410,7 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
     const w = SCORING.why;
     return g.players.filter((p) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints); // a duel
   };
-  type Maker = { r: Row; p: PlayerLine; won: boolean; open: number; total: number; q13: number; decidedAt: string };
+  type Maker = { r: Row; p: PlayerLine; won: boolean; open: number; total: number; q13: number; q13Eff?: number; decidedAt: string };
   const makers: Maker[] = [];
   for (const r of blowoutRocks) {
     const loserChance = (margin: number, period: number, left: number) => {
@@ -435,18 +436,33 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
         }
         before = { period, left, h, a };
       }
-      makers.push({ r, p, won: (p.team === 'home') === r.homeWon, open, total, q13, decidedAt: decided });
+      const q13Line = r.ps ? lineOver(r.ps, p, 1, 3) : undefined;
+      makers.push({ r, p, won: (p.team === 'home') === r.homeWon, open, total, q13, ...(q13Line ? { q13Eff: efficiency(q13Line) } : {}), decidedAt: decided });
     }
   }
   for (const m of [...makers].sort((a, b) => b.q13 - a.q13)) {
     const g = m.r.g;
-    console.log(`    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(m.r.note).padStart(3)} · ${(m.p.name ?? '?').padEnd(24)} ${String(m.p.pts).padStart(2)} pts (${m.total} in the play-by-play), eff ${String(efficiency(m.p)).padStart(2)} · ${m.won ? 'won ' : 'LOST'} · ${String(m.q13).padStart(2)} pts in Q1-Q3 · ${String(m.open).padStart(2)} pts while open · decided after ${m.decidedAt} · ${story(m.r)}`);
+    console.log(`    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(m.r.note).padStart(3)} · ${(m.p.name ?? '?').padEnd(24)} ${String(m.p.pts).padStart(2)} pts (${m.total} in the play-by-play), eff ${String(efficiency(m.p)).padStart(2)} · ${m.won ? 'won ' : 'LOST'} · Q1-Q3 ${String(m.q13).padStart(2)} pts, eff ${m.q13Eff === undefined ? ' ?' : String(m.q13Eff).padStart(2)} · ${String(m.open).padStart(2)} pts while open · decided after ${m.decidedAt} · ${story(m.r)}`);
   }
   const seasons2 = new Set(rows.map((r) => r.season)).size;
   console.log('\n  rule "a rock in a blowout if the player won and scored at least X points while the game was open":');
   for (const x of [20, 25, 30, 35, 40]) {
     const games = new Set(makers.filter((m) => m.won && m.open >= x).map((m) => m.r));
     console.log(`    X = ${x}: +${games.size} rocks (${(games.size / seasons2).toFixed(1)} per season)`);
+  }
+  const withEff = makers.filter((m) => m.q13Eff !== undefined).length;
+  console.log(`\n  efficiency in Q1-Q3: ${withEff} of ${makers.length} rock players (needs npm run season-stats -- <season> --period-stats)`);
+  if (withEff > 0) {
+    console.log('  rule "a rock in a blowout if the player won and had at least X efficiency in the first three quarters":');
+    for (const x of [35, 40, 45, 50]) {
+      const ms = makers.filter((m) => m.won && (m.q13Eff ?? -1) >= x);
+      console.log(`    X = ${x}: +${new Set(ms.map((m) => m.r)).size} rocks (${(new Set(ms.map((m) => m.r)).size / seasons2).toFixed(1)} per season): ${ms.map((m) => `${m.p.name ?? '?'} eff ${m.q13Eff}/${efficiency(m.p)}, ${m.q13}/${m.p.pts} pts`).join(', ')}`);
+    }
+    console.log('  rule "… 50 points or X efficiency in the first three quarters":');
+    for (const x of [40, 45, 50]) {
+      const ms = makers.filter((m) => m.won && (m.q13 >= 50 || (m.q13Eff ?? -1) >= x));
+      console.log(`    X = ${x}: +${new Set(ms.map((m) => m.r)).size} rocks (${(new Set(ms.map((m) => m.r)).size / seasons2).toFixed(1)} per season): ${ms.map((m) => `${m.p.name ?? '?'} ${m.q13} pts eff ${m.q13Eff ?? '?'}`).join(', ')}`);
+    }
   }
   console.log('\n  rule "a rock in a blowout if the player won and scored at least X points in the first three quarters":');
   for (const x of [30, 35, 40, 45, 50]) {
@@ -512,6 +528,7 @@ async function main(): Promise<void> {
   for (const season of seasons) {
     const dir = path.join(ROOT, '.cache', 'boxscores', season);
     const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
+    const psDir = path.join(ROOT, '.cache', 'periodstats', season);
     if (!existsSync(dir)) throw new Error(`No box score in ${dir}.`);
     for (const f of (await readdir(dir)).filter((x) => x.endsWith('.json'))) {
       const pbp = path.join(pbpDir, f);
@@ -522,7 +539,9 @@ async function main(): Promise<void> {
       const fs = finalScore(g);
       if (fs.home === fs.away) continue;
       const storyPts = (isDisputed(g) ? disputedBaseFor(g) : 0) + competitivenessPoints(g);
-      rows.push({ g, tl, season, note: displayScore(g), story: storyPts, homeWon: fs.home > fs.away });
+      const psFile = path.join(psDir, f);
+      const ps = existsSync(psFile) ? JSON.parse(await readFile(psFile, 'utf8')) as PeriodStats : undefined;
+      rows.push({ g, tl, season, note: displayScore(g), story: storyPts, homeWon: fs.home > fs.away, ...(ps ? { ps } : {}) });
     }
   }
   console.log(`Win probability study, ${seasons.join(' + ')}: ${rows.length} games with their play-by-play\n`);
