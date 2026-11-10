@@ -17,6 +17,7 @@
 //   8. The reverse check with that definition: close games where the loser never had a real chance, by door.
 //   9. The calibration in the fourth quarter (the doors' range): predicted vs actual, and a deficit × time grid.
 //  10. The order among the close games: the rating and its ingredients against the model, weights, disagreements.
+//  11. The lead changes: three ways to weigh them (by period, B, by the model) × the scenario weight 6 / 9 / 12.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -26,7 +27,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lateFrom, type Timeline } from './nba/clutch.ts';
+import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
 import { lineOver, type PeriodStats } from './nba/periodStats.ts';
 import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
@@ -649,6 +650,82 @@ function closeOrder(rows: Row[], mu: number, sigma: number): void {
   for (const i of idx.filter((i) => rS[i]! > 0.8 && rE[i]! < 0.4).sort((a, c) => rS[c]! - rS[a]!).slice(0, 15)) console.log(show(i));
 }
 
+// November 10: the lead changes, how and when they count. Three ways to weigh each lead change and tie:
+//   A. today: by period (SCORING.swings), a tie counts like a lead change;
+//   B. the first quarter at ×0.25 and a tie at ×0.5 (a −1 → +1 swing through a tie no longer counts double);
+//   C. by the model: each one weighs what its basket moved the win probability (at the same clock), so the
+//      time, the score and the stakes come in at once.
+// The cap (fullAt) is set for B and C at the same 90th percentile of close games as A, so the three saturate
+// alike. Then the scenario weight at 6 (today), 9 and 12: the order among the close games against the
+// excitement index, the rating bands, the 100s, and the games that move most.
+function scenarioWeights(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 11. The lead changes: how and when they count ===');
+  const w = SCORING.swings;
+  const sw = (r: Row) => swings(r.tl);
+  const weighA = (r: Row) => sw(r).reduce((t, x) => t + (x.period >= 4 && x.secondsLeft <= 300 ? w.late : x.period === 1 ? w.q1 : x.period === 2 ? w.q2 : x.period === 3 ? w.q3 : w.q4), 0);
+  const weighB = (r: Row) => sw(r).reduce((t, x) => t + (x.kind === 'tie' ? 0.5 : 1) * (x.period >= 4 && x.secondsLeft <= 300 ? w.late : x.period === 1 ? 0.25 : x.period === 2 ? w.q2 : x.period === 3 ? w.q3 : w.q4), 0);
+  const weighC = (r: Row) => {
+    let t = 0, prevMargin = 0, lastLeader = 0;
+    for (const [period, left, h, a] of r.tl) {
+      const m = h - a;
+      const leader = Math.sign(m);
+      const isSwing = (m === 0 && prevMargin !== 0) || (leader !== 0 && lastLeader !== 0 && leader !== lastLeader);
+      if (isSwing) {
+        const tau = tauOf(period, left);
+        t += Math.abs(wpHome(m, tau, mu, sigma) - wpHome(prevMargin, tau, mu, sigma));
+      }
+      if (leader !== 0) lastLeader = leader;
+      prevMargin = m;
+    }
+    return t;
+  };
+  const close = rows.filter((r) => isDisputed(r.g));
+  const q90 = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t[Math.floor(0.9 * (t.length - 1))]!; };
+  const raw = { A: close.map(weighA), B: close.map(weighB), C: close.map(weighC) };
+  const fullA = w.fullAt;
+  const share90A = Math.min(1, q90(raw.A) / fullA);
+  const fullAt = { A: fullA, B: q90(raw.B) / share90A, C: q90(raw.C) / share90A };
+  console.log(`  cap (fullAt), same 90th percentile as today: A ${fullAt.A} · B ${fullAt.B.toFixed(1)} · C ${fullAt.C.toFixed(2)} (win probability moved)`);
+  console.log(`  close games at the cap: A ${raw.A.filter((x) => x >= fullAt.A).length} · B ${raw.B.filter((x) => x >= fullAt.B).length} · C ${raw.C.filter((x) => x >= fullAt.C).length} of ${close.length}`);
+
+  const ei = close.map((r) => {
+    let prev = wpHome(0, 1, mu, sigma), t = 0;
+    for (const st of states(r.tl).slice(1)) { const p = wpHome(st.margin, tauOf(st.period, st.left), mu, sigma); t += Math.abs(p - prev); prev = p; }
+    return t;
+  });
+  const others = close.map((r) => { const d = competitivenessDetails(r.g); return d.suspense.points + d.comeback.points + d.offense.points; });
+  const perf = close.map((r) => performancePoints(r.g));
+  const med = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t.length ? t[Math.floor((t.length - 1) / 2)]! : 0; };
+  const today = close.map((r) => r.note);
+  console.log('\n  variant               corr. story   corr. rating   at 100   median excitement by band 50s / 60s / 70s / 80s / 90s / 100');
+  type Result = { label: string; notes: number[] };
+  const results: Result[] = [];
+  for (const v of ['A', 'B', 'C'] as const) {
+    for (const weight of [...new Set([SCORING.scenario.weight, 9, 12])].sort((a, b) => a - b)) {
+      const scen = raw[v].map((x) => weight * Math.min(1, x / fullAt[v]));
+      const story0 = scen.map((x, i) => x + others[i]!);
+      const notes = story0.map((x, i) => Math.min(100, Math.round(SCORING.disputedBase + x + perf[i]!)));
+      const bands = [[50, 59], [60, 69], [70, 79], [80, 89], [90, 99], [100, 100]].map(([lo, hi]) => med(close.map((_, i) => i).filter((i) => notes[i]! >= lo! && notes[i]! <= hi!).map((i) => ei[i]!)).toFixed(2)).join(' / ');
+      const label = `${v}, weight ${weight}${v === 'A' && weight === SCORING.scenario.weight ? ' (today)' : ''}`;
+      console.log(`  ${label.padEnd(22)} ${spearman(ei, story0).toFixed(3).padStart(11)}   ${spearman(ei, notes).toFixed(3).padStart(12)}   ${String(notes.filter((n) => n >= 100).length).padStart(6)}   ${bands}`);
+      results.push({ label, notes });
+      if (v === 'A' && weight === SCORING.scenario.weight) {
+        const off = notes.filter((n, i) => n !== today[i]).length;
+        console.log(`    (check: today recomputed = the real rating for ${close.length - off} of ${close.length} close games)`);
+      }
+    }
+  }
+  for (const label of ['B, weight 9', 'C, weight 9', 'C, weight 12']) {
+    const res = results.find((x) => x.label === label)!;
+    const moves = close.map((r, i) => ({ r, i, d: res.notes[i]! - today[i]! })).filter((x) => x.d !== 0);
+    console.log(`\n  ${label}: ${moves.length} close games move (avg ${(moves.reduce((t, x) => t + x.d, 0) / (moves.length || 1)).toFixed(1)}); the biggest rises and falls (lead changes + ties, raw A / B / C):`);
+    const line = (x: typeof moves[number]) => `    ${(x.r.g.date ?? '').padEnd(10)} ${`${x.r.g.away}@${x.r.g.home}`.padEnd(8)} ${String(today[x.i]).padStart(3)} → ${String(res.notes[x.i]).padStart(3)}   ${sw(x.r).length} swings (A ${raw.A[x.i]!.toFixed(1)}, B ${raw.B[x.i]!.toFixed(1)}, C ${raw.C[x.i]!.toFixed(2)}) · excitement ${ei[x.i]!.toFixed(2)} · ${story(x.r)}`;
+    for (const x of [...moves].sort((a, b) => b.d - a.d).slice(0, 8)) console.log(line(x));
+    console.log('    …');
+    for (const x of [...moves].sort((a, b) => a.d - b.d).slice(0, 8)) console.log(line(x));
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
@@ -732,6 +809,7 @@ async function main(): Promise<void> {
   reverseWithDoubt(rows, mu, sigma);
   lateCalibration(rows, mu, sigma);
   closeOrder(rows, mu, sigma);
+  scenarioWeights(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
