@@ -360,8 +360,6 @@ function doubtInQ4(rows: Row[], mu: number, sigma: number): void {
 // game: the games out lose theirs, the games in may win one (the other gates unchanged).
 function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   console.log('\n=== 7. The spicy rocks with the doubt in the fourth (33%) and the net (10%) ===');
-  const otherDoors = (g: Row['g']) => closeFinalMargin(g) || closeByClutch(g)
-    || (g.late !== undefined && (g.late.clutchSeconds > 0 || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
   const forced = (g: Row['g']): Row['g'] => ({ ...g, late: { ...(g.late ?? { clutchSeconds: 0, marginAt2: 99, weightedSwings: 0 }), clutchSeconds: Math.max(1, g.late?.clutchSeconds ?? 0), loserChanceAfter6: 1 } });
   const star = (p: PlayerLine) => `${p.name ?? '?'} ${p.pts} pts, eff ${efficiency(p)}`;
   const seasons = [...new Set(rows.map((r) => r.season))].sort();
@@ -371,7 +369,8 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   let today = 0;
   let after = 0;
   for (const r of rows) {
-    const close = otherDoors(r.g) || netOf(r, mu, sigma).best >= 0.1 || bestBefore6(r, mu, sigma) >= 0.33;
+    // The rating in use since November 10 has these doors and the garbage-time check (isDisputed)
+    const close = isDisputed(r.g);
     const rockToday = Boolean(whyOf(r.g)?.nuclear);
     const rockAnyGame = Boolean(whyOf(forced(r.g))?.nuclear);
     if (rockAnyGame && !isDisputed(r.g)) blowoutRocks.push(r);
@@ -398,6 +397,56 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   console.log(`\n  without the "close game only" rule (the rating in use): +${blowoutRocks.length} rocks in blowouts (${(blowoutRocks.length / seasons.length).toFixed(1)} per season: ${(inUse / seasons.length).toFixed(1)} → ${((inUse + blowoutRocks.length) / seasons.length).toFixed(1)})`);
   console.log(`  per season: ${seasons.map((s) => `${s} ${blowoutRocks.filter((r) => r.season === s).length}`).join(' · ')}`);
   for (const r of [...blowoutRocks].sort((a, b) => b.note - a.note)) console.log(show(r));
+
+  // November 10: did the player make the blowout, or pad a decided game? His points scored while the game
+  // was still open (the final loser at 10%+ before the basket), and whether his team won.
+  console.log('\n  the rocks in blowouts: did the player make the blowout? (points scored while the loser still had 10%+)');
+  const hasScorers = blowoutRocks.some((r) => r.tl.some((e) => e[4] !== undefined));
+  if (!hasScorers) { console.log('  no scorer in these timelines (downloaded before November 2026)'); return; }
+  const rockPlayers = (g: Row['g']) => {
+    const alone = g.players.filter((p) => whyOf(forced({ ...g, players: [p] }))?.nuclear);
+    if (alone.length) return alone;
+    const w = SCORING.why;
+    return g.players.filter((p) => efficiency(p) >= w.nuclearDuel || p.pts >= w.nuclearDuelPoints); // a duel
+  };
+  type Maker = { r: Row; p: PlayerLine; won: boolean; open: number; total: number; decidedAt: string };
+  const makers: Maker[] = [];
+  for (const r of blowoutRocks) {
+    const loserChance = (margin: number, period: number, left: number) => {
+      const p = wpHome(margin, tauOf(period, left), mu, sigma);
+      return r.homeWon ? 1 - p : p;
+    };
+    // When the game was decided for good: the last moment the loser still had 10%+
+    let decided = '';
+    let prev = { period: 1, left: 720, h: 0, a: 0 };
+    for (const [period, left, h, a] of r.tl) {
+      if (loserChance(prev.h - prev.a, prev.period, prev.left) >= 0.1) decided = `${period <= 4 ? `Q${period}` : `OT${period - 4}`} ${clock(left)}`;
+      prev = { period, left, h, a };
+    }
+    for (const p of rockPlayers(r.g)) {
+      let open = 0, total = 0;
+      let before = { period: 1, left: 720, h: 0, a: 0 };
+      for (const [period, left, h, a, scorer] of r.tl) {
+        const pts = p.team === 'home' ? h - before.h : a - before.a;
+        if (scorer !== undefined && scorer === p.id && pts > 0) {
+          total += pts;
+          if (loserChance(before.h - before.a, before.period, before.left) >= 0.1) open += pts;
+        }
+        before = { period, left, h, a };
+      }
+      makers.push({ r, p, won: (p.team === 'home') === r.homeWon, open, total, decidedAt: decided });
+    }
+  }
+  for (const m of [...makers].sort((a, b) => b.open - a.open)) {
+    const g = m.r.g;
+    console.log(`    ${(g.date ?? '').padEnd(10)} ${`${g.away}@${g.home}`.padEnd(8)} rated ${String(m.r.note).padStart(3)} · ${(m.p.name ?? '?').padEnd(24)} ${String(m.p.pts).padStart(2)} pts (${m.total} in the play-by-play), eff ${String(efficiency(m.p)).padStart(2)} · ${m.won ? 'won ' : 'LOST'} · ${String(m.open).padStart(2)} pts while open · decided after ${m.decidedAt} · ${story(m.r)}`);
+  }
+  const seasons2 = new Set(rows.map((r) => r.season)).size;
+  console.log('\n  rule "a rock in a blowout if the player won and scored at least X points while the game was open":');
+  for (const x of [20, 25, 30, 35, 40]) {
+    const games = new Set(makers.filter((m) => m.won && m.open >= x).map((m) => m.r));
+    console.log(`    X = ${x}: +${games.size} rocks (${(games.size / seasons2).toFixed(1)} per season)`);
+  }
 }
 
 // November 10: the reverse check with the new definition. Every door of a close game, and the games that
