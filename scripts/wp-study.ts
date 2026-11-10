@@ -12,6 +12,7 @@
 //      last six minutes, and the reverse check (competitive games today that stay under the bar).
 //   5. The net at 10% with three versions of the comeback door (kept, removed, kept if alive in Q4).
 //   6. The comeback door replaced by the doubt in the fourth (the loser's best chance before 6:00 ≥ X%).
+//   7. The spicy rocks lost and won with the doubt in the fourth at 33% and the 10% net.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
 // Usage: npm run wp-study -- 2019-20 2020-21 2021-22 2022-23 2023-24 2024-25 2025-26 > rapport-wp.txt
@@ -22,13 +23,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { lateFrom, type Timeline } from './nba/clutch.ts';
+import { loadPeaks } from './load-peaks.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
-  closeByClutch, closeFinalMargin, competitivenessPoints, disputedBaseFor, displayScore, finalScore, isDisputed, loserBiggestLead,
+  closeByClutch, closeFinalMargin, competitivenessPoints, efficiency, disputedBaseFor, displayScore, finalScore, isDisputed, loserBiggestLead,
   performancePoints,
 } from '../src/lib/scoring.ts';
-import type { Game } from '../src/types/game.ts';
+import type { Game, PlayerLine } from '../src/types/game.ts';
+import { whyOf } from '../src/lib/why.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type CachedGame = Game & { id: string; date?: string };
@@ -351,11 +354,47 @@ function doubtInQ4(rows: Row[], mu: number, sigma: number): void {
   }
 }
 
+// November 10: the spicy rocks with the doubt in the fourth at 33% and the 10% net. A rock needs a close
+// game: the games out lose theirs, the games in may win one (the other gates unchanged).
+function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
+  console.log('\n=== 7. The spicy rocks with the doubt in the fourth (33%) and the net (10%) ===');
+  const otherDoors = (g: Row['g']) => closeFinalMargin(g) || closeByClutch(g)
+    || (g.late !== undefined && (g.late.clutchSeconds > 0 || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
+  const forced = (g: Row['g']): Row['g'] => ({ ...g, late: { ...(g.late ?? { clutchSeconds: 0, marginAt2: 99, weightedSwings: 0 }), clutchSeconds: Math.max(1, g.late?.clutchSeconds ?? 0) } });
+  const star = (p: PlayerLine) => `${p.name ?? '?'} ${p.pts} pts, eff ${efficiency(p)}`;
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const lost: Row[] = [];
+  const won: Row[] = [];
+  let today = 0;
+  let after = 0;
+  for (const r of rows) {
+    const close = otherDoors(r.g) || netOf(r, mu, sigma).best >= 0.1 || bestBefore6(r, mu, sigma) >= 0.33;
+    const rockToday = Boolean(whyOf(r.g)?.nuclear);
+    const rockAfter = close && Boolean(whyOf(forced(r.g))?.nuclear);
+    if (rockToday) today++;
+    if (rockAfter) after++;
+    if (rockToday && !rockAfter) lost.push(r);
+    if (!rockToday && rockAfter) won.push(r);
+  }
+  console.log(`  rocks: ${today} today → ${after} (${(today / seasons.length).toFixed(1)} → ${(after / seasons.length).toFixed(1)} per season)`);
+  console.log(`  per season, lost / won: ${seasons.map((s) => `${s} ${lost.filter((r) => r.season === s).length}/${won.filter((r) => r.season === s).length}`).join(' · ')}`);
+  const show = (r: Row) => {
+    const best = [...r.g.players].sort((a, b) => Math.max(efficiency(b), b.pts) - Math.max(efficiency(a), a.pts))[0]!;
+    const before = bestBefore6(r, mu, sigma), late = netOf(r, mu, sigma);
+    return `    ${(r.g.date ?? '').padEnd(10)} ${`${r.g.away}@${r.g.home}`.padEnd(8)} rated ${String(r.note).padStart(3)} · ${star(best)} · loser's best before 6:00 ${(100 * before).toFixed(0)}%, after ${(100 * late.best).toFixed(0)}% · lead at 6:00 ${late.lead6} · loser led by ${loserBiggestLead(r.g)} · ${story(r)}`;
+  };
+  console.log(`\n  rocks lost (${lost.length}):`);
+  for (const r of lost) console.log(show(r));
+  console.log(`\n  rocks won (${won.length}):`);
+  for (const r of won) console.log(show(r));
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') throw new Error('wp-study prints games and how the rating behaves: never on GitHub Actions (public logs).');
   const seasons = process.argv.slice(2).filter((a) => /^\d{4}-\d{2}$/.test(a));
   if (seasons.length === 0) throw new Error('Usage: npm run wp-study -- 2025-26 [2024-25 …]');
   loadScoring();
+  loadPeaks();
 
   const rows: Row[] = [];
   for (const season of seasons) {
@@ -426,6 +465,7 @@ async function main(): Promise<void> {
   safetyNet(rows, mu, sigma);
   netAndComeback(rows, mu, sigma);
   doubtInQ4(rows, mu, sigma);
+  rocksWithDoubt(rows, mu, sigma);
 }
 
 main().catch((error: unknown) => {
