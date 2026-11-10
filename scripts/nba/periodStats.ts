@@ -3,8 +3,8 @@
 // the fourth quarter (a night that made the blowout, or stats padded once the game was over).
 // Checked against the box score: the periods must add up to the game's line.
 
-import { parseClock } from './clutch.ts';
-import type { PlayerLine } from '../../src/types/game.ts';
+import { efficiency } from '../../src/lib/scoring.ts';
+import type { Game, PlayerLine } from '../../src/types/game.ts';
 
 // [pts, reb, ast, stl, blk, fgm, fga, ftm, fta, tov], one per period (index 0 = Q1)
 export type PeriodLine = [number, number, number, number, number, number, number, number, number, number];
@@ -34,7 +34,7 @@ export function periodStats(raw: unknown): PeriodStats {
   const ownSteals = actions.some((a) => a.actionType === 'steal');
   const ownBlocks = actions.some((a) => a.actionType === 'block');
   for (const a of actions) {
-    parseClock(a.clock); // fails loudly on an unexpected clock
+    if (typeof a.clock !== 'string' || !/^PT\d+M[\d.]+S$/.test(a.clock)) throw new Error(`Unexpected play-by-play clock: ${JSON.stringify(a.clock)}`);
     const t = a.actionType;
     const made = a.shotResult === 'Made';
     if (t === '2pt' || t === '3pt') {
@@ -74,4 +74,13 @@ export function mismatches(stats: PeriodStats, p: PlayerLine): string[] {
   const all = lineOver(stats, p, 1, 99) ?? lineOver({ [String(p.id)]: [empty()] }, p, 1, 1)!;
   const keys = ['pts', 'reb', 'ast', 'stl', 'blk', 'fgm', 'fga', 'ftm', 'fta', 'tov'] as const;
   return keys.filter((k) => all[k] !== p[k]).map((k) => `${k} ${all[k]}/${p[k]}`);
+}
+
+// What each player did in the first three quarters (Game.late.firstThree): points and efficiency, for
+// the players of the box score who have a personId
+export function firstThreeQuarters(stats: PeriodStats, game: Game): NonNullable<NonNullable<Game['late']>['firstThree']> {
+  return game.players.flatMap((p) => {
+    const line = lineOver(stats, p, 1, 3);
+    return line && p.id !== undefined ? [{ id: p.id, pts: line.pts, eff: efficiency(line) }] : [];
+  });
 }

@@ -1,7 +1,7 @@
 // scripts/nba/periodStats.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { lineOver, mismatches, periodStats } from './periodStats.ts';
+import { firstThreeQuarters, lineOver, mismatches, periodStats } from './periodStats.ts';
 import { efficiency } from '../../src/lib/scoring.ts';
 import type { PlayerLine } from '../../src/types/game.ts';
 
@@ -47,4 +47,11 @@ test('period stats: a line over the first three quarters, and the check against 
   // Steals and blocks carried by the turnover / the missed shot when the feed has no own actions
   const old = periodStats({ game: { gameId: 'y', actions: [act(1, 'turnover', 7, { stealPersonId: 5 }), act(1, '2pt', 7, { shotResult: 'Missed', blockPersonId: 5 })] } });
   assert.deepEqual(old['5'], [[0, 0, 0, 1, 1, 0, 0, 0, 0, 0]]);
+});
+
+test('period stats: each player\'s points and efficiency over the first three quarters', () => {
+  const s = periodStats(raw);
+  const box: PlayerLine = { team: 'home', id: 7, pts: 6, reb: 0, ast: 0, stl: 0, blk: 0, fgm: 2, fga: 3, ftm: 1, fta: 2, tov: 1 };
+  const game = { home: 'A', away: 'B', periods: [], leadChanges: 0, timesTied: 0, biggestLead: { home: 0, away: 0 }, players: [box, { ...box, id: undefined }] };
+  assert.deepEqual(firstThreeQuarters(s, game), [{ id: 7, pts: 4, eff: 1 }]);
 });

@@ -2,6 +2,7 @@
 import { SCORING } from '../../src/config/scoring.ts';
 import { finalScore } from '../../src/lib/scoring.ts';
 import { homeWinProbability } from '../../src/lib/winProbability.ts';
+import { firstThreeQuarters, periodStats } from './periodStats.ts';
 import type { Game } from '../../src/types/game.ts';
 
 // "Clutch", the NBA's own definition: the last 5 minutes of the 4th quarter or of an overtime,
@@ -239,5 +240,12 @@ export function readPlayByPlay(pbp: RawPlayByPlay, game: Game): PlayByPlayRead {
     const seen = last ? `${last[3]}-${last[2]}` : 'none';
     return { buzzer, problem: `not complete yet: last score ${seen}, final ${f.away}-${f.home}` };
   }
-  return { buzzer, late: lateFrom(timeline, game.periods.length) };
+  const late = lateFrom(timeline, game.periods.length);
+  // The first three quarters of each player: a format the stats can't read never blocks the rating
+  try {
+    late.firstThree = firstThreeQuarters(periodStats(pbp), game);
+  } catch (error) {
+    console.warn(`First three quarters not read: ${error instanceof Error ? error.message : error}`);
+  }
+  return { buzzer, late };
 }

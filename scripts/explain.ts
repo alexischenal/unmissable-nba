@@ -114,6 +114,12 @@ function explain(g: Game, notes: Notes = {}): void {
   console.log(`Rating: ${base} = ${n1(raw)} → ${displayScore(g)}`);
   const why = whyOf(g);
   console.log(`Why (the card's flame): ${why ? whyLabels(why).join(' · ') : 'nothing, no flame on this card'}`);
+  const firstThree = [...(g.late?.firstThree ?? [])].sort((a, b) => Math.max(b.pts, b.eff) - Math.max(a.pts, a.eff)).slice(0, 2);
+  if (firstThree.length) {
+    const w = SCORING.why;
+    const names = new Map(g.players.map((p) => [p.id, p.name ?? '?']));
+    console.log(`First three quarters (a winner at ${w.blowoutPoints} pts or ${w.blowoutEff} eff lights the rock, even in a blowout): ${firstThree.map((x) => `${names.get(x.id)} ${x.pts} pts, eff ${x.eff}`).join(' · ')}`);
+  }
 }
 
 // A night of a past season, from the box scores (and play-by-play) cached by season-stats.

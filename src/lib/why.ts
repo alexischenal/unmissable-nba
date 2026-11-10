@@ -7,7 +7,7 @@ import { PEAKS } from '../config/peaks.ts';
 import { SCORING } from '../config/scoring.ts';
 import type { Game, PlayerLine } from '../types/game.ts';
 import type { Why } from '../types/public.ts';
-import { efficiency, isDisputed } from './scoring.ts';
+import { efficiency, finalScore, isDisputed } from './scoring.ts';
 
 // A quadruple-double: 10 or more in four of points, rebounds, assists, steals, blocks
 const quadrupleDouble = (p: PlayerLine) => [p.pts, p.reb, p.ast, p.stl, p.blk].filter((v) => v >= 10).length >= 4;
@@ -34,9 +34,17 @@ export function whyOf(g: Game): Why | undefined {
     const eff = efficiency(p);
     return (eff >= peaks.eff && eff >= bar.eff) || (p.pts >= peaks.pts && p.pts >= bar.pts);
   };
+  // A player who made the blowout: he won, and his first three quarters (points or efficiency) were
+  // historic. In any game: the show is the player, whatever the margin.
+  const f = finalScore(g);
+  const winner = f.home > f.away ? 'home' : f.away > f.home ? 'away' : null;
+  const madeIt = (p: PlayerLine) => {
+    const q = p.id !== undefined ? g.late?.firstThree?.find((x) => x.id === p.id) : undefined;
+    return q !== undefined && p.team === winner && (q.pts >= w.blowoutPoints || q.eff >= w.blowoutEff);
+  };
   const lines = g.players.map((p) => {
     const eff = efficiency(p);
-    const nuclear = competitive
+    const nuclear = madeIt(p) || competitive
       && (p.pts >= w.nuclearPoints || eff >= w.nuclearEff || quadrupleDouble(p) || (p.fg3m ?? 0) >= w.nuclearThrees
         || (duel && duelist(p)) || buzzer(p) || peak(p));
     return { eff, pts: p.pts, nuclear };
