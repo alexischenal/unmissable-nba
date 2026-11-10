@@ -472,5 +472,9 @@
 
   .card__abbr {
     bottom: -0.19em;
+
+    @media (max-width: $breakpoint-mobile) {
+      bottom: -0.16em;
+    }
   }
 }
