@@ -97,7 +97,7 @@
 
   .card__abbr {
     position: absolute;
-    bottom: -0.17em;
+    bottom: -0.16em;
     font-family: $font-display;
     font-weight: 900;
     font-size: calc(var(--card-h) * 0.95);
@@ -471,6 +471,6 @@
   }
 
   .card__abbr {
-    bottom: -0.21em;
+    bottom: -0.2em;
   }
 }
