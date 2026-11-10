@@ -145,24 +145,32 @@ and milestones (context, not play), fights and ejections.
    the 6:00 door (decided against: the promise). `scripts/close-rule-sim.ts` predates it: its check shows
    mismatches.
 
-0. **Later (November 8): a statistical definition of a close game, or a safety net.** The win probability
-   model (`wp-study`, Stern 1994, fitted on seven seasons) as the judge of "the loser could still believe".
-   Kept as is: the 12-point door at 6:00 (the user likes it) and the comeback as bonus points.
-   - **The safety net after 6:00** (section 4/5): the loser had at least a 1-in-10 chance at some point after
-     6:00 (in points: down 7 at 5:00, 6 at 3:00). About 2 games per season, all landing in the low 50s. The
-     bar of the 6:00 door itself (down 12 at 6:00, about 3.4%) is too loose as a net: the net keeps the best
-     moment out of dozens, the door looks at one (34 games per season, mostly noise).
-   - **The comeback door is the weak spot** (reverse check): about 15 games per season rated close only
-     because the loser once led by 13+, some of them dead at 6:00 (down 20 to 30, rated 60 to 88): the
-     DET @ PHI mistake the other way around. Removing it is too harsh (104 games, some tight through three
-     quarters); keeping it only when the loser still had 3.4% in the fourth drops 22 clear blowouts.
-   - **The doubt in the fourth instead of the comeback door** (section 6, preferred): the loser had at least
-     X% at some point of the fourth before 6:00. Same shape, same verdict (today a lead of 13 in the first
-     quarter decides). At 33% (about one possession): the share of close games unchanged (64%), about 15 in
-     and 13 out per season. 20-25% lets in games down 7 after Q3 and 15 at 6:00.
-   - To do before deciding: check the spicy rocks that the games out would lose (a rock needs a close
-     game); a sentence for How it works; the model in the site's code (μ, σ and the thresholds in the
-     secret, refitted each season with `wp-study`).
+0. **Done (November 10): a close game, judged by the loser's chances.** The win probability model
+   (`src/lib/winProbability.ts`, Stern 1994: the margin as a random walk with a home edge, fitted on seven
+   seasons with `wp-study`, well calibrated) as the judge of "the loser could still believe in it".
+   With the play-by-play (v2), a close game opens through one of these doors:
+   - the final margin (with garbage time ruled out at 2:00), a tight finish, one second of clutch (the NBA's
+     definition), within `maxMarginAt6` with 6:00 left: unchanged;
+   - **the doubt in the fourth** (`doubtChance`): the loser had that chance at some point of the fourth before
+     6:00, about one possession. It replaces the comeback door (the loser once led by 13+), which let in
+     about 15 games per season dead at 6:00 (down 20 to 30, rated 60 to 88) and missed games tied after Q3
+     then put away. The loser's lead now only gives comeback points;
+   - **the late run** (`lateChance`): that chance at some point after 6:00 (a run back to 6 or 7 with 3 to 5
+     minutes left), about 2 games per season;
+   - and **a check on every door**: never close if the loser never had, after 6:00, the chance of a team down
+     `maxMarginAt6` with 6:00 left (the same bar, about 3.4%, shrinking with the clock: 10 at 5:00, 7 at
+     2:00, 4 at 1:00), nor the doubt before. It shuts the final margin door on garbage time: 39 games in seven
+     seasons (WAS @ BOS, April 2024, down 19 at 6:00, rated 81).
+   Simulated on seven seasons (`wp-study` sections 4 to 8): the share of close games about the same (around
+   62%), about 15 games in and 13 out per season, the spicy rocks 21.1 → 20.9 per season (lost: games dead in
+   the fourth, Curry's 50 at Atlanta keeps its Crazy flame; won: Durant's 51 at Detroit, McCollum's 50 vs
+   Washington, both tied or close after three quarters). v1 (no play-by-play, rare: only 4 hours after
+   tip-off) keeps the old doors. The published ratings stay.
+   - New settings: `disputed.doubtChance`, `disputed.lateChance`, `winProbability.homeEdge`,
+     `winProbability.sigma`. **Refit the model each season** (`npm run wp-study`, section 1) and update the
+     secret.
+   - Left as is: the threshold effect of any door (33% opens, 31% doesn't); what the model can't see
+     (possession, team strength, the benches in garbage time).
 
 0. **Done (November 8): the shooting in the points gap.** A big night scored cleanly (true shooting, free
    throws included, at a setting or more) counts with all its points, without the gap. Simulated on seven

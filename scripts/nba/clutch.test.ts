@@ -1,7 +1,7 @@
 // scripts/nba/clutch.test.ts — run with: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buzzerAt, buzzerBeater, computeClutch, lateFrom, marginAt6, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
+import { buzzerAt, buzzerBeater, computeClutch, lateFrom, loserChances, marginAt6, parseClock, readPlayByPlay, swings, toTimeline, weightedSwings, type Timeline } from './clutch.ts';
 
 test('clock: "PT04M32.00S" is 272 seconds', () => {
   assert.equal(parseClock('PT04M32.00S'), 272);
@@ -113,4 +113,16 @@ test('the margin with 6:00 left: the last score before 6:00 in the fourth', () =
   const t: Timeline = [[3, 0, 70, 64], [4, 600, 80, 66], [4, 400, 82, 77], [4, 300, 100, 77]];
   assert.equal(marginAt6(t), 5); // 14 at 10:00, then 5 at 6:40; the 23 at 5:00 is too late
   assert.equal(lateFrom(t, 4).marginAt6, 5);
+});
+
+test('the loser\'s best chances in the fourth, before and after 6:00', () => {
+  // Home up 20 after Q3, the visitors back to 6 at 4:56, then pushed away: a 12-point win
+  const t: Timeline = [[3, 0, 80, 60], [4, 500, 86, 74], [4, 296, 88, 82], [4, 200, 96, 82], [4, 0, 100, 88]];
+  const c = loserChances(t);
+  assert.ok(c.before6 > 0 && c.before6 < 0.1);   // down 12 at 8:20 at best
+  assert.ok(c.after6 > 0.1 && c.after6 < 0.3);   // down 6 with 4:56 left
+  assert.equal(lateFrom(t, 4).loserChanceAfter6, c.after6);
+  // Tied at the end of regulation (overtime): at least a coin flip (here the loser even led with 0:30 left)
+  assert.equal(loserChances([[4, 30, 100, 98], [4, 0, 100, 100], [5, 0, 109, 104]]).after6, 0.5);
+  assert.ok(loserChances([[4, 30, 98, 100], [4, 0, 100, 100], [5, 0, 109, 104]]).after6 > 0.5);
 });

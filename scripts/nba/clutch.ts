@@ -1,6 +1,7 @@
 // scripts/nba/clutch.ts
 import { SCORING } from '../../src/config/scoring.ts';
 import { finalScore } from '../../src/lib/scoring.ts';
+import { homeWinProbability } from '../../src/lib/winProbability.ts';
 import type { Game } from '../../src/types/game.ts';
 
 // "Clutch", the NBA's own definition: the last 5 minutes of the 4th quarter or of an overtime,
@@ -169,12 +170,39 @@ export function marginAt6(timeline: Timeline): number {
   return Math.abs(margin);
 }
 
+// The losing team's best chance to win in the fourth quarter, before and after 6:00: at 12:00 (or 6:00),
+// then right after every score (between two scores the chance only drops as the clock runs). The loser is
+// the team behind after the last score. Settings: SCORING.winProbability.
+export function loserChances(timeline: Timeline): { before6: number; after6: number } {
+  const last = timeline[timeline.length - 1];
+  const homeLost = last !== undefined && last[2] < last[3];
+  const chance = (margin: number, left: number) => {
+    const p = homeWinProbability(margin, left, SCORING.winProbability);
+    return homeLost ? p : 1 - p;
+  };
+  const marginBefore = (left0: number) => {
+    let margin = 0;
+    for (const [period, left, h, a] of timeline) if (period < 4 || (period === 4 && left > left0)) margin = h - a;
+    return margin;
+  };
+  let before6 = chance(marginBefore(720), 720);
+  let after6 = chance(marginBefore(360), 360);
+  for (const [period, left, h, a] of timeline) {
+    if (period !== 4) continue;
+    if (left > 360) before6 = Math.max(before6, chance(h - a, left));
+    else after6 = Math.max(after6, chance(h - a, left));
+  }
+  return { before6, after6 };
+}
+
 // What the rating v2 reads from the play-by-play (Game.late)
 export function lateFrom(timeline: Timeline, periods: number): NonNullable<Game['late']> {
   const c = computeClutch(timeline, periods);
   const shooter = buzzerBeater(timeline, periods);
+  const chances = loserChances(timeline);
   return {
     clutchSeconds: c.seconds, marginAt2: c.marginAt2, weightedSwings: weightedSwings(timeline), marginAt6: marginAt6(timeline),
+    loserChanceBefore6: chances.before6, loserChanceAfter6: chances.after6,
     ...(shooter !== undefined ? { buzzerBeater: shooter } : {}),
   };
 }

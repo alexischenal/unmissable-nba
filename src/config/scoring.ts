@@ -15,8 +15,15 @@ export type ScoringConfig = {
     maxMarginAt2: number;        // …only if within this margin with 2:00 left, or the loser got within 5 late
     maxMarginAfterQ3: number;    // margin at the end of the 3rd quarter (v1 only: without the play-by-play)
     maxMarginAt6: number;        // v2: a close game if still within this with 6:00 left in the fourth
-    minLoserBiggestLead: number; // biggest lead of the losing team (comeback)
+    minLoserBiggestLead: number; // v1 only: biggest lead of the losing team (comeback)
+    // v2, with the win probability model (winProbability below), for the losing team:
+    doubtChance: number;         // a close game if it had this chance (0–1) at some point of Q4 before 6:00
+    lateChance: number;          // …or this chance at some point after 6:00 (a late run)
+    // And a check on every door: never close if the loser never had, after 6:00, the chance of a team down
+    // maxMarginAt6 with 6:00 left, nor doubtChance before (garbage time making a final margin look close).
   };
+  // v2: the win probability model (src/lib/winProbability.ts), refitted each season with scripts/wp-study.ts
+  winProbability: { homeEdge: number; sigma: number };
   // Rating ranges
   disputedBase: number; // where a competitive game starts (uncapped, display capped at 100)
   // v1 only (no play-by-play): where a game starts when it's competitive only through the margin after Q3.
@@ -69,7 +76,8 @@ export type ScoringConfig = {
 
 // EXAMPLE VALUES — not the ones used on unmissable.watch.
 export const EXAMPLE_SCORING: ScoringConfig = {
-  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, maxMarginAt6: 11, minLoserBiggestLead: 10 },
+  disputed: { maxRegulationMargin: 12, maxMarginAt2: 11, maxMarginAfterQ3: 6, maxMarginAt6: 11, minLoserBiggestLead: 10, doubtChance: 0.35, lateChance: 0.12 },
+  winProbability: { homeEdge: 2.5, sigma: 19.5 },
   disputedBase: 50,
   q3OnlyBase: 42,
   blowoutMax: 49,

@@ -36,5 +36,8 @@ export type Game = {
     weightedSwings: number; // lead changes + ties, weighted by when they happened
     marginAt6?: number;     // margin with 6:00 left in the 4th quarter
     buzzerBeater?: number;  // the shooter (personId) of a buzzer beater that won the game or forced overtime
+    // The losing team's best chance to win (0–1, src/lib/winProbability.ts) in the fourth quarter:
+    loserChanceBefore6?: number; // from 12:00 to 6:00 (at 12:00, then after every score)
+    loserChanceAfter6?: number;  // from 6:00 to the end of regulation (at 6:00, then after every score)
   };
 };
