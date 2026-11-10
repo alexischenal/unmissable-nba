@@ -5,6 +5,10 @@
 // Usage:
 //   npm run season-stats -- 2025-26            → downloads what's missing, then the report
 //   npm run season-stats -- 2025-26 --offline  → only what's already downloaded
+//   npm run season-stats -- 2025-26 --period-stats → each player's line in each period, from the full
+//                                                play-by-play (once, 10–15 min), checked against the box
+//                                                score: .cache/periodstats/2025-26/ (what a player did
+//                                                before the fourth quarter, for the spicy rock studies)
 //   npm run season-stats -- 2025-26 --clutch   → also the play-by-play (once, 10–15 min), the
 //                                                comparison v1 (box score) vs v2 (with the play-by-play),
 //                                                the flame on the cards (how often, and why),
@@ -22,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { fetchBoxscore, fetchPlayByPlay, pause } from './nba/client.ts';
 import { computeClutch, lateFrom, swings, timelineMatches, toTimeline, type Clutch, type RawPlayByPlay, type Timeline } from './nba/clutch.ts';
 import { isFinal, toGame } from './nba/adapter.ts';
+import { mismatches, periodStats, type PeriodStats } from './nba/periodStats.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
@@ -194,6 +199,67 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
   }
 }
 
+// Each player's line per period (scripts/nba/periodStats.ts), for the games that have none yet. The first
+// game is checked against its box score before going on: a format the parser misreads stops everything.
+async function downloadPeriodStats(games: CachedGame[], dir: string, pbpDir: string): Promise<void> {
+  const missing = games.filter((g) => !existsSync(path.join(dir, `${g.id}.json`)));
+  if (missing.length === 0) return;
+  console.log(`Downloading ${missing.length} full play-by-play file(s) for the period stats, one every ~0.5 s…`);
+  let failures = 0, done = 0, checked = false;
+  for (const g of missing) {
+    try {
+      const raw = await fetchPlayByPlay(g.id);
+      const stats = periodStats(raw);
+      if (!checked) {
+        const off = g.players.map((p) => mismatches(stats, p)).filter((m) => m.length > 0);
+        if (off.length > g.players.length / 2) {
+          const actions = (raw as { game?: { actions?: unknown[] } })?.game?.actions ?? [];
+          console.error(`Period stats don't add up to the box score (${g.id}): ${off.slice(0, 3).map((m) => m.join(', ')).join(' | ')}`);
+          console.error('Some actions:', JSON.stringify(actions.slice(5, 9)).slice(0, 1500));
+          throw new Error('Stopped: paste this message to fix the format.');
+        }
+        checked = true;
+      }
+      await writeFile(path.join(dir, `${g.id}.json`), JSON.stringify(stats));
+      const tlFile = path.join(pbpDir, `${g.id}.json`);
+      if (!existsSync(tlFile)) await writeFile(tlFile, JSON.stringify(toTimeline(raw as RawPlayByPlay)));
+      failures = 0;
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('Stopped')) throw error;
+      failures++;
+      console.warn(`  ${g.id}: ${error instanceof Error ? error.message : error}`);
+      if (failures >= 15) {
+        console.warn('15 failures in a row: stopping. Run again later; what is downloaded is kept.');
+        return;
+      }
+    }
+    if (++done % 100 === 0) console.log(`  ${done} / ${missing.length}`);
+    await pause(400);
+  }
+}
+
+// The periods added up against the box score, stat by stat, over every player of every game
+function periodStatsCheck(games: CachedGame[], stats: Map<string, PeriodStats>): void {
+  title(`Period stats against the box score (${stats.size} games)`);
+  const keys = ['pts', 'reb', 'ast', 'stl', 'blk', 'fgm', 'fga', 'ftm', 'fta', 'tov'];
+  const off = new Map<string, number>(keys.map((k) => [k, 0]));
+  let lines = 0;
+  const examples: string[] = [];
+  for (const g of games) {
+    const s = stats.get(g.id);
+    if (!s) continue;
+    for (const p of g.players) {
+      if (p.pts + p.reb + p.ast + p.fga + p.fta + p.tov === 0) continue; // did not play
+      lines++;
+      const m = mismatches(s, p);
+      for (const x of m) off.set(x.split(' ')[0]!, off.get(x.split(' ')[0]!)! + 1);
+      if (m.length && examples.length < 15) examples.push(`    ${label(g).padEnd(22)} ${(p.name ?? '?').padEnd(24)} ${m.join(', ')}`);
+    }
+  }
+  console.log(`  ${lines} player lines · exact: ${keys.map((k) => `${k} ${(100 - (100 * off.get(k)!) / lines).toFixed(1)}%`).join(' · ')}`);
+  if (examples.length) console.log(`  examples (pbp/box score):\n${examples.join('\n')}`);
+}
+
 type Pbp = { clutch: Clutch; late: NonNullable<Game['late']>; count: number; complete: boolean };
 
 // v1 (box score only) vs v2 (with the play-by-play), both with the settings in use
@@ -307,7 +373,7 @@ async function main(): Promise<void> {
   }
   const args = process.argv.slice(2);
   const season = args.find((a) => /^\d{4}-\d{2}$/.test(a));
-  if (!season) throw new Error('Usage: npm run season-stats -- 2025-26 [--offline] [--clutch]');
+  if (!season) throw new Error('Usage: npm run season-stats -- 2025-26 [--offline] [--clutch] [--period-stats]');
   loadScoring();
 
   const dir = path.join(ROOT, '.cache', 'boxscores', season);
@@ -318,6 +384,20 @@ async function main(): Promise<void> {
   const games = await Promise.all(files.map(async (f) => JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame));
   if (games.length === 0) throw new Error(`No box score in ${dir}.`);
   report(games.sort((a, b) => a.id.localeCompare(b.id)));
+
+  if (args.includes('--period-stats')) {
+    const psDir = path.join(ROOT, '.cache', 'periodstats', season);
+    const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
+    await mkdir(psDir, { recursive: true });
+    await mkdir(pbpDir, { recursive: true });
+    if (!args.includes('--offline')) await downloadPeriodStats(games, psDir, pbpDir);
+    const stats = new Map<string, PeriodStats>();
+    for (const g of games) {
+      const file = path.join(psDir, `${g.id}.json`);
+      if (existsSync(file)) stats.set(g.id, JSON.parse(await readFile(file, 'utf8')) as PeriodStats);
+    }
+    periodStatsCheck(games, stats);
+  }
 
   if (args.includes('--clutch')) {
     const pbpDir = path.join(ROOT, '.cache', 'playbyplay', season);
