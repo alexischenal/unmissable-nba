@@ -45,8 +45,10 @@ function TipOff({ iso }: { iso: string }) {
   const parts = TIME_FORMAT.formatToParts(new Date(iso));
   const period = parts.find((p) => p.type === 'dayPeriod')?.value;
   const time = parts.filter((p) => p.type !== 'dayPeriod').map((p) => p.value).join('').trim();
+  // A long time ("20 h 00" in Quebec) keeps the smaller size: it must fit the box on phones
+  const long = time.length > 5;
   return (
-    <span className="card__note-value card__note-value--time">
+    <span className={`card__note-value card__note-value--time${long ? ' card__note-value--long' : ''}`}>
       {time}
       {period && <span className="card__note-period">{period}</span>}
     </span>
