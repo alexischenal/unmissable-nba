@@ -201,10 +201,15 @@ async function downloadPlayByPlay(ids: string[], dir: string): Promise<void> {
 
 // Each player's line per period (scripts/nba/periodStats.ts), for the games that have none yet. The first
 // game is checked against its box score before going on: a format the parser misreads stops everything.
+// Slow on purpose (one request every 3 to 4 s): fast runs got the visitor's address blocked by the NBA
+// (403, then League Pass refused as a VPN, November 10). The first refusal stops the run.
+const PERIOD_STATS_PAUSE = 3000;
+class Refused extends Error {}
 async function downloadPeriodStats(games: CachedGame[], dir: string, pbpDir: string): Promise<void> {
   const missing = games.filter((g) => !existsSync(path.join(dir, `${g.id}.json`)));
   if (missing.length === 0) return;
-  console.log(`Downloading ${missing.length} full play-by-play file(s) for the period stats, one every ~0.5 s…`);
+  const hours = (missing.length * (PERIOD_STATS_PAUSE + 700)) / 3600000;
+  console.log(`Downloading ${missing.length} full play-by-play file(s) for the period stats, one every 3 to 4 s (about ${hours.toFixed(1)} h)…`);
   let failures = 0, done = 0, checked = false;
   for (const g of missing) {
     try {
@@ -226,15 +231,18 @@ async function downloadPeriodStats(games: CachedGame[], dir: string, pbpDir: str
       failures = 0;
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('Stopped')) throw error;
+      if (error instanceof Error && /HTTP (403|429)/.test(error.message)) {
+        throw new Refused(`The NBA refused the request (${error.message.slice(0, 8)}): stopped at once, ${done} game(s) done. Wait a few hours (or another network) before running again; what is downloaded is kept.`);
+      }
       failures++;
       console.warn(`  ${g.id}: ${error instanceof Error ? error.message : error}`);
-      if (failures >= 15) {
-        console.warn('15 failures in a row: stopping. Run again later; what is downloaded is kept.');
+      if (failures >= 5) {
+        console.warn('5 failures in a row: stopping. Run again later; what is downloaded is kept.');
         return;
       }
     }
-    if (++done % 100 === 0) console.log(`  ${done} / ${missing.length}`);
-    await pause(400);
+    if (++done % 50 === 0) console.log(`  ${done} / ${missing.length} (${new Date().toTimeString().slice(0, 5)})`);
+    await pause(PERIOD_STATS_PAUSE + Math.round(Math.random() * 1000));
   }
 }
 
@@ -378,7 +386,8 @@ async function main(): Promise<void> {
 
   const dir = path.join(ROOT, '.cache', 'boxscores', season);
   await mkdir(dir, { recursive: true });
-  if (!args.includes('--offline')) await download(season, dir);
+  // --period-stats only adds to the box scores already there (no request for the missing ones)
+  if (!args.includes('--offline') && !args.includes('--period-stats')) await download(season, dir);
 
   const files = (await readdir(dir)).filter((f) => f.endsWith('.json'));
   const games = await Promise.all(files.map(async (f) => JSON.parse(await readFile(path.join(dir, f), 'utf8')) as CachedGame));
