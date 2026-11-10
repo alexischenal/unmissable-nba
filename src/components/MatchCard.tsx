@@ -41,12 +41,15 @@ function TeamSide({ side, abbr, team, colors }: TeamSideProps) {
 }
 
 // "3:00 PM" → "3:00" + "PM" on its own line, so it fits the note box. "21:00" stays as is.
+// No spaces inside the time: "20 h 00" (Quebec) → "20h00", tighter and nicer in the box.
 function TipOff({ iso }: { iso: string }) {
   const parts = TIME_FORMAT.formatToParts(new Date(iso));
   const period = parts.find((p) => p.type === 'dayPeriod')?.value;
-  const time = parts.filter((p) => p.type !== 'dayPeriod').map((p) => p.value).join('').trim();
+  const time = parts.filter((p) => p.type !== 'dayPeriod').map((p) => p.value).join('').replace(/\s/g, '');
+  // A time still longer than "21:30" keeps the smaller size: it must fit the box on phones
+  const long = time.length > 5;
   return (
-    <span className="card__note-value card__note-value--time">
+    <span className={`card__note-value card__note-value--time${long ? ' card__note-value--long' : ''}`}>
       {time}
       {period && <span className="card__note-period">{period}</span>}
     </span>

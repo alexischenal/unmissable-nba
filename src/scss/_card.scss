@@ -163,9 +163,17 @@
   }
 
   .card__note-value--time {
-    font-size: calc(var(--note-size) * 0.55);
+    font-size: calc(var(--note-size) * 0.6);
     text-align: center;
     top: 0;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: calc(var(--note-size) * 0.65);
+    }
+  }
+
+  .card__note-value--long {
+    font-size: calc(var(--note-size) * 0.55);
   }
 
   .card__note-period {
