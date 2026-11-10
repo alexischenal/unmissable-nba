@@ -12,7 +12,8 @@
 //      last six minutes, and the reverse check (competitive games today that stay under the bar).
 //   5. The net at 10% with three versions of the comeback door (kept, removed, kept if alive in Q4).
 //   6. The comeback door replaced by the doubt in the fourth (the loser's best chance before 6:00 ≥ X%).
-//   7. The spicy rocks lost and won with the doubt in the fourth at 33% and the 10% net.
+//   7. The spicy rocks lost and won with the doubt in the fourth at 33% and the 10% net, and the rocks a
+//      blowout would add without the close-game condition.
 //   8. The reverse check with that definition: close games where the loser never had a real chance, by door.
 // Local only, like the other studies (it prints games and how the rating behaves).
 //
@@ -361,17 +362,20 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   console.log('\n=== 7. The spicy rocks with the doubt in the fourth (33%) and the net (10%) ===');
   const otherDoors = (g: Row['g']) => closeFinalMargin(g) || closeByClutch(g)
     || (g.late !== undefined && (g.late.clutchSeconds > 0 || (g.late.marginAt6 !== undefined && g.late.marginAt6 <= SCORING.disputed.maxMarginAt6)));
-  const forced = (g: Row['g']): Row['g'] => ({ ...g, late: { ...(g.late ?? { clutchSeconds: 0, marginAt2: 99, weightedSwings: 0 }), clutchSeconds: Math.max(1, g.late?.clutchSeconds ?? 0) } });
+  const forced = (g: Row['g']): Row['g'] => ({ ...g, late: { ...(g.late ?? { clutchSeconds: 0, marginAt2: 99, weightedSwings: 0 }), clutchSeconds: Math.max(1, g.late?.clutchSeconds ?? 0), loserChanceAfter6: 1 } });
   const star = (p: PlayerLine) => `${p.name ?? '?'} ${p.pts} pts, eff ${efficiency(p)}`;
   const seasons = [...new Set(rows.map((r) => r.season))].sort();
   const lost: Row[] = [];
   const won: Row[] = [];
+  const blowoutRocks: Row[] = [];
   let today = 0;
   let after = 0;
   for (const r of rows) {
     const close = otherDoors(r.g) || netOf(r, mu, sigma).best >= 0.1 || bestBefore6(r, mu, sigma) >= 0.33;
     const rockToday = Boolean(whyOf(r.g)?.nuclear);
-    const rockAfter = close && Boolean(whyOf(forced(r.g))?.nuclear);
+    const rockAnyGame = Boolean(whyOf(forced(r.g))?.nuclear);
+    if (rockAnyGame && !isDisputed(r.g)) blowoutRocks.push(r);
+    const rockAfter = close && rockAnyGame;
     if (rockToday) today++;
     if (rockAfter) after++;
     if (rockToday && !rockAfter) lost.push(r);
@@ -388,6 +392,12 @@ function rocksWithDoubt(rows: Row[], mu: number, sigma: number): void {
   for (const r of lost) console.log(show(r));
   console.log(`\n  rocks won (${won.length}):`);
   for (const r of won) console.log(show(r));
+
+  // Without the close-game condition: the rocks a blowout would add (same gates, any game)
+  const inUse = rows.filter((r) => whyOf(r.g)?.nuclear).length;
+  console.log(`\n  without the "close game only" rule (the rating in use): +${blowoutRocks.length} rocks in blowouts (${(blowoutRocks.length / seasons.length).toFixed(1)} per season: ${(inUse / seasons.length).toFixed(1)} → ${((inUse + blowoutRocks.length) / seasons.length).toFixed(1)})`);
+  console.log(`  per season: ${seasons.map((s) => `${s} ${blowoutRocks.filter((r) => r.season === s).length}`).join(' · ')}`);
+  for (const r of [...blowoutRocks].sort((a, b) => b.note - a.note)) console.log(show(r));
 }
 
 // November 10: the reverse check with the new definition. Every door of a close game, and the games that
