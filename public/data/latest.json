@@ -3,6 +3,12 @@
   "date": "2026-11-10",
   "games": [
     {
+      "away": "LAC",
+      "home": "PHX",
+      "tipOff": "2026-11-11T02:00:00Z",
+      "note": 7
+    },
+    {
       "away": "BOS",
       "home": "PHI",
       "tipOff": "2026-11-11T01:00:00Z",
@@ -13,11 +19,6 @@
       "home": "NYK",
       "tipOff": "2026-11-11T00:30:00Z",
       "note": 3
-    },
-    {
-      "away": "LAC",
-      "home": "PHX",
-      "tipOff": "2026-11-11T02:00:00Z"
     },
     {
       "away": "MIA",
