@@ -3,15 +3,16 @@
   "date": "2026-11-10",
   "games": [
     {
+      "away": "BOS",
+      "home": "PHI",
+      "tipOff": "2026-11-11T01:00:00Z",
+      "note": 5
+    },
+    {
       "away": "MIL",
       "home": "NYK",
       "tipOff": "2026-11-11T00:30:00Z",
       "note": 3
-    },
-    {
-      "away": "BOS",
-      "home": "PHI",
-      "tipOff": "2026-11-11T01:00:00Z"
     },
     {
       "away": "LAC",
