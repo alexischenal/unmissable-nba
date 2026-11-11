@@ -9,6 +9,12 @@
       "note": 58
     },
     {
+      "away": "ORL",
+      "home": "SAC",
+      "tipOff": "2026-11-11T03:00:00Z",
+      "note": 56
+    },
+    {
       "away": "LAC",
       "home": "PHX",
       "tipOff": "2026-11-11T02:00:00Z",
@@ -25,11 +31,6 @@
       "home": "NYK",
       "tipOff": "2026-11-11T00:30:00Z",
       "note": 3
-    },
-    {
-      "away": "ORL",
-      "home": "SAC",
-      "tipOff": "2026-11-11T03:00:00Z"
     },
     {
       "away": "OKC",
