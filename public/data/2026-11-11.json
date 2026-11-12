@@ -18,6 +18,15 @@
       }
     },
     {
+      "away": "DEN",
+      "home": "MEM",
+      "tipOff": "2026-11-12T01:00:00Z",
+      "note": 71,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "CLE",
       "home": "NYK",
       "tipOff": "2026-11-12T00:00:00Z",
@@ -32,11 +41,6 @@
     {
       "away": "BKN",
       "home": "NOP",
-      "tipOff": "2026-11-12T01:00:00Z"
-    },
-    {
-      "away": "DEN",
-      "home": "MEM",
       "tipOff": "2026-11-12T01:00:00Z"
     },
     {
