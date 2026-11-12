@@ -39,15 +39,16 @@
       "note": 59
     },
     {
+      "away": "BKN",
+      "home": "NOP",
+      "tipOff": "2026-11-12T01:00:00Z",
+      "note": 8
+    },
+    {
       "away": "LAL",
       "home": "MIL",
       "tipOff": "2026-11-12T01:00:00Z",
       "note": 7
-    },
-    {
-      "away": "BKN",
-      "home": "NOP",
-      "tipOff": "2026-11-12T01:00:00Z"
     },
     {
       "away": "ORL",
