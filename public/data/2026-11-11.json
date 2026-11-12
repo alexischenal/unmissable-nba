@@ -9,6 +9,15 @@
       "note": 79
     },
     {
+      "away": "SAS",
+      "home": "CHI",
+      "tipOff": "2026-11-12T01:00:00Z",
+      "note": 78,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "CLE",
       "home": "NYK",
       "tipOff": "2026-11-12T00:00:00Z",
@@ -33,11 +42,6 @@
     {
       "away": "LAL",
       "home": "MIL",
-      "tipOff": "2026-11-12T01:00:00Z"
-    },
-    {
-      "away": "SAS",
-      "home": "CHI",
       "tipOff": "2026-11-12T01:00:00Z"
     },
     {
