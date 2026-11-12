@@ -45,6 +45,12 @@
       "note": 59
     },
     {
+      "away": "GSW",
+      "home": "HOU",
+      "tipOff": "2026-11-12T02:30:00Z",
+      "note": 53
+    },
+    {
       "away": "BKN",
       "home": "NOP",
       "tipOff": "2026-11-12T01:00:00Z",
@@ -55,11 +61,6 @@
       "home": "MIL",
       "tipOff": "2026-11-12T01:00:00Z",
       "note": 7
-    },
-    {
-      "away": "GSW",
-      "home": "HOU",
-      "tipOff": "2026-11-12T02:30:00Z"
     },
     {
       "away": "OKC",
