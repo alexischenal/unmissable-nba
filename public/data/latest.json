@@ -3,6 +3,12 @@
   "date": "2026-11-11",
   "games": [
     {
+      "away": "WAS",
+      "home": "IND",
+      "tipOff": "2026-11-12T00:00:00Z",
+      "note": 59
+    },
+    {
       "away": "BOS",
       "home": "TOR",
       "tipOff": "2026-11-12T00:00:00Z"
@@ -10,11 +16,6 @@
     {
       "away": "CLE",
       "home": "NYK",
-      "tipOff": "2026-11-12T00:00:00Z"
-    },
-    {
-      "away": "WAS",
-      "home": "IND",
       "tipOff": "2026-11-12T00:00:00Z"
     },
     {
