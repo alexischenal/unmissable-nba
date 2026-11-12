@@ -39,6 +39,12 @@
       "note": 66
     },
     {
+      "away": "OKC",
+      "home": "POR",
+      "tipOff": "2026-11-12T03:00:00Z",
+      "note": 66
+    },
+    {
       "away": "WAS",
       "home": "IND",
       "tipOff": "2026-11-12T00:00:00Z",
@@ -61,11 +67,6 @@
       "home": "MIL",
       "tipOff": "2026-11-12T01:00:00Z",
       "note": 7
-    },
-    {
-      "away": "OKC",
-      "home": "POR",
-      "tipOff": "2026-11-12T03:00:00Z"
     }
   ]
 }
