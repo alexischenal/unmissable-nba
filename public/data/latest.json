@@ -22,15 +22,16 @@
       }
     },
     {
+      "away": "CHA",
+      "home": "PHX",
+      "tipOff": "2026-11-13T02:00:00Z",
+      "note": 64
+    },
+    {
       "away": "DAL",
       "home": "MIN",
       "tipOff": "2026-11-13T01:00:00Z",
       "note": 6
-    },
-    {
-      "away": "CHA",
-      "home": "PHX",
-      "tipOff": "2026-11-13T02:00:00Z"
     }
   ]
 }
