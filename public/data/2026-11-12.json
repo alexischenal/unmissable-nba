@@ -3,6 +3,16 @@
   "date": "2026-11-12",
   "games": [
     {
+      "away": "DET",
+      "home": "WAS",
+      "tipOff": "2026-11-13T00:00:00Z",
+      "note": 100,
+      "why": {
+        "nuclear": 1,
+        "big": 2
+      }
+    },
+    {
       "away": "TOR",
       "home": "PHI",
       "tipOff": "2026-11-13T00:00:00Z",
@@ -10,11 +20,6 @@
       "why": {
         "big": 1
       }
-    },
-    {
-      "away": "DET",
-      "home": "WAS",
-      "tipOff": "2026-11-13T00:00:00Z"
     },
     {
       "away": "DAL",
