@@ -17,6 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { lateFrom, swings, type Timeline } from './nba/clutch.ts';
+import { firstThreeQuarters, type PeriodStats } from './nba/periodStats.ts';
 import { loadScoring } from './load-scoring.ts';
 import { SCORING } from '../src/config/scoring.ts';
 import {
@@ -469,13 +470,13 @@ function seasonSummary(rows: Row[]): void {
   const top = (xs: number[]) => { const t = [...xs].sort((a, b) => a - b); return t[Math.max(0, Math.ceil(t.length * 0.99) - 1)]!; };
   const history = new Map<number, { eff: number[]; pts: number[] }>();
   const w = SCORING.why;
-  console.log(`  ${'season'.padEnd(8)} ${'games'.padStart(5)}  ${'flame'.padStart(5)}   big  huge crazy  rock │ rocks by door: 60 pts  eff  quad  duel  buzzer  personal`);
+  console.log(`  ${'season'.padEnd(8)} ${'games'.padStart(5)}  ${'flame'.padStart(5)}   big  huge crazy  rock │ rocks by door: 60 pts  eff  quad  duel  buzzer  threes  3 QT  personal`);
   for (const season of seasons) {
     const rs = rows.filter((r) => r.season === season);
     // The bars of this season: every game before it
     const bars = new Map<number, { eff: number; pts: number }>();
     for (const [id, h] of history) if (h.eff.length >= 60) bars.set(id, { eff: top(h.eff), pts: top(h.pts) });
-    const c = { flame: 0, big: 0, huge: 0, crazy: 0, rock: 0, pts: 0, eff: 0, quad: 0, duel: 0, buzzer: 0, personal: 0 };
+    const c = { flame: 0, big: 0, huge: 0, crazy: 0, rock: 0, pts: 0, eff: 0, quad: 0, duel: 0, buzzer: 0, threes: 0, q3: 0, personal: 0 };
     for (const r of rs) {
       const why = whyOf(r.g);
       const competitive = r.note > SCORING.blowoutMax;
@@ -486,6 +487,11 @@ function seasonSummary(rows: Row[]): void {
       });
       if (why?.nuclear || personal) {
         c.rock++;
+        // The blowout door: any game, a winner's line over the first three quarters
+        if (r.g.players.some((p) => {
+          const q = p.id !== undefined ? r.g.late?.firstThree?.find((x) => x.id === p.id) : undefined;
+          return !!q && (q.pts >= w.blowoutPoints || q.eff >= w.blowoutEff);
+        })) c.q3++;
         if (competitive) {
           if (r.g.players.some((p) => p.pts >= w.nuclearPoints)) c.pts++;
           if (r.g.players.some((p) => efficiency(p) >= w.nuclearEff)) c.eff++;
@@ -493,6 +499,7 @@ function seasonSummary(rows: Row[]): void {
           if (mixedDuel(r.g)) c.duel++;
           const shooter = r.g.players.find((p) => p.id !== undefined && p.id === r.g.late?.buzzerBeater);
           if (shooter && (efficiency(shooter) >= w.bigNight || shooter.pts >= w.bigPoints)) c.buzzer++;
+          if (r.g.players.some((p) => (p.fg3m ?? 0) >= w.nuclearThrees)) c.threes++;
           if (personal) c.personal++;
         }
       } else if (why?.crazy) c.crazy++;
@@ -501,7 +508,7 @@ function seasonSummary(rows: Row[]): void {
       if (why || personal) c.flame++;
     }
     const pc = (n: number) => `${String(n).padStart(4)}`;
-    console.log(`  ${season.padEnd(8)} ${String(rs.length).padStart(5)}  ${pct(c.flame, rs.length).padStart(5)}  ${pc(c.big)}  ${pc(c.huge)}  ${pc(c.crazy)}  ${pc(c.rock)} │ ${' '.repeat(14)}${pc(c.pts)} ${pc(c.eff)}  ${pc(c.quad)}  ${pc(c.duel)}  ${pc(c.buzzer).padStart(6)}  ${floors ? pc(c.personal).padStart(8) : '       -'}`);
+    console.log(`  ${season.padEnd(8)} ${String(rs.length).padStart(5)}  ${pct(c.flame, rs.length).padStart(5)}  ${pc(c.big)}  ${pc(c.huge)}  ${pc(c.crazy)}  ${pc(c.rock)} │ ${' '.repeat(14)}${pc(c.pts)} ${pc(c.eff)}  ${pc(c.quad)}  ${pc(c.duel)}  ${pc(c.buzzer).padStart(6)}  ${pc(c.threes).padStart(6)}  ${pc(c.q3)}  ${floors ? pc(c.personal).padStart(8) : '       -'}`);
     // Then this season joins the history of the next ones
     for (const r of rs) for (const p of r.g.players) {
       if (p.id === undefined || !played(p)) continue;
@@ -510,7 +517,8 @@ function seasonSummary(rows: Row[]): void {
       history.set(p.id, h);
     }
   }
-  console.log('  (cards counted once, by their hottest level; "rock" includes the personal door; a rock can open several doors)');
+  console.log('  (cards counted once, by their hottest level; "rock" includes the personal door; a rock can open several doors;');
+  console.log('   "3 QT": the blowout door, counted only where the period stats are downloaded)');
 }
 
 // Threes (November 5): a door for the nights efficiency doesn't see, the shooter's kind (Curry's).
@@ -1120,6 +1128,7 @@ async function main(): Promise<void> {
 
   const rows: Row[] = [];
   let v2 = 0;
+  let withQ3 = 0;
   for (const season of seasons) {
     const dir = path.join(ROOT, '.cache', 'boxscores', season);
     const files = existsSync(dir) ? (await readdir(dir)).filter((f) => f.endsWith('.json')) : [];
@@ -1134,6 +1143,13 @@ async function main(): Promise<void> {
         tl = JSON.parse(await readFile(pbp, 'utf8')) as Timeline;
         g = { ...g0, late: lateFrom(tl, g0.periods.length) };
         v2++;
+        // The first three quarters (the blowout door), from the period stats when downloaded
+        const ps = path.join(ROOT, '.cache', 'periodstats', season, f);
+        if (existsSync(ps)) {
+          const stats = JSON.parse(await readFile(ps, 'utf8')) as PeriodStats;
+          g = { ...g, late: { ...g.late!, firstThree: firstThreeQuarters(stats, g) } };
+          withQ3++;
+        }
       }
       const effs = g.players.map(efficiency);
       rows.push({ g, season, note: displayScore(g), effs, best: Math.max(0, ...effs), maxPts: Math.max(0, ...g.players.map((p) => p.pts)), tl });
@@ -1142,7 +1158,7 @@ async function main(): Promise<void> {
   const nights = new Map<string, Row[]>();
   for (const r of rows) nights.set(r.g.date ?? '?', [...(nights.get(r.g.date ?? '?') ?? []), r]);
 
-  console.log(`Flame study, ${seasons.join(' + ')}: ${rows.length} games (${v2} rated with the play-by-play), focus on ${at}+`);
+  console.log(`Flame study, ${seasons.join(' + ')}: ${rows.length} games (${v2} rated with the play-by-play, ${withQ3} with the first three quarters), focus on ${at}+`);
   console.log(`The flame: efficiency at the threshold, or ${SCORING.why.bigPoints}+ points (setting why.bigPoints).`);
   distribution(rows);
   thresholdTable(rows, nights);
