@@ -81,20 +81,16 @@ export function Help() {
         aria-label="What is Unmissable?"
       >
         <p className="header__help-text">
-          <strong>Last night&rsquo;s NBA games, rated without spoilers.</strong> No scores, no names.
+          <strong>Last night&rsquo;s NBA games, rated without spoilers.</strong>
         </p>
         <p className="header__help-text">
           The higher the percentage, the more the game is worth your replay. Close games start at 50%.
         </p>
-        <p className="header__help-text">
+        <p className="header__help-text header__help-flame">
           <span className="header__help-badge" aria-hidden="true">
             <svg className="header__help-icon"><use href="/sprite.svg#flame" /></svg>
-          </span>{' '}
-          Somebody cooked.{' '}
-          <span className="header__help-badge header__help-badge--nuclear" aria-hidden="true">
-            <svg className="header__help-icon"><use href="/sprite.svg#nuclear" /></svg>
-          </span>{' '}
-          Rare. Watch it.
+          </span>
+          A flame means somebody cooked.
         </p>
         <a className="header__help-link" href={ABOUT_URL}>How it works</a>
       </div>

@@ -289,19 +289,21 @@ $burger-gap: $gap-ratio * 1em;
     margin: 0 0 10px;
   }
 
+  .header__help-flame {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
   .header__help-badge {
-    display: inline-flex;
+    display: flex;
+    flex: none;
     align-items: center;
     justify-content: center;
     width: 1.35em;
     height: 1.35em;
-    vertical-align: -0.3em;
     box-shadow: 0 0 5px 1px rgba(255, 140, 26, 0.6);
     @include fire-pastille;
-  }
-
-  .header__help-badge--nuclear {
-    @include nuclear-pastille;
   }
 
   .header__help-icon {
