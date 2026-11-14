@@ -86,7 +86,9 @@ export function Help() {
           Ratings drop minutes after the final buzzer.
         </p>
         <p className="header__help-text">
-          The higher the percentage, the more it&rsquo;s worth watching.
+          The higher the percentage,
+          <br />
+          the more unmissable the game.
         </p>
         <p className="header__help-text header__help-flame">
           <span className="header__help-badge" aria-hidden="true">
