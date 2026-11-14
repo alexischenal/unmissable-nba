@@ -72,7 +72,7 @@ export function Help() {
         aria-controls={popId}
         onClick={onClick}
       >
-        ?<span className="header__help-unit">%</span>
+        <span>?<span className="header__help-unit">%</span></span>
       </button>
       <div
         id={popId}

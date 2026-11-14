@@ -230,9 +230,9 @@ $burger-gap: $gap-ratio * 1em;
   }
 
   .header__help-unit {
-    align-self: flex-end;
-    margin: 0 0 0.62em 0.04em;
+    margin-left: 0.04em;
     font-size: 0.35em;
+    vertical-align: baseline;
   }
 
   .header__help-button:hover,
