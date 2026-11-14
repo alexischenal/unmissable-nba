@@ -7,6 +7,7 @@
 //   npm run flame-study -- 2025-26            → the study, focused on the current bigNight threshold
 //   npm run flame-study -- 2025-26 --at 40    → the same, focused on 40
 //   npm run flame-study -- 2025-26 --player "Stephen Curry"   → also that player's biggest scoring nights
+//   npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26 --rocks → only the spicy rock blocks
 //
 // The nights are grouped by the UTC date of the game (all the cache keeps): close to the real nights,
 // not exact (a 1 p.m. Sunday game and the Saturday night games share a date).
@@ -1208,7 +1209,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   // One season or several: npm run flame-study -- 2021-22 2022-23 2023-24 2024-25 2025-26
   const seasons = args.filter((a) => /^\d{4}-\d{2}$/.test(a));
-  if (seasons.length === 0) throw new Error('Usage: npm run flame-study -- 2025-26 [2024-25 …] [--at 40] [--player "Stephen Curry"]');
+  if (seasons.length === 0) throw new Error('Usage: npm run flame-study -- 2025-26 [2024-25 …] [--at 40] [--player "Stephen Curry"] [--rocks]');
   loadScoring();
   const atArg = args.indexOf('--at');
   const at = atArg >= 0 ? Number(args[atArg + 1]) : SCORING.why.bigNight;
@@ -1248,6 +1249,12 @@ async function main(): Promise<void> {
 
   console.log(`Flame study, ${seasons.join(' + ')}: ${rows.length} games (${v2} rated with the play-by-play, ${withQ3} with the first three quarters), focus on ${at}+`);
   console.log(`The flame: efficiency at the threshold, or ${SCORING.why.bigPoints}+ points (setting why.bigPoints).`);
+  // --rocks: only the spicy rock blocks (season summary, personal door floors), nothing to scroll
+  if (args.includes('--rocks')) {
+    seasonSummary(rows);
+    personalFloors(rows);
+    return;
+  }
   distribution(rows);
   thresholdTable(rows, nights);
   nightsReport(nights, at);
