@@ -81,7 +81,9 @@ export function Help() {
         aria-label="What is Unmissable?"
       >
         <p className="header__help-text">
-          <strong>Last night&rsquo;s NBA games, rated without spoilers.</strong>
+          <strong>Every NBA game, rated without spoilers.</strong>
+          <br />
+          Minutes after the final buzzer.
         </p>
         <p className="header__help-text">
           The higher the percentage, the more it&rsquo;s worth watching.
