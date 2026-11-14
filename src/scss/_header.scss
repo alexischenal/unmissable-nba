@@ -287,6 +287,7 @@ $burger-gap: $gap-ratio * 1em;
 
   .header__help-text {
     margin: 0 0 10px;
+    text-wrap: balance;
   }
 
   .header__help-flame {

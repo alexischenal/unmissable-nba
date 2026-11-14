@@ -84,7 +84,7 @@ export function Help() {
           <strong>Last night&rsquo;s NBA games, rated without spoilers.</strong>
         </p>
         <p className="header__help-text">
-          The higher the percentage, the more the game is worth your replay. Close games start at 50%.
+          The higher the percentage, the more it&rsquo;s worth watching.
         </p>
         <p className="header__help-text header__help-flame">
           <span className="header__help-badge" aria-hidden="true">
