@@ -21,6 +21,15 @@
       }
     },
     {
+      "away": "OKC",
+      "home": "LAC",
+      "tipOff": "2026-11-14T03:30:00Z",
+      "note": 76,
+      "why": {
+        "big": 2
+      }
+    },
+    {
       "away": "ATL",
       "home": "CHI",
       "tipOff": "2026-11-14T01:00:00Z",
@@ -61,11 +70,6 @@
       "home": "SAS",
       "tipOff": "2026-11-14T02:30:00Z",
       "note": 3
-    },
-    {
-      "away": "OKC",
-      "home": "LAC",
-      "tipOff": "2026-11-14T03:30:00Z"
     }
   ]
 }
