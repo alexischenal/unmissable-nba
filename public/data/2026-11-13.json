@@ -3,6 +3,15 @@
   "date": "2026-11-13",
   "games": [
     {
+      "away": "CLE",
+      "home": "MIA",
+      "tipOff": "2026-11-14T01:00:00Z",
+      "note": 80,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "NYK",
       "home": "IND",
       "tipOff": "2026-11-14T00:00:00Z",
@@ -18,18 +27,14 @@
       }
     },
     {
-      "away": "ATL",
-      "home": "CHI",
-      "tipOff": "2026-11-14T01:00:00Z"
-    },
-    {
-      "away": "CLE",
-      "home": "MIA",
-      "tipOff": "2026-11-14T01:00:00Z"
-    },
-    {
       "away": "MEM",
       "home": "NOP",
+      "tipOff": "2026-11-14T01:00:00Z",
+      "note": 8
+    },
+    {
+      "away": "ATL",
+      "home": "CHI",
       "tipOff": "2026-11-14T01:00:00Z"
     },
     {
