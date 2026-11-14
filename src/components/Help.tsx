@@ -90,11 +90,12 @@ export function Help() {
           <br />
           the more unmissable the game.
         </p>
-        <p className="header__help-text header__help-flame">
-          <span className="header__help-badge" aria-hidden="true">
-            <svg className="header__help-icon"><use href="/sprite.svg#flame" /></svg>
-          </span>
-          A flame means somebody cooked.
+        <p className="header__help-text">
+          A{' '}
+          <span className="header__help-badge" role="img" aria-label="flame">
+            <svg className="header__help-icon" aria-hidden="true"><use href="/sprite.svg#flame" /></svg>
+          </span>{' '}
+          means somebody cooked.
         </p>
         <a className="header__help-link" href={ABOUT_URL}>How it works</a>
       </div>
