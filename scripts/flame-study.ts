@@ -1125,11 +1125,13 @@ function personalFloors(rows: Row[]): void {
   const seasons = [...new Set(rows.map((r) => r.season))].sort();
   const quantile = (xs: number[], q: number) => { const t = [...xs].sort((a, b) => a - b); return t[Math.max(0, Math.ceil(t.length * q) - 1)]!; };
   type Bar = { eff: number; pts: number };
-  type Variant = { label: string; d: number; q: number };
+  // d: the floors in use raised by d; floors: absolute floors instead
+  type Variant = { label: string; d: number; q: number; floors?: { eff: number; pts: number } };
   const variants: Variant[] = [
     { label: 'floors in use, top 1%', d: 0, q: 0.99 },
     { label: '+3, top 1%', d: 3, q: 0.99 },
     { label: '+5, top 1%', d: 5, q: 0.99 },
+    { label: '55 / 55 (crazy), top 1%', d: 0, q: 0.99, floors: { eff: 55, pts: 55 } },
     { label: '+8, top 1%', d: 8, q: 0.99 },
     { label: '+10, top 1%', d: 10, q: 0.99 },
     { label: 'floors in use, top 0.5%', d: 0, q: 0.995 },
@@ -1158,7 +1160,8 @@ function personalFloors(rows: Row[]): void {
           if (!b) return false;
           const bar = v.q === 0.99 ? b.q1 : b.q05;
           const e = efficiency(p);
-          return (e >= base.eff + v.d && e >= bar.eff) || (p.pts >= base.pts + v.d && p.pts >= bar.pts);
+          const f = v.floors ?? { eff: base.eff + v.d, pts: base.pts + v.d };
+          return (e >= f.eff && e >= bar.eff) || (p.pts >= f.pts && p.pts >= bar.pts);
         });
         const c = counts[k]!.get(season) ?? { rocks: 0, personal: 0 };
         if (other || hit) c.rocks++;
