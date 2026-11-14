@@ -27,9 +27,9 @@ export function About() {
       <h1 className="article__title">Another percentage, on my NBA?</h1>
 
       <p className="article__text">
-        Where do these percentages come from? As soon as a game ends, Unmissable.watch politely asks the NBA
-        for every stat and every play (sometimes published with a delay). Then the math kicks in: win
-        probabilities, game flow, individual performances.
+        These percentages tell you how unmissable each game was. As soon as a game ends, Unmissable.watch
+        politely asks the NBA for every stat and every play (sometimes published with a delay). Then the math
+        kicks in: win probabilities, game flow, individual performances.
       </p>
 
       <h2 className="article__subtitle">Step one: blowout or close game?</h2>
