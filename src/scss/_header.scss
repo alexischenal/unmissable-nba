@@ -270,6 +270,17 @@ $burger-gap: $gap-ratio * 1em;
     }
   }
 
+  @media (hover: hover) {
+    .header__help-pop::before {
+      content: "";
+      position: absolute;
+      right: -2px;
+      bottom: calc(100% + 2px);
+      width: calc(100% + 4px);
+      height: calc(100cqh + 10px);
+    }
+  }
+
   .header__help-pop--open {
     opacity: 1;
     transform: none;
