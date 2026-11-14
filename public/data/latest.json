@@ -42,6 +42,15 @@
       }
     },
     {
+      "away": "POR",
+      "home": "SAC",
+      "tipOff": "2026-11-14T03:00:00Z",
+      "note": 11,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "MEM",
       "home": "NOP",
       "tipOff": "2026-11-14T01:00:00Z",
@@ -52,11 +61,6 @@
       "home": "SAS",
       "tipOff": "2026-11-14T02:30:00Z",
       "note": 3
-    },
-    {
-      "away": "POR",
-      "home": "SAC",
-      "tipOff": "2026-11-14T03:00:00Z"
     },
     {
       "away": "OKC",
