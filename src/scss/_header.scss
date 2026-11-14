@@ -198,17 +198,24 @@ $burger-gap: $gap-ratio * 1em;
 
   .header__help {
     position: absolute;
-    top: 50%;
+    top: 20px;
+    bottom: 20px;
     right: var(--stripe);
-    translate: 0 -50%;
+    aspect-ratio: 1;
+    container-type: size;
+
+    @media (max-width: $breakpoint-mobile) {
+      top: 16px;
+      bottom: 16px;
+    }
   }
 
   .header__help-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 100%;
+    height: 100%;
     padding: 0;
     border: 2px solid $white;
     border-radius: 4px;
@@ -216,22 +223,16 @@ $burger-gap: $gap-ratio * 1em;
     color: $white;
     font-family: $font-display;
     font-weight: 900;
-    font-size: 26px;
+    font-size: 60cqh;
     line-height: 1;
     cursor: pointer;
     transition: background-color 0.15s ease-out;
+  }
 
-    @media (max-width: $breakpoint-tablet) {
-      width: 40px;
-      height: 40px;
-      font-size: 24px;
-    }
-
-    @media (max-width: $breakpoint-mobile) {
-      width: 32px;
-      height: 32px;
-      font-size: 20px;
-    }
+  .header__help-unit {
+    align-self: flex-end;
+    margin: 0 0 0.62em 0.04em;
+    font-size: 0.35em;
   }
 
   .header__help-button:hover,
