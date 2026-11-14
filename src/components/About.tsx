@@ -27,8 +27,8 @@ export function About() {
       <h1 className="article__title">Another percentage, on my NBA?</h1>
 
       <p className="article__text">
-        These percentages tell you how unmissable each game was. As soon as a game ends, Unmissable.watch
-        politely asks the NBA for every stat and every play (sometimes published with a delay). Then the math
+        These percentages tell you how unmissable each game was. As soon as the final buzzer sounds,
+        Unmissable.watch politely asks the NBA for every stat and every play (sometimes published with a delay). Then the math
         kicks in: win probabilities, game flow, individual performances.
       </p>
 
