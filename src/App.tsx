@@ -10,6 +10,7 @@ import { About } from './components/About.tsx';
 import { EmptyNight } from './components/EmptyNight.tsx';
 import { Legal } from './components/Legal.tsx';
 import { MatchCard } from './components/MatchCard.tsx';
+import { Help } from './components/Help.tsx';
 import { Menu, type MenuItem } from './components/Menu.tsx';
 import { useNextNight, useNight } from './hooks/useNight.ts';
 import { emptyNightDate, isEmptyNow, staleAt } from './lib/empty.ts';
@@ -136,6 +137,8 @@ export function App() {
                 : SHOWCASE ? 'Showcase' : homeDate ? <NightName date={homeDate} /> : ' '}
             </p>
           )}
+          {/* The concept in a few lines, on the right (not on the text pages: they explain already) */}
+          {!SECTION && <Help />}
         </header>
 
         {PAGE === 'about' && <About />}
