@@ -145,6 +145,23 @@ and milestones (context, not play), fights and ejections.
    the 6:00 door (decided against: the promise). `scripts/close-rule-sim.ts` predates it: its check shows
    mismatches.
 
+0. **Next (week of November 16): promotion by e-mail.** Where Unmissable helps: NBA fans in the wrong time
+   zone, who watch last night's games the next day.
+   - **One short e-mail, the same for everyone** (a few lines: what it is, the link, no spoilers, free), to
+     NBA news sites and NBA streamers / video creators. Claude lists the sites, the user finds the contacts.
+     No country-by-country approach.
+   - **Europe**: games at night, watched the next morning (the site's first public).
+   - **Asia-Pacific** (added November 12): NBA games land in the morning or at lunch there (Manila,
+     Singapore, Sydney: during work or school), and the Philippines and China are among the NBA's biggest
+     audiences. The site is in English: **English-speaking markets first** (Philippines, Australia / New
+     Zealand, Singapore, Malaysia, India, Hong Kong). Japan, Korea, China, Indonesia, Thailand, Vietnam
+     would need a translated site: later.
+   - Later: r/nba, only in the Friday self-promotion thread, after a few weeks of activity on the account.
+     Bluesky (automated post when the night is complete) not built yet: the content and the account to decide.
+     X and LinkedIn: no.
+   - Measure what works: a source on each link (`?ref=mail-eu`, `?ref=mail-asia`…): GoatCounter, already on
+     the site, shows it as the referrer. Nothing more (no cookies, no tracker).
+
 0. **Done (November 10): the spicy rock for a player who made the blowout.** The rock needs a close game
    ("watch it"), but a player who crushes a game in three quarters makes the blowout himself: the show is
    him (Harden, 60 points in three quarters vs Atlanta, December 2019, the fourth on the bench). Now, in any
