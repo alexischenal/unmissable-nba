@@ -83,7 +83,7 @@ export function Help() {
         <p className="header__help-text">
           <strong>Every NBA game, rated without spoilers.</strong>
           <br />
-          Minutes after the final buzzer.
+          Ratings drop minutes after the final buzzer.
         </p>
         <p className="header__help-text">
           The higher the percentage, the more it&rsquo;s worth watching.
