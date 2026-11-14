@@ -137,8 +137,8 @@ export function App() {
                 : SHOWCASE ? 'Showcase' : homeDate ? <NightName date={homeDate} /> : ' '}
             </p>
           )}
-          {/* The concept in a few lines, on the right (not on the text pages: they explain already) */}
-          {!SECTION && <Help />}
+          {/* The concept in a few lines, on the right: only where the ratings are (not on the next night) */}
+          {PAGE === 'home' && <Help />}
         </header>
 
         {PAGE === 'about' && <About />}
