@@ -87,7 +87,7 @@ export function About() {
           width="800"
           height="460"
           loading="lazy"
-          alt="Every game of the 2025–26 season as a dot, stacked on its rating: 46% of the 1,230 games are under 50%, 54% at 50% or more, and 15 reach 100%."
+          alt="Every game of the 2025–26 season as a dot, stacked on its rating: 41% of the 1,230 games are under 50%, 59% at 50% or more, and 18 reach 100%."
         />
       </figure>
     </article>
