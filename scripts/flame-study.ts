@@ -1113,6 +1113,94 @@ function lateRun(rows: Row[]): void {
   }
 }
 
+// The personal door at stricter floors: how many spicy rocks per season, and which 2025-26 ones would stay.
+// Same simulation as the season summary (each player's top 1% or top 0.5% from the seasons before, 60 games
+// minimum, in a 50%+ game), the floors raised together by +0 to +10.
+function personalFloors(rows: Row[]): void {
+  title('The personal door at stricter floors');
+  const file = path.join(ROOT, 'player-peaks.secret.json');
+  if (!existsSync(file)) { console.log('  (no player-peaks.secret.json: nothing to simulate)'); return; }
+  const base = JSON.parse(readFileSync(file, 'utf8')) as { eff: number; pts: number };
+  const seasons = [...new Set(rows.map((r) => r.season))].sort();
+  const quantile = (xs: number[], q: number) => { const t = [...xs].sort((a, b) => a - b); return t[Math.max(0, Math.ceil(t.length * q) - 1)]!; };
+  type Bar = { eff: number; pts: number };
+  type Variant = { label: string; d: number; q: number };
+  const variants: Variant[] = [
+    { label: 'floors in use, top 1%', d: 0, q: 0.99 },
+    { label: '+3, top 1%', d: 3, q: 0.99 },
+    { label: '+5, top 1%', d: 5, q: 0.99 },
+    { label: '+8, top 1%', d: 8, q: 0.99 },
+    { label: '+10, top 1%', d: 10, q: 0.99 },
+    { label: 'floors in use, top 0.5%', d: 0, q: 0.995 },
+    { label: '+5, top 0.5%', d: 5, q: 0.995 },
+    { label: 'no personal door', d: 999, q: 0.99 },
+  ];
+  const history = new Map<number, { eff: number[]; pts: number[] }>();
+  const counts = variants.map(() => new Map<string, { rocks: number; personal: number }>());
+  const nights = new Map<string, number>();
+  type Case = { r: Row; p: PlayerLine; eff: number; bar: Bar; bar05: Bar; other: boolean };
+  const last = seasons[seasons.length - 1]!;
+  const cases: Case[] = [];
+  for (const season of seasons) {
+    const rs = rows.filter((r) => r.season === season);
+    nights.set(season, new Set(rs.map((r) => r.g.date)).size);
+    const bars = new Map<number, { q1: Bar; q05: Bar }>();
+    for (const [id, h] of history) if (h.eff.length >= 60) {
+      bars.set(id, { q1: { eff: quantile(h.eff, 0.99), pts: quantile(h.pts, 0.99) }, q05: { eff: quantile(h.eff, 0.995), pts: quantile(h.pts, 0.995) } });
+    }
+    for (const r of rs) {
+      const other = !!whyOf(r.g)?.nuclear;
+      const competitive = r.note > SCORING.blowoutMax;
+      variants.forEach((v, k) => {
+        const hit = competitive && r.g.players.some((p) => {
+          const b = p.id !== undefined ? bars.get(p.id) : undefined;
+          if (!b) return false;
+          const bar = v.q === 0.99 ? b.q1 : b.q05;
+          const e = efficiency(p);
+          return (e >= base.eff + v.d && e >= bar.eff) || (p.pts >= base.pts + v.d && p.pts >= bar.pts);
+        });
+        const c = counts[k]!.get(season) ?? { rocks: 0, personal: 0 };
+        if (other || hit) c.rocks++;
+        if (hit) c.personal++;
+        counts[k]!.set(season, c);
+      });
+      if (season === last && competitive) for (const p of r.g.players) {
+        const b = p.id !== undefined ? bars.get(p.id) : undefined;
+        const e = efficiency(p);
+        if (b && ((e >= base.eff && e >= b.q1.eff) || (p.pts >= base.pts && p.pts >= b.q1.pts))) {
+          cases.push({ r, p, eff: e, bar: b.q1, bar05: b.q05, other });
+        }
+      }
+    }
+    for (const r of rs) for (const p of r.g.players) {
+      if (p.id === undefined || !played(p)) continue;
+      const h = history.get(p.id) ?? { eff: [], pts: [] };
+      h.eff.push(efficiency(p)); h.pts.push(p.pts);
+      history.set(p.id, h);
+    }
+  }
+  // The seasons with a history behind them (the first one has none)
+  const shown = seasons.slice(1);
+  console.log(`  floors in use: eff ${base.eff}, pts ${base.pts}. Rocks per season (all doors), the personal door in brackets`);
+  console.log(`  ${'variant'.padEnd(26)} ${shown.map((s) => s.padStart(11)).join('')}   average   one every`);
+  variants.forEach((v, k) => {
+    const cells = shown.map((s) => { const c = counts[k]!.get(s)!; return `${c.rocks} (${c.personal})`.padStart(11); });
+    // The average over the full seasons where the personal door could open (enough history behind)
+    const full = shown.filter((s) => rows.filter((r) => r.season === s).length >= 1000 && counts[0]!.get(s)!.personal > 0);
+    const avg = full.reduce((a, s) => a + counts[k]!.get(s)!.rocks, 0) / Math.max(1, full.length);
+    const avgNights = full.reduce((a, s) => a + nights.get(s)!, 0) / Math.max(1, full.length);
+    console.log(`  ${v.label.padEnd(26)} ${cells.join('')}   ${avg.toFixed(1).padStart(7)}   ${(avgNights / Math.max(avg, 0.1)).toFixed(1).padStart(5)} nights`);
+  });
+  console.log(`\n  ${last}: the rocks through the personal door (floors in use, top 1%), and the strictest floors each one survives`);
+  for (const c of cases.sort((a, b) => b.eff - a.eff)) {
+    const keeps = (d: number, bar: Bar) => (c.eff >= base.eff + d && c.eff >= bar.eff) || (c.p.pts >= base.pts + d && c.p.pts >= bar.pts);
+    const upTo = [10, 8, 5, 3, 0].find((d) => keeps(d, c.bar)) ?? -1;
+    const half = keeps(0, c.bar05) ? 'yes' : 'no';
+    const line = `${c.p.pts} pts ${c.p.reb} reb ${c.p.ast} ast`;
+    console.log(`    ${(c.r.g.date ?? '').padEnd(10)} ${(c.p.name ?? '?').padEnd(24)} ${line.padEnd(20)} eff ${String(c.eff).padStart(2)}  his top 1% ${c.bar.eff}/${c.bar.pts}  · kept up to +${upTo}  · top 0.5%: ${half}${c.other ? '  (a rock anyway, other door)' : ''}`);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.env.GITHUB_ACTIONS === 'true') {
     throw new Error('flame-study prints player names and how the settings behave: never on GitHub Actions (public logs).');
@@ -1172,6 +1260,7 @@ async function main(): Promise<void> {
   buzzerBeaters(rows);
   personalPeaks(rows);
   seasonSummary(rows);
+  personalFloors(rows);
   threesNights(rows);
   peakWindows(rows);
   scoringByCloseness(rows);
