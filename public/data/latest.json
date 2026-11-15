@@ -20,12 +20,14 @@
     {
       "away": "BKN",
       "home": "MEM",
-      "tipOff": "2026-11-15T01:00:00Z"
+      "tipOff": "2026-11-15T01:00:00Z",
+      "note": 7
     },
     {
       "away": "CHI",
       "home": "MIN",
-      "tipOff": "2026-11-15T01:00:00Z"
+      "tipOff": "2026-11-15T01:00:00Z",
+      "note": 5
     },
     {
       "away": "DET",
