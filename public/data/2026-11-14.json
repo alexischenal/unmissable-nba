@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "date": "2026-11-14",
+  "games": [
+    {
+      "away": "DEN",
+      "home": "NOP",
+      "tipOff": "2026-11-15T00:00:00Z"
+    },
+    {
+      "away": "DAL",
+      "home": "CLE",
+      "tipOff": "2026-11-15T00:30:00Z"
+    },
+    {
+      "away": "BKN",
+      "home": "MEM",
+      "tipOff": "2026-11-15T01:00:00Z"
+    },
+    {
+      "away": "CHI",
+      "home": "MIN",
+      "tipOff": "2026-11-15T01:00:00Z"
+    },
+    {
+      "away": "DET",
+      "home": "MIA",
+      "tipOff": "2026-11-15T01:00:00Z"
+    }
+  ]
+}
