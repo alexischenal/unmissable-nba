@@ -12,6 +12,15 @@
       }
     },
     {
+      "away": "DET",
+      "home": "MIA",
+      "tipOff": "2026-11-15T01:00:00Z",
+      "note": 31,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "DAL",
       "home": "CLE",
       "tipOff": "2026-11-15T00:30:00Z",
@@ -28,11 +37,6 @@
       "home": "MIN",
       "tipOff": "2026-11-15T01:00:00Z",
       "note": 5
-    },
-    {
-      "away": "DET",
-      "home": "MIA",
-      "tipOff": "2026-11-15T01:00:00Z"
     }
   ]
 }
