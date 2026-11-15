@@ -11,7 +11,11 @@
     {
       "away": "LAL",
       "home": "PHX",
-      "tipOff": "2026-11-15T21:00:00Z"
+      "tipOff": "2026-11-15T21:00:00Z",
+      "note": 60,
+      "why": {
+        "big": 1
+      }
     },
     {
       "away": "CHA",
