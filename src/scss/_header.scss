@@ -9,8 +9,8 @@
   --box-gap: 12px;
   --box-top: 3px;
   --box: 43px;
-  --icon-w: 19px;
-  --icon-h: 21px;
+  --icon-w: 17px;
+  --icon-h: 17px;
   --bar: 3px;
 
   position: relative;
@@ -28,8 +28,8 @@
     --box-gap: 11px;
     --box-top: 2px;
     --box: 41px;
-    --icon-w: 17px;
-    --icon-h: 19px;
+    --icon-w: 15px;
+    --icon-h: 15px;
   }
 
   @media (max-width: $breakpoint-mobile) {
@@ -40,8 +40,8 @@
     --box-gap: 10px;
     --box-top: 1px;
     --box: 38px;
-    --icon-w: 16px;
-    --icon-h: 18px;
+    --icon-w: 14px;
+    --icon-h: 16px;
     --bar: 2px;
   }
 
@@ -49,8 +49,8 @@
     --brand: 22px;
     --box-gap: 9px;
     --box: 36px;
-    --icon-w: 16px;
-    --icon-h: 16px;
+    --icon-w: 14px;
+    --icon-h: 14px;
   }
 
   @media (max-width: 360px) {
@@ -58,8 +58,8 @@
     --sub: 11px;
     --box-top: 2px;
     --box: 32px;
-    --icon-w: 14px;
-    --icon-h: 14px;
+    --icon-w: 12px;
+    --icon-h: 12px;
   }
 
   .header__title {
