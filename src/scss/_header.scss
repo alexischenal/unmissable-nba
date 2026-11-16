@@ -6,10 +6,12 @@ $brand-size-tablet: 32px;
 $brand-size-mobile: min(24px, 6.2vw);
 $gap-ratio: 0.4;
 $burger-gap: $gap-ratio * 1em;
-$burger-top: 0.055em;
-$burger-box: calc(0.945em + 20px);
-$burger-box-tablet: calc(0.945em + 17px);
-$burger-box-mobile: calc(0.945em + 19px);
+$box-top: calc(#{$brand-size} * 0.055);
+$box-top-tablet: calc(#{$brand-size-tablet} * 0.055);
+$box-top-mobile: calc(#{$brand-size-mobile} * 0.055);
+$box: calc(#{$brand-size} * 0.945 + 20px);
+$box-tablet: calc(#{$brand-size-tablet} * 0.945 + 17px);
+$box-mobile: calc(#{$brand-size-mobile} * 0.945 + 19px);
 
 .header {
   position: relative;
@@ -67,9 +69,9 @@ $burger-box-mobile: calc(0.945em + 19px);
     align-items: center;
     justify-content: center;
     flex: none;
-    width: $burger-box;
-    height: $burger-box;
-    margin-top: $burger-top;
+    width: $box;
+    height: $box;
+    margin-top: $box-top;
     padding: 0;
     border: 2px solid $white;
     border-radius: 4px;
@@ -81,13 +83,15 @@ $burger-box-mobile: calc(0.945em + 19px);
     transition: background-color 0.15s ease-out;
 
     @media (max-width: $breakpoint-tablet) {
-      width: $burger-box-tablet;
-      height: $burger-box-tablet;
+      width: $box-tablet;
+      height: $box-tablet;
+      margin-top: $box-top-tablet;
     }
 
     @media (max-width: $breakpoint-mobile) {
-      width: $burger-box-mobile;
-      height: $burger-box-mobile;
+      width: $box-mobile;
+      height: $box-mobile;
+      margin-top: $box-top-mobile;
     }
   }
 
@@ -216,15 +220,22 @@ $burger-box-mobile: calc(0.945em + 19px);
 
   .header__help {
     position: absolute;
-    top: 22px;
-    bottom: 23px;
+    top: calc(20px + #{$box-top});
     right: var(--stripe);
-    aspect-ratio: 1;
+    width: $box;
+    height: $box;
     container-type: size;
 
+    @media (max-width: $breakpoint-tablet) {
+      top: calc(20px + #{$box-top-tablet});
+      width: $box-tablet;
+      height: $box-tablet;
+    }
+
     @media (max-width: $breakpoint-mobile) {
-      top: 17px;
-      bottom: 19px;
+      top: calc(16px + #{$box-top-mobile});
+      width: $box-mobile;
+      height: $box-mobile;
     }
   }
 
