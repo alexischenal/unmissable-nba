@@ -111,8 +111,12 @@ $burger-box-mobile: calc(0.945em + 19px);
 
   .header__burger-bar {
     display: block;
-    height: 9cqh;
+    height: 3px;
     background: currentColor;
+
+    @media (max-width: $breakpoint-mobile) {
+      height: 2px;
+    }
   }
 
   .header__menu {
