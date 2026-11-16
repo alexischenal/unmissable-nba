@@ -123,20 +123,19 @@ export function App() {
         <header className="header">
           <div className="header__title">
             <Menu items={menuItems} />
-            <Brand className="header__brand">
-              <a className="header__home" href={HOME_URL}>Unmissable</a>
-              {/* The text pages say where you are next to the brand, not under it */}
-              {SECTION && <span className="header__section">{SECTION}</span>}
-            </Brand>
+            <div className="header__names">
+              <Brand className="header__brand">
+                <a className="header__home" href={HOME_URL}>Unmissable</a>
+              </Brand>
+              {/* Where you are, in plain text, under the brand on every page. The other pages are in the menu. */}
+              <p className="header__night header__current">
+                {SECTION
+                  ?? (PAGE === 'next'
+                    ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
+                    : SHOWCASE ? 'Showcase' : homeDate ? <NightName date={homeDate} /> : ' ')}
+              </p>
+            </div>
           </div>
-          {/* Where you are, in plain text. The other pages are in the menu. */}
-          {!SECTION && (
-            <p className="header__night header__current">
-              {PAGE === 'next'
-                ? (nextNight ? <NextNightName date={nextNight.date} /> : 'Next night')
-                : SHOWCASE ? 'Showcase' : homeDate ? <NightName date={homeDate} /> : ' '}
-            </p>
-          )}
           {/* The concept in a few lines, on the right: only where the ratings are (not on the next night) */}
           {PAGE === 'home' && <Help />}
         </header>

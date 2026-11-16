@@ -44,21 +44,10 @@ export function Menu({ items }: { items: MenuItem[] }) {
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
       >
-        {/* Three bars, as tall as the brand's capital letters (see _header.scss).
-            Whole numbers on purpose: drawn at 31px (desktop), each bar falls on exactly 3 rows of
-            pixels. With 3.2-tall bars, the middle one straddled 4 rows and looked thicker. */}
-        <svg className="header__burger-icon" viewBox="0 0 25 31" aria-hidden="true">
-          <rect x="0" y="0" width="25" height="3" fill="currentColor" />
-          <rect x="0" y="14" width="25" height="3" fill="currentColor" />
-          <rect x="0" y="28" width="25" height="3" fill="currentColor" />
-        </svg>
-        {/* Tablets (brand at 32px): the drawing above would land between pixels and the middle bar
-            would look thicker. Its own drawing, in whole pixels: 26px tall, 2px bars, 10px gaps. */}
-        <svg className="header__burger-icon-tablet" viewBox="0 0 21 26" aria-hidden="true">
-          <rect x="0" y="0" width="21" height="2" fill="currentColor" />
-          <rect x="0" y="12" width="21" height="2" fill="currentColor" />
-          <rect x="0" y="24" width="21" height="2" fill="currentColor" />
-        </svg>
+        {/* Three bars from the top of the brand to the bottom of the line under it (see _header.scss) */}
+        <span className="header__burger-bar" aria-hidden="true" />
+        <span className="header__burger-bar" aria-hidden="true" />
+        <span className="header__burger-bar" aria-hidden="true" />
       </button>
 
       {/* Closed: hidden from view, from the keyboard and from screen readers (visibility in the CSS) */}
