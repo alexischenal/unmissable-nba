@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -15,7 +15,11 @@ function otherPages(): Plugin {
       const dist = (p: string) => fileURLToPath(new URL(`./dist/${p}`, import.meta.url));
       for (const page of PAGES) {
         mkdirSync(dist(page), { recursive: true });
-        copyFileSync(dist('index.html'), dist(`${page}/index.html`));
+        // Each copy says its own address to search engines (canonical and link previews)
+        const html = readFileSync(dist('index.html'), 'utf8')
+          .replace('<link rel="canonical" href="https://unmissable.watch/" />', `<link rel="canonical" href="https://unmissable.watch/${page}/" />`)
+          .replace('<meta property="og:url" content="https://unmissable.watch/" />', `<meta property="og:url" content="https://unmissable.watch/${page}/" />`);
+        writeFileSync(dist(`${page}/index.html`), html);
       }
     },
   };
