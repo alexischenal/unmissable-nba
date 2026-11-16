@@ -9,6 +9,12 @@
       "note": 75
     },
     {
+      "away": "ATL",
+      "home": "MIL",
+      "tipOff": "2026-11-16T01:00:00Z",
+      "note": 74
+    },
+    {
       "away": "SAS",
       "home": "UTA",
       "tipOff": "2026-11-15T22:00:00Z",
@@ -46,11 +52,6 @@
       "home": "BOS",
       "tipOff": "2026-11-15T23:00:00Z",
       "note": 3
-    },
-    {
-      "away": "ATL",
-      "home": "MIL",
-      "tipOff": "2026-11-16T01:00:00Z"
     },
     {
       "away": "OKC",
