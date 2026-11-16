@@ -44,10 +44,12 @@ export function Menu({ items }: { items: MenuItem[] }) {
         aria-controls={menuId}
         onClick={() => setOpen((o) => !o)}
       >
-        {/* Three bars from the top of the brand to the bottom of the line under it (see _header.scss) */}
-        <span className="header__burger-bar" aria-hidden="true" />
-        <span className="header__burger-bar" aria-hidden="true" />
-        <span className="header__burger-bar" aria-hidden="true" />
+        {/* A box like the "?%" on the right; the three bars take the size of the "?%" in it (see _header.scss) */}
+        <span className="header__burger-icon" aria-hidden="true">
+          <span className="header__burger-bar" />
+          <span className="header__burger-bar" />
+          <span className="header__burger-bar" />
+        </span>
       </button>
 
       {/* Closed: hidden from view, from the keyboard and from screen readers (visibility in the CSS) */}

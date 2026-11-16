@@ -4,12 +4,12 @@
 $brand-size: 36px;
 $brand-size-tablet: 32px;
 $brand-size-mobile: min(24px, 6.2vw);
-$burger-width-ratio: 0.625;
 $gap-ratio: 0.4;
-$burger-width: $burger-width-ratio * 1em;
 $burger-gap: $gap-ratio * 1em;
 $burger-top: 0.055em;
-$burger-bottom: 3px;
+$burger-box: calc(0.945em + 20px);
+$burger-box-tablet: calc(0.945em + 17px);
+$burger-box-mobile: calc(0.945em + 19px);
 
 .header {
   position: relative;
@@ -27,7 +27,7 @@ $burger-bottom: 3px;
 
   .header__title {
     display: flex;
-    align-items: stretch;
+    align-items: flex-start;
     gap: $burger-gap;
     font-size: $brand-size;
 
@@ -51,10 +51,6 @@ $burger-bottom: 3px;
     }
   }
 
-  .header__menu-root {
-    display: flex;
-  }
-
   .header__brand {
     margin: 0;
     font-size: inherit;
@@ -68,34 +64,55 @@ $burger-bottom: 3px;
 
   .header__burger {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: $burger-width;
-    font: inherit;
-    margin: $burger-top 0 $burger-bottom;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: $burger-box;
+    height: $burger-box;
+    margin-top: $burger-top;
     padding: 0;
-    border: 0;
-    background: none;
+    border: 2px solid $white;
+    border-radius: 4px;
+    background: $ink;
     color: $white;
+    font: inherit;
     cursor: pointer;
+    container-type: size;
+    transition: background-color 0.15s ease-out;
 
     @media (max-width: $breakpoint-tablet) {
-      width: 21px;
+      width: $burger-box-tablet;
+      height: $burger-box-tablet;
     }
 
     @media (max-width: $breakpoint-mobile) {
-      width: $burger-width;
+      width: $burger-box-mobile;
+      height: $burger-box-mobile;
     }
+  }
+
+  .header__burger:hover,
+  .header__burger[aria-expanded="true"] {
+    background: #2a2a2a;
+  }
+
+  .header__burger:focus-visible {
+    outline: 2px solid $white;
+    outline-offset: 3px;
+  }
+
+  .header__burger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 42cqw;
+    height: 48cqh;
   }
 
   .header__burger-bar {
     display: block;
-    height: 3px;
+    height: 9cqh;
     background: currentColor;
-
-    @media (max-width: $breakpoint-tablet) {
-      height: 2px;
-    }
   }
 
   .header__menu {
@@ -131,15 +148,15 @@ $burger-bottom: 3px;
     align-items: flex-start;
     gap: 18px;
     margin: 0;
-    padding: 0 0 0 calc(#{$brand-size} * #{$burger-width-ratio + $gap-ratio});
+    padding: 0 0 0 calc(#{$brand-size} * #{0.945 + $gap-ratio} + 20px);
     list-style: none;
 
     @media (max-width: $breakpoint-tablet) {
-      padding-left: calc(21px + #{$brand-size-tablet} * #{$gap-ratio});
+      padding-left: calc(#{$brand-size-tablet} * #{0.945 + $gap-ratio} + 17px);
     }
 
     @media (max-width: $breakpoint-mobile) {
-      padding-left: calc(#{$brand-size-mobile} * #{$burger-width-ratio + $gap-ratio});
+      padding-left: calc(#{$brand-size-mobile} * #{0.945 + $gap-ratio} + 19px);
     }
   }
 
