@@ -36,15 +36,16 @@
       }
     },
     {
+      "away": "HOU",
+      "home": "WAS",
+      "tipOff": "2026-11-16T00:00:00Z",
+      "note": 12
+    },
+    {
       "away": "DAL",
       "home": "BOS",
       "tipOff": "2026-11-15T23:00:00Z",
       "note": 3
-    },
-    {
-      "away": "HOU",
-      "home": "WAS",
-      "tipOff": "2026-11-16T00:00:00Z"
     },
     {
       "away": "ATL",
