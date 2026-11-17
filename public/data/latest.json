@@ -3,13 +3,14 @@
   "date": "2026-11-16",
   "games": [
     {
-      "away": "CHI",
-      "home": "CLE",
-      "tipOff": "2026-11-17T00:00:00Z"
-    },
-    {
       "away": "MEM",
       "home": "WAS",
+      "tipOff": "2026-11-17T00:00:00Z",
+      "note": 17
+    },
+    {
+      "away": "CHI",
+      "home": "CLE",
       "tipOff": "2026-11-17T00:00:00Z"
     },
     {
