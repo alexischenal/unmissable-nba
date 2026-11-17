@@ -30,6 +30,12 @@
       }
     },
     {
+      "away": "PHX",
+      "home": "DEN",
+      "tipOff": "2026-11-17T02:00:00Z",
+      "note": 11
+    },
+    {
       "away": "POR",
       "home": "MIN",
       "tipOff": "2026-11-17T01:00:00Z",
@@ -46,11 +52,6 @@
       "home": "NOP",
       "tipOff": "2026-11-17T01:00:00Z",
       "note": 1
-    },
-    {
-      "away": "PHX",
-      "home": "DEN",
-      "tipOff": "2026-11-17T02:00:00Z"
     }
   ]
 }
