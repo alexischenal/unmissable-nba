@@ -26,7 +26,8 @@
     {
       "away": "HOU",
       "home": "MIA",
-      "tipOff": "2026-11-17T00:30:00Z"
+      "tipOff": "2026-11-17T00:30:00Z",
+      "note": 6
     },
     {
       "away": "PHI",
