@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "date": "2026-11-17",
+  "games": [
+    {
+      "away": "NYK",
+      "home": "TOR",
+      "tipOff": "2026-11-18T00:30:00Z"
+    },
+    {
+      "away": "DET",
+      "home": "SAS",
+      "tipOff": "2026-11-18T01:00:00Z"
+    },
+    {
+      "away": "POR",
+      "home": "MIN",
+      "tipOff": "2026-11-18T01:00:00Z"
+    },
+    {
+      "away": "UTA",
+      "home": "LAC",
+      "tipOff": "2026-11-18T03:30:00Z"
+    },
+    {
+      "away": "CHA",
+      "home": "LAL",
+      "tipOff": "2026-11-18T04:00:00Z"
+    }
+  ]
+}
