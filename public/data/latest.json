@@ -18,6 +18,12 @@
       "note": 78
     },
     {
+      "away": "CHI",
+      "home": "BKN",
+      "tipOff": "2026-11-19T00:30:00Z",
+      "note": 7
+    },
+    {
       "away": "HOU",
       "home": "IND",
       "tipOff": "2026-11-19T00:00:00Z",
@@ -27,11 +33,6 @@
       "away": "MIL",
       "home": "MIA",
       "tipOff": "2026-11-19T00:00:00Z"
-    },
-    {
-      "away": "CHI",
-      "home": "BKN",
-      "tipOff": "2026-11-19T00:30:00Z"
     },
     {
       "away": "WAS",
