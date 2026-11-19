@@ -18,6 +18,12 @@
       "note": 78
     },
     {
+      "away": "ATL",
+      "home": "OKC",
+      "tipOff": "2026-11-19T01:00:00Z",
+      "note": 61
+    },
+    {
       "away": "WAS",
       "home": "TOR",
       "tipOff": "2026-11-19T00:30:00Z",
@@ -43,11 +49,6 @@
       "home": "IND",
       "tipOff": "2026-11-19T00:00:00Z",
       "note": 5
-    },
-    {
-      "away": "ATL",
-      "home": "OKC",
-      "tipOff": "2026-11-19T01:00:00Z"
     },
     {
       "away": "DET",
