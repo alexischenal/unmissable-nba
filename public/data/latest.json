@@ -39,6 +39,15 @@
       }
     },
     {
+      "away": "GSW",
+      "home": "DAL",
+      "tipOff": "2026-11-19T01:00:00Z",
+      "note": 8,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "CHI",
       "home": "BKN",
       "tipOff": "2026-11-19T00:30:00Z",
@@ -53,11 +62,6 @@
     {
       "away": "DET",
       "home": "NOP",
-      "tipOff": "2026-11-19T01:00:00Z"
-    },
-    {
-      "away": "GSW",
-      "home": "DAL",
       "tipOff": "2026-11-19T01:00:00Z"
     },
     {
