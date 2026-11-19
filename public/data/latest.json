@@ -51,6 +51,12 @@
       "note": 9
     },
     {
+      "away": "PHX",
+      "home": "SAC",
+      "tipOff": "2026-11-19T03:00:00Z",
+      "note": 9
+    },
+    {
       "away": "GSW",
       "home": "DAL",
       "tipOff": "2026-11-19T01:00:00Z",
@@ -70,11 +76,6 @@
       "home": "IND",
       "tipOff": "2026-11-19T00:00:00Z",
       "note": 5
-    },
-    {
-      "away": "PHX",
-      "home": "SAC",
-      "tipOff": "2026-11-19T03:00:00Z"
     },
     {
       "away": "UTA",
