@@ -3,24 +3,29 @@
   "date": "2026-11-18",
   "games": [
     {
+      "away": "PHI",
+      "home": "ORL",
+      "tipOff": "2026-11-19T00:00:00Z",
+      "note": 80,
+      "why": {
+        "big": 1
+      }
+    },
+    {
+      "away": "MEM",
+      "home": "CLE",
+      "tipOff": "2026-11-19T00:00:00Z",
+      "note": 78
+    },
+    {
       "away": "HOU",
       "home": "IND",
       "tipOff": "2026-11-19T00:00:00Z",
       "note": 5
     },
     {
-      "away": "MEM",
-      "home": "CLE",
-      "tipOff": "2026-11-19T00:00:00Z"
-    },
-    {
       "away": "MIL",
       "home": "MIA",
-      "tipOff": "2026-11-19T00:00:00Z"
-    },
-    {
-      "away": "PHI",
-      "home": "ORL",
       "tipOff": "2026-11-19T00:00:00Z"
     },
     {
