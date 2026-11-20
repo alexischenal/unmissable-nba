@@ -3,25 +3,28 @@
   "date": "2026-11-19",
   "games": [
     {
+      "away": "POR",
+      "home": "MIL",
+      "tipOff": "2026-11-20T01:00:00Z",
+      "note": 72
+    },
+    {
       "away": "NYK",
       "home": "MIN",
       "tipOff": "2026-11-20T01:00:00Z",
       "note": 62
     },
     {
-      "away": "GSW",
-      "home": "MEM",
-      "tipOff": "2026-11-20T01:00:00Z"
-    },
-    {
       "away": "LAC",
       "home": "SAS",
-      "tipOff": "2026-11-20T01:00:00Z"
+      "tipOff": "2026-11-20T01:00:00Z",
+      "note": 61
     },
     {
-      "away": "POR",
-      "home": "MIL",
-      "tipOff": "2026-11-20T01:00:00Z"
+      "away": "GSW",
+      "home": "MEM",
+      "tipOff": "2026-11-20T01:00:00Z",
+      "note": 2
     }
   ]
 }
