@@ -27,6 +27,12 @@
       "note": 74
     },
     {
+      "away": "WAS",
+      "home": "CHI",
+      "tipOff": "2026-11-21T01:00:00Z",
+      "note": 72
+    },
+    {
       "away": "TOR",
       "home": "DET",
       "tipOff": "2026-11-21T00:30:00Z",
@@ -37,11 +43,6 @@
       "home": "ATL",
       "tipOff": "2026-11-21T00:00:00Z",
       "note": 10
-    },
-    {
-      "away": "WAS",
-      "home": "CHI",
-      "tipOff": "2026-11-21T01:00:00Z"
     },
     {
       "away": "PHX",
