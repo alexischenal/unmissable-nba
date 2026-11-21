@@ -5,7 +5,12 @@
     {
       "away": "MIL",
       "home": "PHI",
-      "tipOff": "2026-11-21T18:00:00Z"
+      "tipOff": "2026-11-21T18:00:00Z",
+      "note": 100,
+      "why": {
+        "nuclear": 1,
+        "big": 1
+      }
     },
     {
       "away": "POR",
