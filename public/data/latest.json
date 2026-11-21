@@ -33,6 +33,12 @@
       "note": 72
     },
     {
+      "away": "SAC",
+      "home": "LAL",
+      "tipOff": "2026-11-21T03:00:00Z",
+      "note": 72
+    },
+    {
       "away": "TOR",
       "home": "DET",
       "tipOff": "2026-11-21T00:30:00Z",
@@ -53,11 +59,6 @@
     {
       "away": "HOU",
       "home": "DEN",
-      "tipOff": "2026-11-21T03:00:00Z"
-    },
-    {
-      "away": "SAC",
-      "home": "LAL",
       "tipOff": "2026-11-21T03:00:00Z"
     }
   ]
