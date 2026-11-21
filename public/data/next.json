@@ -1,51 +1,36 @@
 {
   "version": 2,
-  "date": "2026-11-20",
+  "date": "2026-11-21",
   "games": [
     {
-      "away": "CHA",
-      "home": "ATL",
-      "tipOff": "2026-11-21T00:00:00Z"
+      "away": "MIL",
+      "home": "PHI",
+      "tipOff": "2026-11-21T18:00:00Z"
     },
     {
-      "away": "IND",
-      "home": "CLE",
-      "tipOff": "2026-11-21T00:30:00Z"
+      "away": "POR",
+      "home": "NYK",
+      "tipOff": "2026-11-22T00:30:00Z"
     },
     {
-      "away": "ORL",
-      "home": "BKN",
-      "tipOff": "2026-11-21T00:30:00Z"
+      "away": "LAC",
+      "home": "DAL",
+      "tipOff": "2026-11-22T01:00:00Z"
     },
     {
-      "away": "TOR",
-      "home": "DET",
-      "tipOff": "2026-11-21T00:30:00Z"
+      "away": "MEM",
+      "home": "MIN",
+      "tipOff": "2026-11-22T01:00:00Z"
     },
     {
       "away": "NOP",
-      "home": "OKC",
-      "tipOff": "2026-11-21T01:00:00Z"
+      "home": "SAS",
+      "tipOff": "2026-11-22T01:00:00Z"
     },
     {
-      "away": "WAS",
-      "home": "CHI",
-      "tipOff": "2026-11-21T01:00:00Z"
-    },
-    {
-      "away": "PHX",
-      "home": "UTA",
-      "tipOff": "2026-11-21T02:30:00Z"
-    },
-    {
-      "away": "HOU",
-      "home": "DEN",
-      "tipOff": "2026-11-21T03:00:00Z"
-    },
-    {
-      "away": "SAC",
-      "home": "LAL",
-      "tipOff": "2026-11-21T03:00:00Z"
+      "away": "BOS",
+      "home": "SAC",
+      "tipOff": "2026-11-22T03:00:00Z"
     }
   ]
 }
