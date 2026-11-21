@@ -3,15 +3,19 @@
   "date": "2026-11-20",
   "games": [
     {
+      "away": "IND",
+      "home": "CLE",
+      "tipOff": "2026-11-21T00:30:00Z",
+      "note": 86,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "CHA",
       "home": "ATL",
       "tipOff": "2026-11-21T00:00:00Z",
       "note": 10
-    },
-    {
-      "away": "IND",
-      "home": "CLE",
-      "tipOff": "2026-11-21T00:30:00Z"
     },
     {
       "away": "ORL",
