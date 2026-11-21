@@ -12,20 +12,22 @@
       }
     },
     {
-      "away": "CHA",
-      "home": "ATL",
-      "tipOff": "2026-11-21T00:00:00Z",
-      "note": 10
-    },
-    {
       "away": "ORL",
       "home": "BKN",
-      "tipOff": "2026-11-21T00:30:00Z"
+      "tipOff": "2026-11-21T00:30:00Z",
+      "note": 74
     },
     {
       "away": "TOR",
       "home": "DET",
-      "tipOff": "2026-11-21T00:30:00Z"
+      "tipOff": "2026-11-21T00:30:00Z",
+      "note": 67
+    },
+    {
+      "away": "CHA",
+      "home": "ATL",
+      "tipOff": "2026-11-21T00:00:00Z",
+      "note": 10
     },
     {
       "away": "NOP",
