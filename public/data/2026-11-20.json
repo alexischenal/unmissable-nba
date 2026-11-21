@@ -21,6 +21,15 @@
       }
     },
     {
+      "away": "HOU",
+      "home": "DEN",
+      "tipOff": "2026-11-21T03:00:00Z",
+      "note": 77,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "ORL",
       "home": "BKN",
       "tipOff": "2026-11-21T00:30:00Z",
@@ -55,11 +64,6 @@
       "home": "ATL",
       "tipOff": "2026-11-21T00:00:00Z",
       "note": 10
-    },
-    {
-      "away": "HOU",
-      "home": "DEN",
-      "tipOff": "2026-11-21T03:00:00Z"
     }
   ]
 }
