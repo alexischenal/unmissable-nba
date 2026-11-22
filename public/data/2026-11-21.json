@@ -15,7 +15,11 @@
     {
       "away": "POR",
       "home": "NYK",
-      "tipOff": "2026-11-22T00:30:00Z"
+      "tipOff": "2026-11-22T00:30:00Z",
+      "note": 61,
+      "why": {
+        "big": 1
+      }
     },
     {
       "away": "LAC",
