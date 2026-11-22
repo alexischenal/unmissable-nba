@@ -13,6 +13,12 @@
       }
     },
     {
+      "away": "BOS",
+      "home": "SAC",
+      "tipOff": "2026-11-22T03:00:00Z",
+      "note": 75
+    },
+    {
       "away": "POR",
       "home": "NYK",
       "tipOff": "2026-11-22T00:30:00Z",
@@ -41,11 +47,6 @@
       "why": {
         "nuclear": 1
       }
-    },
-    {
-      "away": "BOS",
-      "home": "SAC",
-      "tipOff": "2026-11-22T03:00:00Z"
     }
   ]
 }
