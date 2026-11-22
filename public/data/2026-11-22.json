@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "date": "2026-11-22",
+  "games": [
+    {
+      "away": "DET",
+      "home": "ATL",
+      "tipOff": "2026-11-22T20:30:00Z"
+    },
+    {
+      "away": "OKC",
+      "home": "MIA",
+      "tipOff": "2026-11-22T23:00:00Z"
+    },
+    {
+      "away": "DAL",
+      "home": "UTA",
+      "tipOff": "2026-11-23T00:00:00Z"
+    },
+    {
+      "away": "DEN",
+      "home": "CHI",
+      "tipOff": "2026-11-23T00:00:00Z"
+    },
+    {
+      "away": "ORL",
+      "home": "WAS",
+      "tipOff": "2026-11-23T00:00:00Z"
+    },
+    {
+      "away": "IND",
+      "home": "NYK",
+      "tipOff": "2026-11-23T01:00:00Z"
+    },
+    {
+      "away": "BOS",
+      "home": "GSW",
+      "tipOff": "2026-11-23T01:30:00Z"
+    }
+  ]
+}
