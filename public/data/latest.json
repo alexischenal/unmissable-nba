@@ -3,6 +3,12 @@
   "date": "2026-11-22",
   "games": [
     {
+      "away": "DAL",
+      "home": "UTA",
+      "tipOff": "2026-11-23T00:00:00Z",
+      "note": 64
+    },
+    {
       "away": "DET",
       "home": "ATL",
       "tipOff": "2026-11-22T20:30:00Z",
@@ -22,11 +28,6 @@
       "home": "WAS",
       "tipOff": "2026-11-23T00:00:00Z",
       "note": 1
-    },
-    {
-      "away": "DAL",
-      "home": "UTA",
-      "tipOff": "2026-11-23T00:00:00Z"
     },
     {
       "away": "DEN",
