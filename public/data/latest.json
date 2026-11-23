@@ -11,7 +11,11 @@
     {
       "away": "OKC",
       "home": "MIA",
-      "tipOff": "2026-11-22T23:00:00Z"
+      "tipOff": "2026-11-22T23:00:00Z",
+      "note": 27,
+      "why": {
+        "huge": 1
+      }
     },
     {
       "away": "DAL",
