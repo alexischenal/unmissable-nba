@@ -3,15 +3,16 @@
   "date": "2026-11-23",
   "games": [
     {
+      "away": "MEM",
+      "home": "CHA",
+      "tipOff": "2026-11-24T00:00:00Z",
+      "note": 58
+    },
+    {
       "away": "POR",
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "MEM",
-      "home": "CHA",
-      "tipOff": "2026-11-24T00:00:00Z"
     },
     {
       "away": "BKN",
