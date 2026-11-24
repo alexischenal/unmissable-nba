@@ -24,6 +24,12 @@
       "note": 58
     },
     {
+      "away": "CLE",
+      "home": "CHI",
+      "tipOff": "2026-11-24T01:00:00Z",
+      "note": 57
+    },
+    {
       "away": "BKN",
       "home": "MIN",
       "tipOff": "2026-11-24T00:30:00Z",
@@ -37,11 +43,6 @@
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "CLE",
-      "home": "CHI",
-      "tipOff": "2026-11-24T01:00:00Z"
     },
     {
       "away": "PHX",
