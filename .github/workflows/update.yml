@@ -112,7 +112,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
     steps:
       # The branch tip, so the data just committed by "update" is included.
       - uses: actions/checkout@v5
@@ -134,5 +134,16 @@ jobs:
         with:
           path: dist
 
+      # GitHub sometimes fails to find the artifact it was just given ("Fetching artifact metadata
+      # failed"). The next runs have no new data, so they wouldn't deploy: the site would stay one
+      # update behind until the next game. Try again once, a minute later.
       - id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
