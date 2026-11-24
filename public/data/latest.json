@@ -48,6 +48,12 @@
       "note": 57
     },
     {
+      "away": "UTA",
+      "home": "LAL",
+      "tipOff": "2026-11-24T03:00:00Z",
+      "note": 55
+    },
+    {
       "away": "BKN",
       "home": "MIN",
       "tipOff": "2026-11-24T00:30:00Z",
@@ -61,11 +67,6 @@
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "UTA",
-      "home": "LAL",
-      "tipOff": "2026-11-24T03:00:00Z"
     }
   ]
 }
