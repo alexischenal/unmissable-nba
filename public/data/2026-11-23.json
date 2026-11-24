@@ -3,6 +3,12 @@
   "date": "2026-11-23",
   "games": [
     {
+      "away": "OKC",
+      "home": "IND",
+      "tipOff": "2026-11-24T00:30:00Z",
+      "note": 71
+    },
+    {
       "away": "MEM",
       "home": "CHA",
       "tipOff": "2026-11-24T00:00:00Z",
@@ -22,11 +28,6 @@
     {
       "away": "MIL",
       "home": "TOR",
-      "tipOff": "2026-11-24T00:30:00Z"
-    },
-    {
-      "away": "OKC",
-      "home": "IND",
       "tipOff": "2026-11-24T00:30:00Z"
     },
     {
