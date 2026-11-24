@@ -3,6 +3,12 @@
   "date": "2026-11-23",
   "games": [
     {
+      "away": "PHX",
+      "home": "NOP",
+      "tipOff": "2026-11-24T01:00:00Z",
+      "note": 75
+    },
+    {
       "away": "MIL",
       "home": "TOR",
       "tipOff": "2026-11-24T00:30:00Z",
@@ -43,11 +49,6 @@
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "PHX",
-      "home": "NOP",
-      "tipOff": "2026-11-24T01:00:00Z"
     },
     {
       "away": "LAC",
