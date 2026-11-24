@@ -24,6 +24,12 @@
       "note": 71
     },
     {
+      "away": "SAS",
+      "home": "SAC",
+      "tipOff": "2026-11-24T03:00:00Z",
+      "note": 62
+    },
+    {
       "away": "LAC",
       "home": "HOU",
       "tipOff": "2026-11-24T01:30:00Z",
@@ -55,11 +61,6 @@
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "SAS",
-      "home": "SAC",
-      "tipOff": "2026-11-24T03:00:00Z"
     },
     {
       "away": "UTA",
