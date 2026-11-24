@@ -15,15 +15,19 @@
       "note": 58
     },
     {
+      "away": "BKN",
+      "home": "MIN",
+      "tipOff": "2026-11-24T00:30:00Z",
+      "note": 17,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "POR",
       "home": "PHI",
       "tipOff": "2026-11-24T00:00:00Z",
       "note": 14
-    },
-    {
-      "away": "BKN",
-      "home": "MIN",
-      "tipOff": "2026-11-24T00:30:00Z"
     },
     {
       "away": "MIL",
