@@ -3,15 +3,19 @@
   "date": "2026-11-24",
   "games": [
     {
+      "away": "BOS",
+      "home": "WAS",
+      "tipOff": "2026-11-25T01:00:00Z",
+      "note": 65,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "DET",
       "home": "ORL",
       "tipOff": "2026-11-25T00:00:00Z",
       "note": 5
-    },
-    {
-      "away": "BOS",
-      "home": "WAS",
-      "tipOff": "2026-11-25T01:00:00Z"
     },
     {
       "away": "DAL",
