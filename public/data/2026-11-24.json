@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "date": "2026-11-24",
+  "games": [
+    {
+      "away": "DET",
+      "home": "ORL",
+      "tipOff": "2026-11-25T00:00:00Z"
+    },
+    {
+      "away": "BOS",
+      "home": "WAS",
+      "tipOff": "2026-11-25T01:00:00Z"
+    },
+    {
+      "away": "DAL",
+      "home": "DEN",
+      "tipOff": "2026-11-25T03:00:00Z"
+    }
+  ]
+}

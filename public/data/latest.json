@@ -1,72 +1,21 @@
 {
   "version": 2,
-  "date": "2026-11-23",
+  "date": "2026-11-24",
   "games": [
     {
-      "away": "PHX",
-      "home": "NOP",
-      "tipOff": "2026-11-24T01:00:00Z",
-      "note": 75
+      "away": "DET",
+      "home": "ORL",
+      "tipOff": "2026-11-25T00:00:00Z"
     },
     {
-      "away": "MIL",
-      "home": "TOR",
-      "tipOff": "2026-11-24T00:30:00Z",
-      "note": 74,
-      "why": {
-        "big": 1
-      }
+      "away": "BOS",
+      "home": "WAS",
+      "tipOff": "2026-11-25T01:00:00Z"
     },
     {
-      "away": "OKC",
-      "home": "IND",
-      "tipOff": "2026-11-24T00:30:00Z",
-      "note": 71
-    },
-    {
-      "away": "SAS",
-      "home": "SAC",
-      "tipOff": "2026-11-24T03:00:00Z",
-      "note": 62
-    },
-    {
-      "away": "LAC",
-      "home": "HOU",
-      "tipOff": "2026-11-24T01:30:00Z",
-      "note": 59
-    },
-    {
-      "away": "MEM",
-      "home": "CHA",
-      "tipOff": "2026-11-24T00:00:00Z",
-      "note": 58
-    },
-    {
-      "away": "CLE",
-      "home": "CHI",
-      "tipOff": "2026-11-24T01:00:00Z",
-      "note": 57
-    },
-    {
-      "away": "UTA",
-      "home": "LAL",
-      "tipOff": "2026-11-24T03:00:00Z",
-      "note": 55
-    },
-    {
-      "away": "BKN",
-      "home": "MIN",
-      "tipOff": "2026-11-24T00:30:00Z",
-      "note": 17,
-      "why": {
-        "huge": 1
-      }
-    },
-    {
-      "away": "POR",
-      "home": "PHI",
-      "tipOff": "2026-11-24T00:00:00Z",
-      "note": 14
+      "away": "DAL",
+      "home": "DEN",
+      "tipOff": "2026-11-25T03:00:00Z"
     }
   ]
 }
