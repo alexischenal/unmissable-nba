@@ -12,15 +12,16 @@
       }
     },
     {
+      "away": "DAL",
+      "home": "DEN",
+      "tipOff": "2026-11-25T03:00:00Z",
+      "note": 55
+    },
+    {
       "away": "DET",
       "home": "ORL",
       "tipOff": "2026-11-25T00:00:00Z",
       "note": 5
-    },
-    {
-      "away": "DAL",
-      "home": "DEN",
-      "tipOff": "2026-11-25T03:00:00Z"
     }
   ]
 }
