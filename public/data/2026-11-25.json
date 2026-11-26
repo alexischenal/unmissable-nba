@@ -3,6 +3,15 @@
   "date": "2026-11-25",
   "games": [
     {
+      "away": "MIN",
+      "home": "OKC",
+      "tipOff": "2026-11-26T00:30:00Z",
+      "note": 80,
+      "why": {
+        "huge": 1
+      }
+    },
+    {
       "away": "CHI",
       "home": "CHA",
       "tipOff": "2026-11-26T00:00:00Z",
@@ -22,11 +31,6 @@
       "why": {
         "big": 2
       }
-    },
-    {
-      "away": "MIN",
-      "home": "OKC",
-      "tipOff": "2026-11-26T00:30:00Z"
     },
     {
       "away": "BKN",
