@@ -122,7 +122,6 @@ export function App() {
       <main className="page">
         <header className="header">
           <div className="header__title">
-            <Menu items={menuItems} />
             <div className="header__names">
               <Brand className="header__brand">
                 <a className="header__home" href={HOME_URL}>Unmissable</a>
@@ -136,8 +135,11 @@ export function App() {
               </p>
             </div>
           </div>
-          {/* The concept in a few lines, on the right: only where the ratings are (not on the next night) */}
-          {PAGE === 'home' && <Help />}
+          {/* On the right, side by side: the concept in a few lines (only where the ratings are), then the menu */}
+          <div className="header__actions">
+            {PAGE === 'home' && <Help />}
+            <Menu items={menuItems} />
+          </div>
         </header>
 
         {PAGE === 'about' && <About />}
