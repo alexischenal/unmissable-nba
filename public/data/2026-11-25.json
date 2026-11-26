@@ -24,6 +24,12 @@
       "note": 59
     },
     {
+      "away": "PHX",
+      "home": "HOU",
+      "tipOff": "2026-11-26T01:30:00Z",
+      "note": 58
+    },
+    {
       "away": "BKN",
       "home": "MIL",
       "tipOff": "2026-11-26T01:00:00Z",
@@ -43,11 +49,6 @@
       "home": "MEM",
       "tipOff": "2026-11-26T01:00:00Z",
       "note": 1
-    },
-    {
-      "away": "PHX",
-      "home": "HOU",
-      "tipOff": "2026-11-26T01:30:00Z"
     },
     {
       "away": "SAC",
