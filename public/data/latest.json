@@ -3,6 +3,16 @@
   "date": "2026-11-25",
   "games": [
     {
+      "away": "SAS",
+      "home": "POR",
+      "tipOff": "2026-11-26T03:00:00Z",
+      "note": 91,
+      "why": {
+        "huge": 1,
+        "big": 1
+      }
+    },
+    {
       "away": "MIN",
       "home": "OKC",
       "tipOff": "2026-11-26T00:30:00Z",
@@ -58,11 +68,6 @@
       "home": "MEM",
       "tipOff": "2026-11-26T01:00:00Z",
       "note": 1
-    },
-    {
-      "away": "SAS",
-      "home": "POR",
-      "tipOff": "2026-11-26T03:00:00Z"
     }
   ]
 }
