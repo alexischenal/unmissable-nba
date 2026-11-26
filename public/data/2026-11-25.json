@@ -3,6 +3,12 @@
   "date": "2026-11-25",
   "games": [
     {
+      "away": "CHI",
+      "home": "CHA",
+      "tipOff": "2026-11-26T00:00:00Z",
+      "note": 73
+    },
+    {
       "away": "MIA",
       "home": "PHI",
       "tipOff": "2026-11-25T22:00:00Z",
@@ -10,11 +16,6 @@
       "why": {
         "big": 2
       }
-    },
-    {
-      "away": "CHI",
-      "home": "CHA",
-      "tipOff": "2026-11-26T00:00:00Z"
     },
     {
       "away": "CLE",
