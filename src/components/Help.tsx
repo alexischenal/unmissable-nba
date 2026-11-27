@@ -9,7 +9,8 @@ import { ABOUT_URL } from '../lib/night.ts';
 
 const CAN_HOVER = window.matchMedia?.('(hover: hover)').matches ?? false;
 
-export function Help() {
+// link: the "How it works" link at the bottom (not on that page itself)
+export function Help({ link = true }: { link?: boolean }) {
   const [open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -97,7 +98,7 @@ export function Help() {
           </span>{' '}
           means somebody cooked.
         </p>
-        <a className="header__help-link" href={ABOUT_URL}>How it works</a>
+        {link && <a className="header__help-link" href={ABOUT_URL}>How it works</a>}
       </div>
     </div>
   );
