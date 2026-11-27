@@ -135,9 +135,9 @@ export function App() {
               </p>
             </div>
           </div>
-          {/* On the right, side by side: the concept in a few lines (only where the ratings are), then the menu */}
+          {/* On the right, side by side: the concept in a few lines (every page), then the menu */}
           <div className="header__actions">
-            {PAGE === 'home' && <Help />}
+            <Help link={PAGE !== 'about'} />
             <Menu items={menuItems} />
           </div>
         </header>
