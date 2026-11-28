@@ -3,6 +3,12 @@
   "date": "2026-11-27",
   "games": [
     {
+      "away": "ATL",
+      "home": "BOS",
+      "tipOff": "2026-11-28T01:00:00Z",
+      "note": 74
+    },
+    {
       "away": "MIA",
       "home": "NYK",
       "tipOff": "2026-11-28T00:00:00Z",
@@ -28,11 +34,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "ATL",
-      "home": "BOS",
-      "tipOff": "2026-11-28T01:00:00Z"
     },
     {
       "away": "MEM",
