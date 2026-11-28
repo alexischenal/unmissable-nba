@@ -18,6 +18,12 @@
       "note": 74
     },
     {
+      "away": "DEN",
+      "home": "UTA",
+      "tipOff": "2026-11-28T02:30:00Z",
+      "note": 72
+    },
+    {
       "away": "MIA",
       "home": "NYK",
       "tipOff": "2026-11-28T00:00:00Z",
@@ -49,11 +55,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "DEN",
-      "home": "UTA",
-      "tipOff": "2026-11-28T02:30:00Z"
     },
     {
       "away": "GSW",
