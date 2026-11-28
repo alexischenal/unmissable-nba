@@ -9,18 +9,20 @@
       "note": 66
     },
     {
-      "away": "BKN",
-      "home": "TOR",
-      "tipOff": "2026-11-28T00:30:00Z"
-    },
-    {
       "away": "MIL",
       "home": "DET",
-      "tipOff": "2026-11-28T00:30:00Z"
+      "tipOff": "2026-11-28T00:30:00Z",
+      "note": 13
     },
     {
       "away": "PHI",
       "home": "IND",
+      "tipOff": "2026-11-28T00:30:00Z",
+      "note": 0
+    },
+    {
+      "away": "BKN",
+      "home": "TOR",
       "tipOff": "2026-11-28T00:30:00Z"
     },
     {
