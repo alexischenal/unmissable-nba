@@ -24,6 +24,12 @@
       "note": 72
     },
     {
+      "away": "NOP",
+      "home": "LAC",
+      "tipOff": "2026-11-28T02:30:00Z",
+      "note": 67
+    },
+    {
       "away": "MIA",
       "home": "NYK",
       "tipOff": "2026-11-28T00:00:00Z",
@@ -64,11 +70,6 @@
     {
       "away": "LAL",
       "home": "SAS",
-      "tipOff": "2026-11-28T02:30:00Z"
-    },
-    {
-      "away": "NOP",
-      "home": "LAC",
       "tipOff": "2026-11-28T02:30:00Z"
     }
   ]
