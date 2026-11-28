@@ -3,6 +3,15 @@
   "date": "2026-11-27",
   "games": [
     {
+      "away": "DAL",
+      "home": "PHX",
+      "tipOff": "2026-11-28T02:00:00Z",
+      "note": 80,
+      "why": {
+        "big": 1
+      }
+    },
+    {
       "away": "ATL",
       "home": "BOS",
       "tipOff": "2026-11-28T01:00:00Z",
@@ -40,11 +49,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "DAL",
-      "home": "PHX",
-      "tipOff": "2026-11-28T02:00:00Z"
     },
     {
       "away": "DEN",
