@@ -18,6 +18,12 @@
       "note": 74
     },
     {
+      "away": "LAL",
+      "home": "SAS",
+      "tipOff": "2026-11-28T02:30:00Z",
+      "note": 73
+    },
+    {
       "away": "DEN",
       "home": "UTA",
       "tipOff": "2026-11-28T02:30:00Z",
@@ -67,11 +73,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "LAL",
-      "home": "SAS",
-      "tipOff": "2026-11-28T02:30:00Z"
     }
   ]
 }
