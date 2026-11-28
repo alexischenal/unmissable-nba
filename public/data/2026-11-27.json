@@ -42,6 +42,12 @@
       "note": 57
     },
     {
+      "away": "GSW",
+      "home": "POR",
+      "tipOff": "2026-11-28T02:30:00Z",
+      "note": 51
+    },
+    {
       "away": "MIL",
       "home": "DET",
       "tipOff": "2026-11-28T00:30:00Z",
@@ -61,11 +67,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "GSW",
-      "home": "POR",
-      "tipOff": "2026-11-28T02:30:00Z"
     },
     {
       "away": "LAL",
