@@ -15,6 +15,12 @@
       "note": 66
     },
     {
+      "away": "MEM",
+      "home": "MIN",
+      "tipOff": "2026-11-28T01:30:00Z",
+      "note": 57
+    },
+    {
       "away": "MIL",
       "home": "DET",
       "tipOff": "2026-11-28T00:30:00Z",
@@ -34,11 +40,6 @@
       "home": "IND",
       "tipOff": "2026-11-28T00:30:00Z",
       "note": 0
-    },
-    {
-      "away": "MEM",
-      "home": "MIN",
-      "tipOff": "2026-11-28T01:30:00Z"
     },
     {
       "away": "DAL",
